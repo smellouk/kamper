@@ -1,19 +1,29 @@
-private object Versions {
+object Versions {
     const val kotlin = "1.6.10"
     const val coroutines = "1.6.0"
+
     const val androidx_app_compat = "1.3.1"
     const val androidx_annotations = "1.3.0"
     const val androidx_lifecycle = "2.3.1"
     const val androidx_material = "1.4.0"
     const val androidx_constraintlayout = "2.1.1"
     const val androidx_core_ktx = "1.6.0"
+
     const val mockk = "1.12.0"
+    const val detekt = "1.18.1"
 }
 
 object Libs {
     object Plugins {
         const val kotlin =
             "org.jetbrains.kotlin:kotlin-gradle-plugin:${Versions.kotlin}"
+
+        object Detekt {
+            const val id =
+                "io.gitlab.arturbosch.detekt"
+            const val formatting =
+                "io.gitlab.arturbosch.detekt:detekt-formatting:${Versions.detekt}"
+        }
     }
 
     object Kmm {

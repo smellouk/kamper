@@ -1,4 +1,9 @@
+import io.gitlab.arturbosch.detekt.Detekt
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
+plugins {
+    id(Libs.Plugins.Detekt.id) version Versions.detekt
+}
 
 buildscript {
     repositories {
@@ -20,5 +25,29 @@ allprojects {
 
     tasks.withType<KotlinCompile> {
         kotlinOptions.jvmTarget = Config.jvmTarget
+    }
+}
+
+tasks.named<Detekt>("detekt") {
+    description = "Runs a custom detekt build on all project modules"
+    setSource(files("$projectDir"))
+    config.setFrom(files("$rootDir/quality/code/detekt.yml"))
+    reports {
+        html {
+            enabled = true
+            destination = file("build/reports/detekt.html")
+        }
+    }
+    include("**/*.kt")
+    exclude("**/*.kts")
+    exclude("**/resources/")
+    exclude("**/build/")
+    exclude("**/buildSrc/")
+    exclude("**/console/")
+    exclude("**/android/")
+    exclude("**/samples/")
+
+    dependencies {
+        detektPlugins(Libs.Plugins.Detekt.formatting)
     }
 }
