@@ -6,10 +6,13 @@ import android.util.Log
 import com.smellouk.kamper.Kamper
 import com.smellouk.kamper.api.DEFAULT
 import com.smellouk.kamper.api.Logger
+import com.smellouk.kamper.cpu.CpuConfig
 import com.smellouk.kamper.cpu.CpuInfo
 import com.smellouk.kamper.cpu.CpuModule
 import com.smellouk.kamper.fps.FpsInfo
 import com.smellouk.kamper.fps.FpsModule
+import com.smellouk.kamper.memory.MemoryInfo
+import com.smellouk.kamper.memory.MemoryModule
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,6 +43,14 @@ class MainActivity : AppCompatActivity() {
             // Quick start default(isEnabled=true, logger=Logger.EMPTY)
             // install(FpsModule)
 
+            install(
+                MemoryModule(applicationContext) {
+                    isEnabled = true
+                    intervalInMs = 1000
+                    logger = Logger.DEFAULT
+                }
+            )
+
             addInfoListener<CpuInfo> { cpuInfo ->
                 if (cpuInfo != CpuInfo.INVALID) {
                     Log.i("Samples", cpuInfo.toString())
@@ -51,6 +62,14 @@ class MainActivity : AppCompatActivity() {
             addInfoListener<FpsInfo> { fpsInfo ->
                 if (fpsInfo != FpsInfo.INVALID) {
                     Log.i("Samples", fpsInfo.toString())
+                } else {
+                    Log.i("Samples", "FPS info is invalid")
+                }
+            }
+
+            addInfoListener<MemoryInfo> { memoryInfo ->
+                if (memoryInfo != MemoryInfo.INVALID) {
+                    Log.i("Samples", memoryInfo.toString())
                 } else {
                     Log.i("Samples", "FPS info is invalid")
                 }
