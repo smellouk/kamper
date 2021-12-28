@@ -14,11 +14,11 @@
 
 ## ✅ Checklist
 <!--- Just put an `x` in all the boxes that apply. -->
-- [ ] My code follows our [contribution guide](../CONTRIBUTING.md).
+- [ ] My code follows our [contribution guide](https://github.com/smellouk/kamper/blob/develop/CONTRIBUTING.md).
 - [ ] I have added unit tests to cover the changes.
 - [ ] I have used and tested this on my device(s).
 - [ ] I have cleaned commit history.
-- [ ] I have updated [README.md](../README.md) (if applicable)
+- [ ] I have updated [README.md](https://github.com/smellouk/kamper/blob/develop/README.md) (if applicable)
 
 ## 📷 Screenshots (if applicable)
 <!-- Please provide a screenshot of your change -->
