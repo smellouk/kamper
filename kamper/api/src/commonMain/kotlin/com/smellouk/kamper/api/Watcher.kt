@@ -12,6 +12,7 @@ open class Watcher<I : Info>(
     private val defaultDispatcher: CoroutineDispatcher,
     private val mainDispatcher: CoroutineDispatcher,
     private val infoRepository: InfoRepository<I>,
+    private val logger: Logger
 ) {
     private var job: Job? = null
 
@@ -24,11 +25,11 @@ open class Watcher<I : Info>(
                 val info = try {
                     infoRepository.getInfo()
                 } catch (e: Exception) {
-                    e.printStackTrace()
+                    logger.log(e.stackTraceToString())
                     null
                 }
                 if (info != null) {
-                    println(info)
+                    logger.log(info.toString())
                     withContext(mainDispatcher) {
                         listeners.forEach { listener ->
                             listener.invoke(info)

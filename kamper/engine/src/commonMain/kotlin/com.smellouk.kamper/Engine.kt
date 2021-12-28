@@ -45,7 +45,7 @@ open class Engine {
     }
 
     inline fun <reified I : Info> addInfoListener(noinline listener: InfoListener<I>): Engine {
-        println(mapListeners)
+        logger.log(mapListeners.toString())
         mapListeners[I::class]?.add(listener)
         return this
     }
