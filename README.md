@@ -1,5 +1,7 @@
 # 🎯 Kamper
-Kamper is a KMP/KMM library that implements a unified way to track application performances. Solution is based on plugin design pattern.
+
+Kamper is a KMP/KMM library that implements a unified way to track application performances.
+Solution is based on plugin design pattern.
 
 ## 💻 Install
 
@@ -10,14 +12,17 @@ Kamper is a KMP/KMM library that implements a unified way to track application p
 ## 🤔 How-tos
 
 ## 🤝 Contribution
-We're looking for contributors, help us to improve Kamper. 
 
-Please check our [contribution guide](CONTRIBUTING.md). 
+We're looking for contributors, help us to improve Kamper.
+
+Please check our [contribution guide](CONTRIBUTING.md).
 
 ## 🙏 Acknowledgments
-Big thanks to [Kyson/AndroidGodEye](https://github.com/Kyson/AndroidGodEye) for inspiration. 
+
+Big thanks to [Kyson/AndroidGodEye](https://github.com/Kyson/AndroidGodEye) for inspiration.
 
 ## ⚖ License
+
     Copyright 2021 S. Mellouk
 
     Licensed under the Apache License, Version 2.0 (the "License");

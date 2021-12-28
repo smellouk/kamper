@@ -620,8 +620,6 @@ style:
     active: false
   NestedClassesVisibility:
     active: true
-  NewLineAtEndOfFile:
-    active: true
   NoTabs:
     active: false
   OptionalAbstractKeyword:
