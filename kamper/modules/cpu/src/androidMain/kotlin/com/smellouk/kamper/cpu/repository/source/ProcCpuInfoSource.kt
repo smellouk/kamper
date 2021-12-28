@@ -49,7 +49,7 @@ internal class ProcCpuInfoSource : CpuInfoSource {
         val idle = cpuInfoList[5].toFloat()
         val ioWait = cpuInfoList[6].toFloat()
         val total = user + nice + system + idle + ioWait
-                + cpuInfoList[7].toFloat() + cpuInfoList[8].toFloat()
+        +cpuInfoList[7].toFloat() + cpuInfoList[8].toFloat()
         val pidCpuInfoList = pidCpuRate.split(" ")
         check(pidCpuInfoList.size >= 17) { "Pid cpu info list size must be >= 17" }
 

@@ -16,12 +16,13 @@ import kotlinx.coroutines.Dispatchers
 fun MemoryModule(
     context: Context,
     builder: MemoryConfig.Builder.() -> Unit = MemoryConfig.Builder.DEFAULT_ACTION
-): PerformanceModule<MemoryConfig, MemoryInfo> = with(MemoryConfig.Builder.DEFAULT.apply(builder).build()) {
-    PerformanceModule(
-        config = this,
-        performance = createPerformance(context, logger)
-    )
-}
+): PerformanceModule<MemoryConfig, MemoryInfo> =
+    with(MemoryConfig.Builder.DEFAULT.apply(builder).build()) {
+        PerformanceModule(
+            config = this,
+            performance = createPerformance(context, logger)
+        )
+    }
 
 private fun createPerformance(
     context: Context,

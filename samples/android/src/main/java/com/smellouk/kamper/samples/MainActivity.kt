@@ -1,18 +1,19 @@
 package com.smellouk.kamper.samples
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import androidx.appcompat.app.AppCompatActivity
 import com.smellouk.kamper.Kamper
 import com.smellouk.kamper.api.DEFAULT
 import com.smellouk.kamper.api.Logger
-import com.smellouk.kamper.cpu.CpuConfig
 import com.smellouk.kamper.cpu.CpuInfo
 import com.smellouk.kamper.cpu.CpuModule
 import com.smellouk.kamper.fps.FpsInfo
 import com.smellouk.kamper.fps.FpsModule
 import com.smellouk.kamper.memory.MemoryInfo
 import com.smellouk.kamper.memory.MemoryModule
+import com.smellouk.kamper.network.NetworkInfo
+import com.smellouk.kamper.network.NetworkModule
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -51,6 +52,14 @@ class MainActivity : AppCompatActivity() {
                 }
             )
 
+            install(
+                NetworkModule {
+                    isEnabled = true
+                    intervalInMs = 1000
+                    logger = Logger.DEFAULT
+                }
+            )
+
             addInfoListener<CpuInfo> { cpuInfo ->
                 if (cpuInfo != CpuInfo.INVALID) {
                     Log.i("Samples", cpuInfo.toString())
@@ -71,7 +80,15 @@ class MainActivity : AppCompatActivity() {
                 if (memoryInfo != MemoryInfo.INVALID) {
                     Log.i("Samples", memoryInfo.toString())
                 } else {
-                    Log.i("Samples", "FPS info is invalid")
+                    Log.i("Samples", "Memory info is invalid")
+                }
+            }
+
+            addInfoListener<NetworkInfo> { memoryInfo ->
+                if (memoryInfo != NetworkInfo.INVALID) {
+                    Log.i("Samples", memoryInfo.toString())
+                } else {
+                    Log.i("Samples", "Network info is invalid")
                 }
             }
         }

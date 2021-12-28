@@ -29,6 +29,7 @@ object Libs {
     object Kmm {
         val stdlib =
             "org.jetbrains.kotlin:kotlin-stdlib-common:${Versions.kotlin}"
+
         object Coroutines {
             const val core =
                 "org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.coroutines}"

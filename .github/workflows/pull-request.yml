@@ -37,7 +37,7 @@ jobs:
 
       - name: Gradle linting
         run: ./gradlew lint
-        
+
       - name: Gradle Testing
         run: ./gradlew test
 
