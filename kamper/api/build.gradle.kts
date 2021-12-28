@@ -3,35 +3,16 @@ plugins {
     id("com.android.library")
 }
 
-android {
-    compileSdk = Config.compileSdk
-    sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
-    defaultConfig {
-        minSdk = Config.minSdk
-        targetSdk = Config.targetSdk
-    }
-    compileOptions {
-        sourceCompatibility = Config.sourceCompatibility
-        targetCompatibility = Config.targetCompatibility
-    }
-}
-
 kotlin {
-    android()
-
     sourceSets {
+        android()
+
         val commonMain by getting {
             dependencies {
                 implementation(Libs.Kmm.Coroutines.core)
             }
         }
-        val commonTest by getting {
-            dependencies {
-                implementation(Libs.Kmm.Tests.mockk)
-                implementation(kotlin(Libs.Kmm.Tests.kcommon))
-                implementation(kotlin(Libs.Kmm.Tests.kannotationscommon))
-            }
-        }
+
         val androidMain by getting {
             dependencies {
                 implementation(Libs.Android.Coroutines.android)

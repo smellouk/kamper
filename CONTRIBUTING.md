@@ -39,6 +39,7 @@ Emojis:
 - 🐛: Bug
 - ⬆️: Version bump
 - 🌟: Feature
+- 🧪: Tests
 
 Please group your commits by context, you can use `git --amend` to amend new commit with previous
 commit or interactive rebase `git rebase -t` to squash same commits or for removing and editing.
