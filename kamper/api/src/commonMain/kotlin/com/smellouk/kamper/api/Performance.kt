@@ -1,15 +1,15 @@
 package com.smellouk.kamper.api
 
 open class Performance<C : Config, W : Watcher<I>, I : Info>(
-    private val watcher: W
+    private val watcher: W,
+    private val logger: Logger
 ) {
-    var config: C? = null
-        private set
+    private lateinit var config: C
 
     private var listeners: List<InfoListener<I>> = emptyList()
 
     fun initialize(config: C, listeners: List<InfoListener<I>>): Boolean {
-        if (config.intervalInMs < 0) {
+        if (config.intervalInMs <= 0) {
             return false
         }
         if (isInitialized()) {
@@ -21,8 +21,10 @@ open class Performance<C : Config, W : Watcher<I>, I : Info>(
     }
 
     open fun start() {
-        config?.intervalInMs?.let { intervalInMs ->
-            watcher.startWatching(intervalInMs, listeners)
+        if (isInitialized()) {
+            watcher.startWatching(config.intervalInMs, listeners)
+        } else {
+            logger.log("Performance[${this::class.simpleName}] is not initialized yet!")
         }
     }
 
@@ -30,7 +32,7 @@ open class Performance<C : Config, W : Watcher<I>, I : Info>(
         watcher.stopWatching()
     }
 
-    private fun isInitialized(): Boolean = config != null
+    private fun isInitialized(): Boolean = this::config.isInitialized
 }
 
 class PerformanceModule<C : Config, I : Info>(

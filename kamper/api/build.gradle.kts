@@ -13,6 +13,12 @@ kotlin {
             }
         }
 
+        val commonTest by getting {
+            dependencies {
+                implementation(Libs.Kmm.Tests.coroutines)
+            }
+        }
+
         val androidMain by getting {
             dependencies {
                 implementation(Libs.Android.Coroutines.android)

@@ -14,13 +14,15 @@ open class Watcher<I : Info>(
     private val infoRepository: InfoRepository<I>,
     private val logger: Logger
 ) {
-    private var job: Job? = null
+    // Visible only for testing
+    internal var job: Job? = null
 
     fun startWatching(intervalInMs: Long, listeners: List<InfoListener<I>>) {
         if (job?.isActive == true) {
             return
         }
         job = CoroutineScope(defaultDispatcher).launch {
+            delay(intervalInMs)
             while (isActive) {
                 val info = try {
                     infoRepository.getInfo()
