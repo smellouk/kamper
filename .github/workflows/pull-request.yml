@@ -1,0 +1,45 @@
+# Pipeline to run checks on on a created Pull Request
+name: Pull request checker
+
+on:
+  pull_request:
+    branches:
+      - develop
+
+concurrency:
+  group: ${{ github.head_ref }}
+  cancel-in-progress: true
+
+jobs:
+  gradle:
+    name: Pull request checker
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Cache Gradle Files
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.gradle/caches/
+            ~/.gradle/wrapper/
+          key: cache-gradle
+
+      - name: Configure JDK
+        uses: actions/setup-java@v1
+        with:
+          distribution: 'adopt'
+          java-version: 11
+
+      - name: Gradle detekting
+        run: ./gradlew detekt
+
+      - name: Gradle linting
+        run: ./gradlew lint
+        
+      - name: Gradle Testing
+        run: ./gradlew test
+
+      - name: Gradle Assembling
+        run: ./gradlew assemble
