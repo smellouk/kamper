@@ -11,6 +11,8 @@ object Versions {
 
     const val mockk = "1.12.0"
     const val detekt = "1.18.1"
+
+    const val gradle_test_logger = "3.1.0"
 }
 
 object Libs {
@@ -24,6 +26,9 @@ object Libs {
             const val formatting =
                 "io.gitlab.arturbosch.detekt:detekt-formatting:${Versions.detekt}"
         }
+
+        const val test_logger =
+            "com.adarshr:gradle-test-logger-plugin:${Versions.gradle_test_logger}"
     }
 
     object Kmm {
@@ -64,6 +69,13 @@ object Libs {
         object Coroutines {
             const val android =
                 "org.jetbrains.kotlinx:kotlinx-coroutines-android:${Versions.coroutines}"
+        }
+
+        object Test {
+            const val kotlin_junit =
+                "test-junit"
+            const val mockk =
+                "io.mockk:mockk:${Versions.mockk}"
         }
     }
 }
