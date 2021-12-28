@@ -28,7 +28,7 @@ private fun createPerformance(
     context: Context,
     logger: Logger
 ): Performance<MemoryConfig, Watcher<MemoryInfo>, MemoryInfo> = MemoryPerformance(
-    MemoryWatcher(
+    watcher = MemoryWatcher(
         defaultDispatcher = Dispatchers.Default,
         mainDispatcher = Dispatchers.Main,
         repository = MemoryInfoRepositoryImpl(
@@ -36,5 +36,6 @@ private fun createPerformance(
             memoryInfoMapper = MemoryInfoMapper(),
         ),
         logger = logger
-    )
+    ),
+    logger = logger
 )

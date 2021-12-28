@@ -1,6 +1,6 @@
 package com.smellouk.kamper.fps.repository.source
 
-import com.smellouk.kamper.api.millisToSeconds
+import com.smellouk.kamper.api.nanosToSeconds
 import com.smellouk.kamper.fps.repository.FpsInfoDto
 
 internal class FpsInfoSource(choreographer: FpsChoreographer) {
@@ -21,8 +21,8 @@ internal class FpsInfoSource(choreographer: FpsChoreographer) {
     fun getFpsInfoRaw(): FpsInfoDto {
         val fpsInfo = FpsInfoDto(
             currentFrameCount = currentFrameCount,
-            startFrameTimeInSeconds = startFrameTimeNanos.millisToSeconds(),
-            currentFrameTimeInSeconds = currentFrameTimeNanos.millisToSeconds()
+            startFrameTimeInSeconds = startFrameTimeNanos.nanosToSeconds(),
+            currentFrameTimeInSeconds = currentFrameTimeNanos.nanosToSeconds()
         )
         startFrameTimeNanos = 0
         currentFrameTimeNanos = 0

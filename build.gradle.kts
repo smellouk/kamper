@@ -43,21 +43,15 @@ subprojects {
     afterEvaluate {
         if (project.plugins.findPlugin("org.jetbrains.kotlin.multiplatform") === null) return@afterEvaluate
         kmmConfig {
-            sourceSets {
-                val commonTest by getting {
-                    dependencies {
-                        implementation(Libs.Kmm.Tests.mockk)
-                        implementation(kotlin(Libs.Kmm.Tests.kcommon))
-                        implementation(kotlin(Libs.Kmm.Tests.kannotationscommon))
-                    }
-                }
+            sourceSets["commonTest"].dependencies {
+                implementation(Libs.Kmm.Tests.mockk)
+                implementation(kotlin(Libs.Kmm.Tests.kcommon))
+                implementation(kotlin(Libs.Kmm.Tests.kannotationscommon))
+            }
 
-                val androidTest by getting {
-                    dependencies {
-                        implementation(Libs.Android.Test.mockk)
-                        implementation(kotlin(Libs.Android.Test.kotlin_junit))
-                    }
-                }
+            sourceSets["androidTest"].dependencies {
+                implementation(Libs.Android.Tests.mockk)
+                implementation(kotlin(Libs.Android.Tests.kotlin_junit))
             }
         }
 

@@ -1,6 +1,6 @@
 package com.smellouk.kamper.memory.repository
 
-import com.smellouk.kamper.api.toMb
+import com.smellouk.kamper.api.bytesToMb
 import com.smellouk.kamper.memory.MemoryInfo
 import com.smellouk.kamper.memory.MemoryInfo.AppMemoryInfo
 import com.smellouk.kamper.memory.MemoryInfo.PssInfo
@@ -13,20 +13,20 @@ class MemoryInfoMapper {
         with(dto) {
             MemoryInfo(
                 appMemoryInfo = AppMemoryInfo(
-                    freeMemoryInMb = freeMemoryInBytes.toMb(),
-                    maxMemoryInMb = maxMemoryInBytes.toMb(),
-                    allocatedInMb = allocatedInBytes.toMb(),
+                    freeMemoryInMb = freeMemoryInBytes.bytesToMb(),
+                    maxMemoryInMb = maxMemoryInBytes.bytesToMb(),
+                    allocatedInMb = allocatedInBytes.bytesToMb(),
                 ),
                 pssInfo = PssInfo(
-                    totalPssInMb = totalPssInBytes?.toMb() ?: -1F,
-                    dalvikPssInMb = dalvikPssInBytes?.toMb() ?: -1F,
-                    nativePssInMb = nativePssInBytes?.toMb() ?: -1F,
-                    otherPssInMb = otherPssInBytes?.toMb() ?: -1F
+                    totalPssInMb = totalPssInBytes?.bytesToMb() ?: -1F,
+                    dalvikPssInMb = dalvikPssInBytes?.bytesToMb() ?: -1F,
+                    nativePssInMb = nativePssInBytes?.bytesToMb() ?: -1F,
+                    otherPssInMb = otherPssInBytes?.bytesToMb() ?: -1F
                 ),
                 ramInfo = RamInfo(
-                    availableRamInMb = availableRamInBytes.toMb(),
-                    totalRamInMb = totalRamInBytes.toMb(),
-                    lowRamThresholdInMb = lowRamThresholdInBytes.toMb(),
+                    availableRamInMb = availableRamInBytes.bytesToMb(),
+                    totalRamInMb = totalRamInBytes.bytesToMb(),
+                    lowRamThresholdInMb = lowRamThresholdInBytes.bytesToMb(),
                     isLowMemory = isLowMemory
                 )
             )

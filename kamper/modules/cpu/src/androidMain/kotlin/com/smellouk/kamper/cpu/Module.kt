@@ -30,7 +30,7 @@ fun CpuModule(
 private fun createPerformance(
     logger: Logger
 ): Performance<CpuConfig, Watcher<CpuInfo>, CpuInfo> = CpuPerformance(
-    CpuWatcher(
+    watcher = CpuWatcher(
         defaultDispatcher = Dispatchers.Default,
         mainDispatcher = Dispatchers.Main,
         repository = CpuInfoRepositoryImpl(
@@ -38,6 +38,7 @@ private fun createPerformance(
             procCpuInfoRawSource = ProcCpuInfoSource(),
             shellCpuInfoRawSource = ShellCpuInfoSource(logger),
         ),
-        logger
-    )
+        logger = logger
+    ),
+    logger = logger
 )

@@ -30,7 +30,7 @@ fun FpsModule(
 private fun createPerformance(
     logger: Logger
 ): Performance<FpsConfig, Watcher<FpsInfo>, FpsInfo> = FpsPerformance(
-    FpsWatcher(
+    watcher = FpsWatcher(
         defaultDispatcher = Dispatchers.Default,
         mainDispatcher = Dispatchers.Main,
         repository = FpsInfoRepositoryImpl(
@@ -38,5 +38,6 @@ private fun createPerformance(
             fpsSource = FpsInfoSource(FpsChoreographer),
         ),
         logger = logger
-    )
+    ),
+    logger = logger
 )

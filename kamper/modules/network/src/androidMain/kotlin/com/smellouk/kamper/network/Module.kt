@@ -30,7 +30,7 @@ fun NetworkModule(
 private fun createPerformance(
     logger: Logger
 ): Performance<NetworkConfig, Watcher<NetworkInfo>, NetworkInfo> = NetworkPerformance(
-    NetworkWatcher(
+    watcher = NetworkWatcher(
         defaultDispatcher = Dispatchers.Default,
         mainDispatcher = Dispatchers.Main,
         repository = NetworkInfoRepositoryImpl(
@@ -38,5 +38,6 @@ private fun createPerformance(
             networkInfoMapper = NetworkInfoMapper()
         ),
         logger = logger
-    )
+    ),
+    logger = logger
 )

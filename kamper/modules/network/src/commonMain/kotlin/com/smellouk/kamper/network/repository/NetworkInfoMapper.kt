@@ -1,6 +1,6 @@
 package com.smellouk.kamper.network.repository
 
-import com.smellouk.kamper.api.toMb
+import com.smellouk.kamper.api.bytesToMb
 import com.smellouk.kamper.network.NetworkInfo
 
 class NetworkInfoMapper {
@@ -11,10 +11,10 @@ class NetworkInfoMapper {
     } else {
         with(dto) {
             NetworkInfo(
-                rxSystemTotalInMb = rxTotalInBytes.toMb(),
-                txSystemTotalInMb = txTotalInBytes.toMb(),
-                rxAppInMb = rxUidInBytes.toMb(),
-                txAppInMb = txUidInBytes.toMb()
+                rxSystemTotalInMb = rxTotalInBytes.bytesToMb(),
+                txSystemTotalInMb = txTotalInBytes.bytesToMb(),
+                rxAppInMb = rxUidInBytes.bytesToMb(),
+                txAppInMb = txUidInBytes.bytesToMb()
             )
         }
     }

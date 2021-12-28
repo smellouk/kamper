@@ -9,7 +9,7 @@ object Versions {
     const val androidx_constraintlayout = "2.1.1"
     const val androidx_core_ktx = "1.6.0"
 
-    const val mockk = "1.12.0"
+    const val mockk = "1.12.1"
     const val detekt = "1.18.1"
 
     const val gradle_test_logger = "3.1.0"
@@ -47,6 +47,8 @@ object Libs {
                 "test-annotations-common"
             const val mockk =
                 "io.mockk:mockk-common:${Versions.mockk}"
+            const val coroutines =
+                "org.jetbrains.kotlinx:kotlinx-coroutines-test:${Versions.coroutines}"
         }
     }
 
@@ -71,7 +73,7 @@ object Libs {
                 "org.jetbrains.kotlinx:kotlinx-coroutines-android:${Versions.coroutines}"
         }
 
-        object Test {
+        object Tests {
             const val kotlin_junit =
                 "test-junit"
             const val mockk =
