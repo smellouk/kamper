@@ -35,7 +35,7 @@ private fun createPerformance(
         mainDispatcher = Dispatchers.Main,
         repository = CpuInfoRepositoryImpl(
             cpuInfoMapper = CpuInfoMapper(),
-            procCpuInfoRawSource = ProcCpuInfoSource(),
+            procCpuInfoRawSource = ProcCpuInfoSource(logger),
             shellCpuInfoRawSource = ShellCpuInfoSource(logger),
         ),
         logger = logger
