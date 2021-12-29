@@ -11,12 +11,15 @@ import kotlin.reflect.KClass
 
 open class Engine {
 
+    // Visible for testing
     @PublishedApi
     internal val performanceList: MutableList<Performance<*, *, *>> = mutableListOf()
 
+    // Visible for testing
     @PublishedApi
     internal val mapListeners: MutableMap<KClass<*>, MutableList<InfoListener<*>>> = mutableMapOf()
 
+    // Visible for testing
     @PublishedApi
     internal var config: KamperConfig = KamperConfig.DEFAULT
         set(value) {
@@ -24,6 +27,7 @@ open class Engine {
             field = value
         }
 
+    // Visible for testing
     @PublishedApi
     internal var logger: Logger = Logger.EMPTY
 
@@ -45,16 +49,18 @@ open class Engine {
     }
 
     inline fun <reified I : Info> addInfoListener(noinline listener: InfoListener<I>): Engine {
-        logger.log(mapListeners.toString())
         mapListeners[I::class]?.add(listener)
+            ?: logger.log(
+                "Can't add listener, maybe you should try to install a module before adding a listener"
+            )
         return this
     }
 
-    inline fun <reified I : Info> removeInfoListener(noinline listener: InfoListener<I>) {
+    inline fun <reified I : Info> removeInfoListener() {
         if (!mapListeners.containsKey(I::class)) {
             return
         }
-        mapListeners[I::class]?.remove(listener)
+        mapListeners.remove(I::class)
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -75,7 +81,7 @@ open class Engine {
                 performanceList.add(performance)
             } else {
                 logger.log(
-                    "${performance::class.simpleName} performance not initialized! " +
+                    "${performance::class.simpleName} performance is not initialized! " +
                             "could be disabled or failed to initialize."
                 )
             }
