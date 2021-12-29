@@ -10,7 +10,7 @@ internal class CpuInfoRepositoryImpl(
     private val cpuInfoMapper: CpuInfoMapper
 ) : CpuInfoRepository {
     override fun getInfo(): CpuInfo {
-        val cpuInfoRaw = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        val cpuInfoRaw = if (ApiLevelProvider.getApiLevel() >= Build.VERSION_CODES.O) {
             shellCpuInfoRawSource.getCpuInfoDto()
         } else {
             procCpuInfoRawSource.getCpuInfoDto()
@@ -18,4 +18,8 @@ internal class CpuInfoRepositoryImpl(
 
         return cpuInfoMapper.map(cpuInfoRaw)
     }
+}
+
+internal object ApiLevelProvider {
+    fun getApiLevel(): Int = Build.VERSION.SDK_INT
 }

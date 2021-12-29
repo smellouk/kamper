@@ -9,7 +9,6 @@ import io.mockk.verify
 import org.junit.Test
 import kotlin.test.assertEquals
 
-@Suppress("IllegalIdentifier")
 class KamperTest {
     private val classToTest = spyk<Kamper>().apply {
         every { (this@apply as Engine).start() } returns Unit

@@ -5,8 +5,12 @@ import androidx.annotation.RequiresApi
 import com.smellouk.kamper.api.Logger
 import com.smellouk.kamper.cpu.repository.CpuInfoDto
 import java.io.InputStream
-import java.util.Locale
+import android.os.Process as ProcessPidProvider
 
+/**
+ * Complicate logic for parsing CPU usage on android +Oreo, Check unit tests to see how the
+ * logic should work.
+ */
 internal class ShellCpuInfoSource(
     private val logger: Logger
 ) : CpuInfoSource {
@@ -14,6 +18,7 @@ internal class ShellCpuInfoSource(
     @RequiresApi(api = Build.VERSION_CODES.O)
     override fun getCpuInfoDto(): CpuInfoDto {
         var process: Process? = null
+        val pid = ProcessPidProvider.myPid()
         try {
             process = Runtime.getRuntime().exec("top -n 1")
             val cmdOutputLines = process?.inputStream?.readAllLine() ?: emptyList()
@@ -21,38 +26,43 @@ internal class ShellCpuInfoSource(
                 return CpuInfoDto.INVALID
             }
 
-            var cpuTasksMap = emptyMap<String, Float>()
+            var cpuInfoUsageMap = emptyMap<String, Double>()
             var cpuLabelIndex = -1
-            var cpuAppUsage = -1F
+            var cpuAppUsage = -1.0
             cmdOutputLines.forEach { line ->
-                if (line.isCpuTasksLine()) {
-                    cpuTasksMap = line.toCpuTasksMap()
+                // 400%cpu   0%user   0%nice   0%sys 400%idle   0%iow   0%irq   0%sirq   0%host
+                if (line.isCpuInfoUsageLine()) {
+                    cpuInfoUsageMap = line.toCpuInfoUsageMap()
                 }
-                if (line.isCpuLabelLine()) {
-                    cpuLabelIndex = line.toCPULabelIndex()
+
+                // [7m   PID USER         PR  NI VIRT  RES  SHR S[%CPU] %MEM     TIME+ ARGS           [0m
+                if (line.isProcessLabelLine()) {
+                    cpuLabelIndex = line.getCpuLabelIndex()
                 }
-                if (line.isCpuAppUsageLine()) {
+
+                // 10062 u0_a149      10 -10  13G 150M  91M S  0.0   7.6   0:09.79 com.smellouk.k+
+                if (line.isProcessAppDetailsLine(pid) && cpuLabelIndex != -1) {
                     cpuAppUsage = line.getCpuAppUsage(cpuLabelIndex)
                 }
             }
 
-            if (cpuTasksMap.isEmpty()) {
+            if (cpuInfoUsageMap.isEmpty()) {
                 return CpuInfoDto.INVALID
             }
 
-            val total = cpuTasksMap["cpu"]
-            val user = cpuTasksMap["user"]
-            val sys = cpuTasksMap["sys"]
-            val idle = cpuTasksMap["idle"]
-            val iow = cpuTasksMap["iow"]
+            val total = cpuInfoUsageMap["cpu"]
+            val user = cpuInfoUsageMap["user"]
+            val sys = cpuInfoUsageMap["sys"]
+            val idle = cpuInfoUsageMap["idle"]
+            val iow = cpuInfoUsageMap["iow"]
 
             return CpuInfoDto(
-                total = total.normalize(),
-                user = user.normalize(),
-                system = sys.normalize(),
-                idle = idle.normalize(),
-                ioWait = iow.normalize(),
-                app = cpuAppUsage.normalize()
+                totalTime = total.normalize(),
+                userTime = user.normalize(),
+                systemTime = sys.normalize(),
+                idleTime = idle.normalize(),
+                ioWaitTime = iow.normalize(),
+                appTime = cpuAppUsage.normalize()
             )
         } catch (e: Exception) {
             logger.log(e.stackTraceToString())
@@ -62,43 +72,54 @@ internal class ShellCpuInfoSource(
 
         return CpuInfoDto.INVALID
     }
+}
 
-    private fun InputStream.readAllLine(): List<String> =
-        bufferedReader(Charsets.ISO_8859_1).useLines { lines ->
-            lines.filter { line ->
-                line.isNotBlank()
-            }.map { line ->
-                line.trim()
-            }
-                .toList()
-        }
+// Visible only for testing
+internal fun InputStream.readAllLine(): List<String> =
+    bufferedReader(Charsets.UTF_8).useLines { lines ->
+        lines.filter { line ->
+            line.isNotBlank()
+        }.map { line ->
+            line.trim()
+        }.toList()
+    }
 
-    private fun String.isCpuTasksLine(): Boolean = matches("^\\d+%\\w+.+\\d+%\\w+".toRegex())
+// Visible only for testing
+internal fun String.isCpuInfoUsageLine(): Boolean = matches("^\\d+%\\w+.+\\d+%\\w+".toRegex())
 
-    private fun String.toCpuTasksMap(): Map<String, Float> = lowercase(Locale.US)
+// Visible only for testing
+internal fun String.toCpuInfoUsageMap(): Map<String, Double> = try {
+    lowercase()
         .split("\\s+".toRegex())
         .map { cpuRaw -> cpuRaw.split("%") }
         .filter { cpuItem -> cpuItem.size >= 2 }
-        .map { cpuItem -> cpuItem[1] to cpuItem[0].toFloat() }
+        .map { cpuItem -> cpuItem[1] to cpuItem[0].toDouble() }
         .toMap()
+} catch (ignore: Throwable) {
+    emptyMap()
+}
 
-    private fun String.isCpuLabelLine(): Boolean = contains("CPU")
+// Visible only for testing
+internal fun String.isProcessLabelLine(): Boolean = contains("PID USER")
 
-    private fun String.toCPULabelIndex(): Int = this.split("\\s+".toRegex())
-        .indexOfFirst { element -> element.contains("CPU") }
+// Visible only for testing
+internal fun String.getCpuLabelIndex(): Int = this.split("\\s+".toRegex())
+    .indexOfFirst { element -> element.contains("CPU") }
 
-    private fun String.isCpuAppUsageLine(): Boolean =
-        startsWith(android.os.Process.myPid().toString())
+// Visible only for testing
+internal fun String.isProcessAppDetailsLine(pid: Int): Boolean =
+    startsWith(pid.toString())
 
-    private fun String.getCpuAppUsage(cpuIndex: Int): Float {
-        return split("\\s+".toRegex()).takeIf { params ->
-            params.isNotEmpty() && params.size >= cpuIndex
-        }?.elementAt(cpuIndex)?.toFloat() ?: -1F
-    }
+// Visible only for testing
+internal fun String.getCpuAppUsage(cpuIndex: Int): Double {
+    return split("\\s+".toRegex()).takeIf { params ->
+        params.isNotEmpty() && params.size >= cpuIndex
+    }?.elementAt(cpuIndex)?.toDouble() ?: -1.0
+}
 
-    private fun Float?.normalize(): Float = if (this == null || this < -1F) {
-        0F
-    } else {
-        this
-    }
+// Visible only for testing
+internal fun Double?.normalize(): Double = if (this == null || this < -1F) {
+    0.0
+} else {
+    this
 }

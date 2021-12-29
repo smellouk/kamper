@@ -1,16 +1,16 @@
 package com.smellouk.kamper.cpu.repository
 
-data class CpuInfoDto(
-    var user: Float,
-    var system: Float,
-    var idle: Float,
-    var ioWait: Float,
-    var total: Float,
-    var app: Float
+internal data class CpuInfoDto(
+    var totalTime: Double,
+    var userTime: Double,
+    var systemTime: Double,
+    var idleTime: Double,
+    var ioWaitTime: Double,
+    var appTime: Double
 ) {
     companion object {
         val INVALID = CpuInfoDto(
-            -1F, -1F, -1F, -1F, -1F, -1F
+            -1.0, -1.0, -1.0, -1.0, -1.0, -1.0
         )
     }
 }
