@@ -12,7 +12,6 @@ kotlin {
                 implementation(Libs.Kmm.Coroutines.core)
             }
         }
-
         val commonTest by getting {
             dependencies {
                 implementation(Libs.Kmm.Tests.coroutines)
