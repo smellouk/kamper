@@ -4,25 +4,35 @@ import android.view.Choreographer
 
 internal object FpsChoreographer {
     private var choreographer: Choreographer? = null
-    private val callback = object : Choreographer.FrameCallback {
+
+    // Visible only for testing
+    internal val frameCallback = object : Choreographer.FrameCallback {
         override fun doFrame(frameTimeNanos: Long) {
-            doFrameListener?.invoke(frameTimeNanos)
+            frameListener?.invoke(frameTimeNanos)
             choreographer?.postFrameCallback(this)
         }
     }
-    private var doFrameListener: ((Long) -> Unit)? = null
+    private var frameListener: FpsChoreographerFrameListener? = null
 
-    fun setDoFrameListener(listener: ((Long) -> Unit)?) {
-        doFrameListener = listener
+    fun setFrameListener(listener: FpsChoreographerFrameListener) {
+        frameListener = listener
     }
 
     fun start() {
-        choreographer = Choreographer.getInstance()
-        choreographer?.postFrameCallback(callback)
+        if (choreographer == null) {
+            choreographer = Choreographer.getInstance()
+        }
+        choreographer?.postFrameCallback(frameCallback)
     }
 
     fun stop() {
-        choreographer?.removeFrameCallback(callback)
+        choreographer?.removeFrameCallback(frameCallback)
+    }
+
+    fun clean() {
         choreographer = null
+        frameListener = null
     }
 }
+
+typealias FpsChoreographerFrameListener = (Long) -> Unit

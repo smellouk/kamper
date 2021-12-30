@@ -1,6 +1,6 @@
 package com.smellouk.kamper.fps.repository
 
-internal class FpsInfoDto(
+internal data class FpsInfoDto(
     val currentFrameCount: Int,
     val startFrameTimeInSeconds: Double,
     val currentFrameTimeInSeconds: Double

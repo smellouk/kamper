@@ -8,6 +8,7 @@ internal class FpsInfoMapper {
         if (this == FpsInfoDto.INVALID) {
             return FpsInfo.INVALID
         }
+
         if (currentFrameCount < 1 || currentFrameTimeInSeconds < startFrameTimeInSeconds) {
             return FpsInfo.INVALID
         }

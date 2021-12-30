@@ -8,5 +8,5 @@ internal class FpsInfoRepositoryImpl(
     private val fpsInfoMapper: FpsInfoMapper
 ) : FpsInfoRepository {
     override fun getInfo(): FpsInfo =
-        fpsInfoMapper.map(fpsSource.getFpsInfoRaw())
+        fpsInfoMapper.map(fpsSource.getFpsInfoDto())
 }
