@@ -1,6 +1,6 @@
 package com.smellouk.kamper.memory.repository
 
-data class MemoryInfoDto(
+internal data class MemoryInfoDto(
     val freeMemoryInBytes: Long,
     val maxMemoryInBytes: Long,
     val allocatedInBytes: Long,

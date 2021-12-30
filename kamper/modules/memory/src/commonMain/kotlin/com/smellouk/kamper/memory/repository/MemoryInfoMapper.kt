@@ -6,7 +6,7 @@ import com.smellouk.kamper.memory.MemoryInfo.AppMemoryInfo
 import com.smellouk.kamper.memory.MemoryInfo.PssInfo
 import com.smellouk.kamper.memory.MemoryInfo.RamInfo
 
-class MemoryInfoMapper {
+internal class MemoryInfoMapper {
     fun map(dto: MemoryInfoDto): MemoryInfo = if (dto == MemoryInfoDto.INVALID) {
         MemoryInfo.INVALID
     } else {

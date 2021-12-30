@@ -32,7 +32,7 @@ private fun createPerformance(
         defaultDispatcher = Dispatchers.Default,
         mainDispatcher = Dispatchers.Main,
         repository = MemoryInfoRepositoryImpl(
-            memorySource = MemoryInfoSource(context, logger),
+            memoryInfoSource = MemoryInfoSource(context, logger),
             memoryInfoMapper = MemoryInfoMapper(),
         ),
         logger = logger
