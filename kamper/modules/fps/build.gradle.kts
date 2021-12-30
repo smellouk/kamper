@@ -2,9 +2,12 @@ plugins {
     kotlin("multiplatform")
     id("com.android.library")
 }
+apply(from = projectDir.resolve("../../publish.gradle.kts"))
 
 kotlin {
-    android()
+    android {
+        publishLibraryVariants("release")
+    }
 
     sourceSets {
         val commonMain by getting {
