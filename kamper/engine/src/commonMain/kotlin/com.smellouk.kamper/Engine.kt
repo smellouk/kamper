@@ -1,5 +1,6 @@
 package com.smellouk.kamper
 
+import com.smellouk.kamper.api.Cleanable
 import com.smellouk.kamper.api.Config
 import com.smellouk.kamper.api.EMPTY
 import com.smellouk.kamper.api.Info
@@ -44,6 +45,10 @@ open class Engine {
     }
 
     open fun clear() {
+        performanceList.filterIsInstance<Cleanable>()
+            .forEach { cleanable ->
+                cleanable.clean()
+            }
         performanceList.clear()
         mapListeners.clear()
     }

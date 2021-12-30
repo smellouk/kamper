@@ -8,25 +8,30 @@ internal class FpsInfoSource(choreographer: FpsChoreographer) {
     private var startFrameTimeNanos: Long = 0
     private var currentFrameTimeNanos: Long = 0
 
-    init {
-        choreographer.setDoFrameListener { frameTimeNanos ->
-            currentFrameCount++
-            if (startFrameTimeNanos == 0L) {
-                startFrameTimeNanos = frameTimeNanos
-            }
-            currentFrameTimeNanos = frameTimeNanos
+    // Visible only for testing
+    internal val frameListener: FpsChoreographerFrameListener = { frameTimeNanos ->
+        currentFrameCount++
+        if (startFrameTimeNanos == 0L) {
+            startFrameTimeNanos = frameTimeNanos
         }
+        currentFrameTimeNanos = frameTimeNanos
     }
 
-    fun getFpsInfoRaw(): FpsInfoDto {
-        val fpsInfo = FpsInfoDto(
+    init {
+        choreographer.setFrameListener(frameListener)
+    }
+
+    fun getFpsInfoDto(): FpsInfoDto = if (currentFrameCount == 0) {
+        FpsInfoDto.INVALID
+    } else {
+        FpsInfoDto(
             currentFrameCount = currentFrameCount,
             startFrameTimeInSeconds = startFrameTimeNanos.nanosToSeconds(),
             currentFrameTimeInSeconds = currentFrameTimeNanos.nanosToSeconds()
-        )
-        startFrameTimeNanos = 0
-        currentFrameTimeNanos = 0
-        currentFrameCount = 0
-        return fpsInfo
+        ).also {
+            startFrameTimeNanos = 0
+            currentFrameTimeNanos = 0
+            currentFrameCount = 0
+        }
     }
 }
