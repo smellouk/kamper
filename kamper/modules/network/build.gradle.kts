@@ -2,6 +2,9 @@ plugins {
     kotlin("multiplatform")
     id("com.android.library")
 }
+apply(from = projectDir.resolve("../../publish.gradle.kts")).also {
+    extra["moduleName"] = "cpu-module"
+}
 
 kotlin {
     android()
