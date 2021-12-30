@@ -5,7 +5,8 @@ import android.os.Process
 import com.smellouk.kamper.network.repository.NetworkInfoDto
 
 internal class NetworkInfoSource {
-    private lateinit var cachedDto: NetworkInfoDto
+    // Visible only for testing
+    internal lateinit var cachedDto: NetworkInfoDto
     fun getNetworkInfoDto(): NetworkInfoDto {
         val currentDto = NetworkInfoDto(
             rxTotalInBytes = TrafficStats.getTotalRxBytes(),

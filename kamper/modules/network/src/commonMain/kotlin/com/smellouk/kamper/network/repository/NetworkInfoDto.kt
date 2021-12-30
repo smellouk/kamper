@@ -1,6 +1,6 @@
 package com.smellouk.kamper.network.repository
 
-data class NetworkInfoDto(
+internal data class NetworkInfoDto(
     val rxTotalInBytes: Long,
     val txTotalInBytes: Long,
     val rxUidInBytes: Long,
