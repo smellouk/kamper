@@ -4,9 +4,34 @@ import com.android.build.gradle.LibraryExtension
 import io.gitlab.arturbosch.detekt.Detekt
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import java.io.ByteArrayOutputStream
+import java.lang.System.getenv as Env
 
 plugins {
     id(Libs.Plugins.Detekt.id) version Versions.detekt
+}
+
+extra.apply {
+    val propertiesFile = rootDir.resolve("credentials.properties")
+    when {
+        propertiesFile.exists() -> {
+            val properties = java.util.Properties()
+            properties.load(propertiesFile.inputStream())
+
+            set("KAMPER_GH_USER", properties["kamperGhUser"])
+            set("KAMPER_GH_PAT", properties["kamperGhToken"])
+        }
+        Env().containsKey("KAMPER_GH_USER") && Env().containsKey("KAMPER_GH_PAT") -> {
+            set("KAMPER_GH_USER", Env("KAMPER_GH_USER"))
+            set("KAMPER_GH_PAT", Env("KAMPER_GH_PAT"))
+        }
+        else -> {
+            set("KAMPER_GH_USER", "")
+            set("KAMPER_GH_PAT", "")
+        }
+    }
+
+    set("LIB_VERSION_NAME", generateVersionName())
 }
 
 buildscript {
@@ -108,3 +133,27 @@ fun Project.kmmConfig(configure: Action<KotlinMultiplatformExtension>): Unit =
 
 fun Project.androidConfig(configure: Action<LibraryExtension>): Unit =
     (this as ExtensionAware).extensions.configure("android", configure)
+
+fun generateVersionName(): String {
+    val default = "git describe --tags --abbrev=0".execute() ?: "0.1.0"
+    val isRelease = Env().containsKey("CI")
+
+    return if (isRelease) {
+        default
+    } else {
+        val hash = "git rev-parse --short HEAD".execute()
+        "$default-snapshot-$hash"
+    }
+}
+
+fun String.execute(currentWorkingDir: File = file("./")): String? = try {
+    val byteOut = ByteArrayOutputStream()
+    project.exec {
+        workingDir = currentWorkingDir
+        commandLine = this@execute.split("\\s".toRegex())
+        standardOutput = byteOut
+    }
+    String(byteOut.toByteArray()).trim()
+} catch (e: Exception) {
+    null
+}
