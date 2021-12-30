@@ -1,0 +1,36 @@
+# Pipeline to publish artifacts
+name: Artifact publisher
+
+on:
+  push:
+    tags:
+      - '*' # Whenever pushed new tag
+env:
+  #Github packages credentials
+  KAMPER_GH_USER: ${{ secrets.KAMPER_GH_USER }}
+  KAMPER_GH_PAT: ${{ secrets.KAMPER_GH_PAT }}
+
+jobs:
+  gradle:
+    name: Artifact publisher
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Cache Gradle Files
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.gradle/caches/
+            ~/.gradle/wrapper/
+          key: cache-gradle
+
+      - name: Configure JDK
+        uses: actions/setup-java@v1
+        with:
+          distribution: 'adopt'
+          java-version: 11
+
+      - name: Gradle publishing to github packages
+        run: ./gradlew publishAllPublicationsToGithubPackagesRepository
