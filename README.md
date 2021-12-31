@@ -18,6 +18,16 @@ The solution is based on plugin design patterns.
 | MacOs       | ❓           |
 | Linux       | ❓           |
 
+### Android 
+Min required api for kamper is 16. 
+
+| Module      | Api level      |
+| ----------- | ----------- |
+| CPU         | Work as expected on all versions bellow 26 <. For 26+ the system usage is not reported (Under investigation)        |
+| FPS         | +16         |
+| Memory      | +16         |
+| Network     | +23         |
+
 ## ⬇️ Install
 To Install the library in your project you need:
 ```kotlin
@@ -172,7 +182,7 @@ Our [samples](samples/) dir showcase how to use the library. (Currently, the sam
 
 Use cases:
 * High usage of CPU [CPU performance]
-* High usage of the main thread [FPS performance]
+* FPS usage of the main thread [FPS performance]
 * High usage of the memory [Memory performance]
 * High usage of the bandwidth [Network performance]
 
