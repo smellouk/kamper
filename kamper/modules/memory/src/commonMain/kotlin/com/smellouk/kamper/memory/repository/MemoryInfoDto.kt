@@ -1,14 +1,13 @@
 package com.smellouk.kamper.memory.repository
 
 internal data class MemoryInfoDto(
-    val freeMemoryInBytes: Long,
     val maxMemoryInBytes: Long,
     val allocatedInBytes: Long,
 
-    val totalPssInBytes: Long?,
-    val dalvikPssInBytes: Long?,
-    val nativePssInBytes: Long?,
-    val otherPssInBytes: Long?,
+    val totalPssInKiloBytes: Long?,
+    val dalvikPssInKiloBytes: Long?,
+    val nativePssInKiloBytes: Long?,
+    val otherPssInKiloBytes: Long?,
 
     val availableRamInBytes: Long,
     val totalRamInBytes: Long,
@@ -17,7 +16,6 @@ internal data class MemoryInfoDto(
 ) {
     companion object {
         val INVALID = MemoryInfoDto(
-            -1,
             -1,
             -1,
             -1,

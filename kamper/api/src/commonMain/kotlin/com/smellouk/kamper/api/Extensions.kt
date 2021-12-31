@@ -1,5 +1,9 @@
 package com.smellouk.kamper.api
 
+fun Long.kBytesToMb(): Float {
+    return this / KILO
+}
+
 fun Long.bytesToMb(): Float {
     return this / KILO / KILO
 }

@@ -23,8 +23,7 @@ class MemoryInfoMapperTest {
 
         with(memoryInfo) {
             val expectedMemoryInMb = MEMORY_IN_BYTE.bytesToMb()
-            with(appMemoryInfo) {
-                assertEquals(expectedMemoryInMb, freeMemoryInMb)
+            with(heapMemoryInfo) {
                 assertEquals(expectedMemoryInMb, maxMemoryInMb)
                 assertEquals(expectedMemoryInMb, allocatedInMb)
             }
@@ -63,15 +62,15 @@ class MemoryInfoMapperTest {
 
 private const val INVALID_MEMORY = -1F
 private const val MEMORY_IN_BYTE = 1024 * 1024L
+private const val MEMORY_IN_KILo_BYTE = 1024L
 
 private val DTO = MemoryInfoDto(
-    freeMemoryInBytes = MEMORY_IN_BYTE,
     maxMemoryInBytes = MEMORY_IN_BYTE,
     allocatedInBytes = MEMORY_IN_BYTE,
-    totalPssInBytes = MEMORY_IN_BYTE,
-    dalvikPssInBytes = MEMORY_IN_BYTE,
-    nativePssInBytes = MEMORY_IN_BYTE,
-    otherPssInBytes = MEMORY_IN_BYTE,
+    totalPssInKiloBytes = MEMORY_IN_KILo_BYTE,
+    dalvikPssInKiloBytes = MEMORY_IN_KILo_BYTE,
+    nativePssInKiloBytes = MEMORY_IN_KILo_BYTE,
+    otherPssInKiloBytes = MEMORY_IN_KILo_BYTE,
     availableRamInBytes = MEMORY_IN_BYTE,
     totalRamInBytes = MEMORY_IN_BYTE,
     lowRamThresholdInBytes = MEMORY_IN_BYTE,
@@ -79,13 +78,12 @@ private val DTO = MemoryInfoDto(
 )
 
 private val DTO_WITH_NULL_PSS = MemoryInfoDto(
-    freeMemoryInBytes = MEMORY_IN_BYTE,
     maxMemoryInBytes = MEMORY_IN_BYTE,
     allocatedInBytes = MEMORY_IN_BYTE,
-    totalPssInBytes = null,
-    dalvikPssInBytes = null,
-    nativePssInBytes = null,
-    otherPssInBytes = null,
+    totalPssInKiloBytes = null,
+    dalvikPssInKiloBytes = null,
+    nativePssInKiloBytes = null,
+    otherPssInKiloBytes = null,
     availableRamInBytes = MEMORY_IN_BYTE,
     totalRamInBytes = MEMORY_IN_BYTE,
     lowRamThresholdInBytes = MEMORY_IN_BYTE,
