@@ -11,10 +11,11 @@ import com.smellouk.kamper.cpu.repository.source.ProcCpuInfoSource
 import com.smellouk.kamper.cpu.repository.source.ShellCpuInfoSource
 import kotlinx.coroutines.Dispatchers
 
-actual val CpuModule: PerformanceModule<CpuConfig, CpuInfo> = PerformanceModule(
-    config = CpuConfig.DEFAULT,
-    performance = createPerformance(CpuConfig.DEFAULT.logger)
-)
+actual val CpuModule: PerformanceModule<CpuConfig, CpuInfo>
+    get() = PerformanceModule(
+        config = CpuConfig.DEFAULT,
+        performance = createPerformance(CpuConfig.DEFAULT.logger)
+    )
 
 @KamperDslMarker
 @Suppress("FunctionNaming")
