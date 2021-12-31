@@ -10,10 +10,11 @@ import com.smellouk.kamper.network.repository.NetworkInfoRepositoryImpl
 import com.smellouk.kamper.network.repository.source.NetworkInfoSource
 import kotlinx.coroutines.Dispatchers
 
-actual val NetworkModule: PerformanceModule<NetworkConfig, NetworkInfo> = PerformanceModule(
-    config = NetworkConfig.DEFAULT,
-    performance = createPerformance(NetworkConfig.DEFAULT.logger)
-)
+actual val NetworkModule: PerformanceModule<NetworkConfig, NetworkInfo>
+    get() = PerformanceModule(
+        config = NetworkConfig.DEFAULT,
+        performance = createPerformance(NetworkConfig.DEFAULT.logger)
+    )
 
 @KamperDslMarker
 @Suppress("FunctionNaming")

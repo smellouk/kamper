@@ -11,10 +11,11 @@ import com.smellouk.kamper.fps.repository.source.FpsChoreographer
 import com.smellouk.kamper.fps.repository.source.FpsInfoSource
 import kotlinx.coroutines.Dispatchers
 
-actual val FpsModule: PerformanceModule<FpsConfig, FpsInfo> = PerformanceModule(
-    config = FpsConfig.DEFAULT,
-    performance = createPerformance(FpsConfig.DEFAULT.logger)
-)
+actual val FpsModule: PerformanceModule<FpsConfig, FpsInfo>
+    get() = PerformanceModule(
+        config = FpsConfig.DEFAULT,
+        performance = createPerformance(FpsConfig.DEFAULT.logger)
+    )
 
 @KamperDslMarker
 @Suppress("FunctionNaming")
