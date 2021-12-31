@@ -55,7 +55,7 @@ rebase it against develop.
 ### PR Merging
 Before creating any PR, please make sure to run on your local machine:
 ```shell
-./gradlew test detekt
+./gradlew detekt lint test 
 ```
 When merging your PR, you must make sure to use `rebase and merge` and not `create merge commit`, at
 At the end of PR merging, your commits must be on the top of the commit's develop.
