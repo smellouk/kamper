@@ -34,7 +34,7 @@ private fun createPerformance(
         defaultDispatcher = Dispatchers.Default,
         mainDispatcher = Dispatchers.Main,
         repository = NetworkInfoRepositoryImpl(
-            networkInfoSource = NetworkInfoSource(),
+            networkInfoSource = NetworkInfoSource(logger),
             networkInfoMapper = NetworkInfoMapper()
         ),
         logger = logger

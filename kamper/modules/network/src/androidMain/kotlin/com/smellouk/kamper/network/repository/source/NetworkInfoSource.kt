@@ -2,9 +2,10 @@ package com.smellouk.kamper.network.repository.source
 
 import android.net.TrafficStats
 import android.os.Process
+import com.smellouk.kamper.api.Logger
 import com.smellouk.kamper.network.repository.NetworkInfoDto
 
-internal class NetworkInfoSource {
+internal class NetworkInfoSource(private val logger: Logger) {
     // Visible only for testing
     internal lateinit var cachedDto: NetworkInfoDto
     fun getNetworkInfoDto(): NetworkInfoDto {
@@ -15,6 +16,13 @@ internal class NetworkInfoSource {
             txUidInBytes = TrafficStats.getUidTxBytes(Process.myUid())
         )
 
+        if (currentDto == NetworkInfoDto.INVALID) {
+            logger.log(
+                "TrafficStats is returning -1, maybe your device does not " +
+                        "support TrafficStats or min required api <23 "
+            )
+            return NetworkInfoDto.NOT_SUPPORTED
+        }
         return if (!this::cachedDto.isInitialized) {
             cachedDto = currentDto
             NetworkInfoDto.INVALID

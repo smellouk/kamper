@@ -6,16 +6,22 @@ import com.smellouk.kamper.network.NetworkInfo
 internal class NetworkInfoMapper {
     fun map(
         dto: NetworkInfoDto
-    ): NetworkInfo = if (dto == NetworkInfoDto.INVALID) {
-        NetworkInfo.INVALID
-    } else {
-        with(dto) {
-            NetworkInfo(
-                rxSystemTotalInMb = rxTotalInBytes.bytesToMb(),
-                txSystemTotalInMb = txTotalInBytes.bytesToMb(),
-                rxAppInMb = rxUidInBytes.bytesToMb(),
-                txAppInMb = txUidInBytes.bytesToMb()
-            )
+    ): NetworkInfo = when {
+        dto == NetworkInfoDto.INVALID -> {
+            NetworkInfo.INVALID
+        }
+        dto == NetworkInfoDto.NOT_SUPPORTED -> {
+            NetworkInfo.NOT_SUPPORTED
+        }
+        else -> {
+            with(dto) {
+                NetworkInfo(
+                    rxSystemTotalInMb = rxTotalInBytes.bytesToMb(),
+                    txSystemTotalInMb = txTotalInBytes.bytesToMb(),
+                    rxAppInMb = rxUidInBytes.bytesToMb(),
+                    txAppInMb = txUidInBytes.bytesToMb()
+                )
+            }
         }
     }
 }

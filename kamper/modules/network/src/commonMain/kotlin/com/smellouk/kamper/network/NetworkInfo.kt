@@ -12,5 +12,8 @@ data class NetworkInfo(
         val INVALID = NetworkInfo(
             -1F, -1F, -1F, -1F
         )
+        val NOT_SUPPORTED = NetworkInfo(
+            -100F, -100F, -100F, -100F
+        )
     }
 }

@@ -4,6 +4,7 @@ import android.net.TrafficStats
 import android.os.Process
 import com.smellouk.kamper.network.repository.NetworkInfoDto
 import io.mockk.every
+import io.mockk.mockk
 import io.mockk.mockkStatic
 import io.mockk.unmockkStatic
 import org.junit.After
@@ -12,7 +13,7 @@ import org.junit.Test
 import kotlin.test.assertEquals
 
 class NetworkInfoSourceTest {
-    private val classToTest = NetworkInfoSource()
+    private val classToTest = NetworkInfoSource(mockk(relaxed = true))
 
     @Before
     fun setup() {
@@ -38,6 +39,15 @@ class NetworkInfoSourceTest {
     }
 
     @Test
+    fun `getNetworkInfoDto should return not supported dto when device does not supports TrafficStats`() {
+        mockTraffic(NOT_SUPPORTED)
+
+        val dto = classToTest.getNetworkInfoDto()
+
+        assertEquals(NetworkInfoDto.NOT_SUPPORTED, dto)
+    }
+
+    @Test
     fun `getNetworkInfoDto should return valid dto when cache is available`() {
         classToTest.cachedDto = CACHED_DTO
         mockTraffic(ONE_MEGABYTE_TRAFFIC_IN_BYTES * 3)
@@ -57,6 +67,7 @@ class NetworkInfoSourceTest {
 
 private const val MY_UUID = 128797234
 private const val ONE_MEGABYTE_TRAFFIC_IN_BYTES = 1024 * 1024L
+private const val NOT_SUPPORTED = -1L
 
 private val CACHED_DTO = NetworkInfoDto(
     rxTotalInBytes = ONE_MEGABYTE_TRAFFIC_IN_BYTES,

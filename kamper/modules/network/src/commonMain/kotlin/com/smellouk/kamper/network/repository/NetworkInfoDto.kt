@@ -13,5 +13,11 @@ internal data class NetworkInfoDto(
             -1,
             -1,
         )
+        val NOT_SUPPORTED = NetworkInfoDto(
+            -100,
+            -100,
+            -100,
+            -100,
+        )
     }
 }
