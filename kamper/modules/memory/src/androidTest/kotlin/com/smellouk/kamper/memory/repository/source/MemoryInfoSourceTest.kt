@@ -94,7 +94,6 @@ class MemoryInfoSourceTest {
 
     private fun mockRuntimeMemory() {
         every { RuntimeWrapper.getRuntimeInfo() } returns mockk<RuntimeWrapper>().apply {
-            every { freeMemory } returns MEMORY_IN_BYTE
             every { maxMemory } returns MEMORY_IN_BYTE
             every { allocatedInBytes } returns MEMORY_IN_BYTE
         }
@@ -123,14 +122,13 @@ private const val PID = 1234
 private const val MEMORY_IN_BYTE = 1024 * 1024L
 private val EXPECTED_DTO = MemoryInfoDto(
     // App
-    freeMemoryInBytes = MEMORY_IN_BYTE,
     maxMemoryInBytes = MEMORY_IN_BYTE,
     allocatedInBytes = MEMORY_IN_BYTE,
     // PSS
-    totalPssInBytes = MEMORY_IN_BYTE,
-    dalvikPssInBytes = MEMORY_IN_BYTE,
-    nativePssInBytes = MEMORY_IN_BYTE,
-    otherPssInBytes = MEMORY_IN_BYTE,
+    totalPssInKiloBytes = MEMORY_IN_BYTE,
+    dalvikPssInKiloBytes = MEMORY_IN_BYTE,
+    nativePssInKiloBytes = MEMORY_IN_BYTE,
+    otherPssInKiloBytes = MEMORY_IN_BYTE,
     // Ram
     availableRamInBytes = MEMORY_IN_BYTE,
     totalRamInBytes = MEMORY_IN_BYTE,
@@ -139,14 +137,13 @@ private val EXPECTED_DTO = MemoryInfoDto(
 )
 private val EXPECTED_DTO_WITH_NULL_PSS = MemoryInfoDto(
     // App
-    freeMemoryInBytes = MEMORY_IN_BYTE,
     maxMemoryInBytes = MEMORY_IN_BYTE,
     allocatedInBytes = MEMORY_IN_BYTE,
     // PSS
-    totalPssInBytes = null,
-    dalvikPssInBytes = null,
-    nativePssInBytes = null,
-    otherPssInBytes = null,
+    totalPssInKiloBytes = null,
+    dalvikPssInKiloBytes = null,
+    nativePssInKiloBytes = null,
+    otherPssInKiloBytes = null,
     // Ram
     availableRamInBytes = MEMORY_IN_BYTE,
     totalRamInBytes = MEMORY_IN_BYTE,

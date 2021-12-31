@@ -13,6 +13,13 @@ class ExtensionsTest {
     }
 
     @Test
+    fun `kBytesToMb should return the expected correct value`() {
+        val expectedMb = 1F
+
+        assertEquals(expectedMb, 1024L.kBytesToMb())
+    }
+
+    @Test
     fun `nanosToSeconds should return the expected correct value`() {
         val expectedMb = 1.0
 

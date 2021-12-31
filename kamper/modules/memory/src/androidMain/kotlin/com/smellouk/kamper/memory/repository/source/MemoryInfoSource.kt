@@ -27,15 +27,14 @@ internal class MemoryInfoSource(
             val ramInfo = RamInfoWrapper.getRamInfo(activityManager)
 
             MemoryInfoDto(
-                // App
-                freeMemoryInBytes = runtime.freeMemory,
+                // Heap
                 maxMemoryInBytes = runtime.maxMemory,
                 allocatedInBytes = runtime.allocatedInBytes,
                 // PSS
-                totalPssInBytes = pssInfo?.totalPss,
-                dalvikPssInBytes = pssInfo?.dalvikPss,
-                nativePssInBytes = pssInfo?.nativePss,
-                otherPssInBytes = pssInfo?.otherPss,
+                totalPssInKiloBytes = pssInfo?.totalPss,
+                dalvikPssInKiloBytes = pssInfo?.dalvikPss,
+                nativePssInKiloBytes = pssInfo?.nativePss,
+                otherPssInKiloBytes = pssInfo?.otherPss,
                 // Ram
                 availableRamInBytes = ramInfo.availMem,
                 totalRamInBytes = ramInfo.totalMem,
@@ -50,7 +49,6 @@ internal class MemoryInfoSource(
 }
 
 internal class RuntimeWrapper(runtime: Runtime) {
-    val freeMemory: Long = runtime.freeMemory()
     val maxMemory: Long = runtime.maxMemory()
     val allocatedInBytes: Long = runtime.totalMemory() - runtime.freeMemory()
 

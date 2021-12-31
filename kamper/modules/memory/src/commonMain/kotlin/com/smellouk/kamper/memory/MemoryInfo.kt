@@ -3,24 +3,23 @@ package com.smellouk.kamper.memory
 import com.smellouk.kamper.api.Info
 
 data class MemoryInfo(
-    val appMemoryInfo: AppMemoryInfo,
+    val heapMemoryInfo: HeapMemoryInfo,
     val pssInfo: PssInfo,
     val ramInfo: RamInfo
 ) : Info {
     companion object {
         val INVALID = MemoryInfo(
-            AppMemoryInfo.INVALID, PssInfo.INVALID, RamInfo.INVALID
+            HeapMemoryInfo.INVALID, PssInfo.INVALID, RamInfo.INVALID
         )
     }
 
-    data class AppMemoryInfo(
-        val freeMemoryInMb: Float,
+    data class HeapMemoryInfo(
         val maxMemoryInMb: Float,
         val allocatedInMb: Float
     ) {
         companion object {
-            val INVALID = AppMemoryInfo(
-                -1F, -1F, -1F
+            val INVALID = HeapMemoryInfo(
+                -1F, -1F
             )
         }
     }
