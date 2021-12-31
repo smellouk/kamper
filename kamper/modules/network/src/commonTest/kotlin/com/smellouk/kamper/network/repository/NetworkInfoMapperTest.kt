@@ -16,6 +16,13 @@ class NetworkInfoMapperTest {
     }
 
     @Test
+    fun `map dto should return not supported when dto not supported`() {
+        val networkInfo = classToTest.map(NetworkInfoDto.NOT_SUPPORTED)
+
+        assertEquals(NetworkInfo.NOT_SUPPORTED, networkInfo)
+    }
+
+    @Test
     fun `map dto should return valid network info`() {
         val networkInfo = classToTest.map(
             NetworkInfoDto(
