@@ -3,12 +3,17 @@
 ![GitHub issues](https://img.shields.io/github/issues/smellouk/kamper)
 ![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/smellouk/kamper)
 ![GitHub Repo stars](https://img.shields.io/github/stars/smellouk/kamper?style=social)
-![GitHub package.json version](https://img.shields.io/github/package-json/v/smellouk/kamper)
 
 Kamper is a KMP/KMM library that implements a unified way to track application performances.
 The solution is based on plugin design patterns.
 
-## 💻 Currently Supported platforms
+## 🖼️ Screenshots
+| CPU         | FPS         | Memory      | Network     |
+| ----------- | ----------- | ----------- | ----------- |
+| android     | android     | android     | android     |
+| <img src="https://user-images.githubusercontent.com/13059906/147838954-6888f2e0-8552-47e3-9fc0-c4e035b2f117.png" width="200" />  |  <img src="https://user-images.githubusercontent.com/13059906/147838957-04b57afc-f9e0-4cdf-b3d9-e465853043c4.png" width="200" />  | <img src="https://user-images.githubusercontent.com/13059906/147838962-991b3dba-b743-434f-ba1e-1357ccc59e12.png" width="200" />  | <img src="https://user-images.githubusercontent.com/13059906/147838968-051ff7ab-6419-417e-b5d7-b9f22c403fc0.png" width="200" />  |
+
+## 💻 Supported platforms
 | Platform    | Status      |
 | ----------- | ----------- |
 | Android     | ✅           |
@@ -23,12 +28,13 @@ Min required api for kamper is 16.
 
 | Module      | Api level      |
 | ----------- | ----------- |
-| CPU         | Work as expected on all versions bellow 26 <. For 26+ the system usage is not reported (Under investigation)        |
+| CPU         | Work as expected on all versions bellow 26 <. For +26 the system usage is not reported (Under investigation)        |
 | FPS         | +16         |
 | Memory      | +16         |
 | Network     | +23         |
 
 ## ⬇️ Install
+### Android
 To Install the library in your project you need:
 ```kotlin
 repositories {
@@ -39,7 +45,7 @@ then
 ```kotlin
 dependencies {
     implementation("com.smellouk.kamper:engine:$KAMPER_VERSION")
-    // Implement the need modules
+    // Implement the needed modules
     implementation("com.smellouk.kamper:cpu-module:$KAMPER_VERSION")
     implementation("com.smellouk.kamper:fps-module:$KAMPER_VERSION")
     implementation("com.smellouk.kamper:memory-module:$KAMPER_VERSION")
@@ -47,8 +53,8 @@ dependencies {
 }
 ```
 ## 🏗️️ Usage
-
-### Lifecycle
+### Android
+#### Lifecycle
 By default the library is lifecycle aware, you can add it to your activity without the need of caring of kampers' lifecycle.
 ```kotlin
 class MainActivity : AppCompatActivity() {
@@ -73,16 +79,15 @@ fun stop() {
 }
 
 fun clean() {
-    // Will clean kamper engine from installed module and clean all added listeners
+    // Will clean kamper engine from installed modules and clean all added listeners
     // (This is critical to not miss it due to the added listeners, otherwise if you forget it, it will introduce memory leaks)
     Kamper.clean()
 }
 ```
 
-### For production
+#### For production
 Kamper is production-ready. it also offers a way to install only the needed modules.
 
-#### CPU Monitoring
 ```kotlin
 dependencies {
     // Don't forget to implement the needed module
@@ -172,7 +177,7 @@ fun initKamper() {
 }
 ```
 
-### For Debug/Qa
+#### For Debug/Qa
 Kamper also offers UI debug tools that allow you to monitor app performance visually. This tool could be used for debugging purposes or for Qa testing.
 
 Feature still under development[coming soon.]
