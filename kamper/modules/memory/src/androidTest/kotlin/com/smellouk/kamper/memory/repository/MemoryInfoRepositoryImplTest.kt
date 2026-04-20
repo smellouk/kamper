@@ -1,20 +1,19 @@
 package com.smellouk.kamper.memory.repository
 
 import com.smellouk.kamper.memory.repository.source.MemoryInfoSource
-import io.mockk.confirmVerified
-import io.mockk.mockk
-import io.mockk.verify
+import dev.mokkery.MockMode
+import dev.mokkery.matcher.any
+import dev.mokkery.mock
+import dev.mokkery.verify
+import dev.mokkery.verifyNoMoreCalls
 import org.junit.Test
 
 class MemoryInfoRepositoryImplTest {
-    private val memoryInfoSource = mockk<MemoryInfoSource>(relaxed = true)
-    private val memoryInfoMapper = mockk<MemoryInfoMapper>(relaxed = true)
+    private val memoryInfoSource = mock<MemoryInfoSource>(MockMode.autofill)
+    private val memoryInfoMapper = mock<MemoryInfoMapper>(MockMode.autofill)
 
     private val classToTest: MemoryInfoRepositoryImpl by lazy {
-        MemoryInfoRepositoryImpl(
-            memoryInfoSource,
-            memoryInfoMapper
-        )
+        MemoryInfoRepositoryImpl(memoryInfoSource, memoryInfoMapper)
     }
 
     @Test
@@ -23,6 +22,6 @@ class MemoryInfoRepositoryImplTest {
 
         verify { memoryInfoSource.getMemoryInfoDto() }
         verify { memoryInfoMapper.map(any()) }
-        confirmVerified(memoryInfoSource, memoryInfoMapper)
+        verifyNoMoreCalls(memoryInfoSource, memoryInfoMapper)
     }
 }

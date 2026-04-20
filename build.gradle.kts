@@ -40,9 +40,9 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        // keeping this here to allow automatic update
-        classpath("com.android.tools.build:gradle:7.0.4")
+        classpath("com.android.tools.build:gradle:8.7.3")
         classpath(Libs.Plugins.kotlin)
+        classpath(Libs.Plugins.mokkery)
         classpath(Libs.Plugins.test_logger)
     }
 }
@@ -56,7 +56,7 @@ allprojects {
     }
 
     tasks.withType<KotlinCompile> {
-        kotlinOptions.jvmTarget = Config.jvmTarget
+        compilerOptions.jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.fromTarget(Config.jvmTarget))
     }
 
     testLoggerConfig {
@@ -69,21 +69,27 @@ subprojects {
         if (project.plugins.findPlugin("org.jetbrains.kotlin.multiplatform") === null) return@afterEvaluate
         kmmConfig {
             sourceSets["commonTest"].dependencies {
-                implementation(Libs.Kmm.Tests.mockk)
                 implementation(kotlin(Libs.Kmm.Tests.kcommon))
                 implementation(kotlin(Libs.Kmm.Tests.kannotationscommon))
+                implementation(Libs.Kmm.Tests.coroutines)
             }
 
-            sourceSets["androidTest"].dependencies {
-                implementation(Libs.Android.Tests.mockk)
+            sourceSets.findByName("androidUnitTest")?.dependencies {
                 implementation(kotlin(Libs.Android.Tests.kotlin_junit))
+            }
+
+            sourceSets.findByName("androidInstrumentedTest")?.dependencies {
+                implementation(Libs.Android.Tests.mockk)
+            }
+
+            sourceSets.findByName("jvmTest")?.dependencies {
+                implementation(kotlin("test"))
             }
         }
 
         if (project.plugins.findPlugin("com.android.library") != null) {
             androidConfig {
                 compileSdk = Config.compileSdk
-                sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
                 defaultConfig {
                     minSdk = Config.minSdk
                     targetSdk = Config.targetSdk
@@ -103,8 +109,8 @@ tasks.named<Detekt>("detekt") {
     config.setFrom(files("$rootDir/quality/code/detekt.yml"))
     reports {
         html {
-            enabled = true
-            destination = file("build/reports/detekt.html")
+            required.set(true)
+            outputLocation.set(file("build/reports/detekt.html"))
         }
     }
     include("**/*.kt")
@@ -122,7 +128,7 @@ tasks.named<Detekt>("detekt") {
 }
 
 tasks.register("clean", Delete::class) {
-    delete(rootProject.buildDir)
+    delete(rootProject.layout.buildDirectory)
 }
 
 fun Project.testLoggerConfig(configure: Action<TestLoggerExtension>) =

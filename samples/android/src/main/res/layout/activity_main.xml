@@ -1,55 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="32dp"
-    tools:context=".MainActivity">
+    android:orientation="vertical"
+    android:background="@color/color_base">
 
-    <Button
-        android:id="@+id/cpuBtn"
+    <!-- Header -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:background="@drawable/header_gradient">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Kamper Performance Monitor"
+                android:textColor="@color/color_blue"
+                android:textSize="16sp"
+                android:textStyle="bold"/>
+
+            <View
+                android:layout_width="8dp"
+                android:layout_height="8dp"
+                android:layout_marginStart="8dp"
+                android:background="@drawable/dot_green"/>
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_gravity="bottom"
+            android:background="@color/color_surface0"/>
+    </FrameLayout>
+
+    <!-- Tabs -->
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tabLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:onClick="onBtnClicked"
-        android:text="CPU"
-        app:layout_constraintBottom_toTopOf="@id/fpsBtn"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_chainStyle="packed" />
+        android:background="@color/color_mantle"
+        app:tabSelectedTextColor="@color/color_text"
+        app:tabTextColor="@color/color_muted"
+        app:tabIndicatorColor="@color/color_blue"
+        app:tabMode="fixed"
+        app:tabGravity="fill"/>
 
-    <Button
-        android:id="@+id/fpsBtn"
+    <!-- Fragment container -->
+    <FrameLayout
+        android:id="@+id/fragmentContainer"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:onClick="onBtnClicked"
-        android:text="FPS"
-        app:layout_constraintBottom_toTopOf="@id/memoryBtn"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/cpuBtn" />
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="@color/color_base"/>
 
-    <Button
-        android:id="@+id/memoryBtn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:onClick="onBtnClicked"
-        android:text="Memory"
-        app:layout_constraintBottom_toTopOf="@id/networkBtn"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/fpsBtn" />
-
-    <Button
-        android:id="@+id/networkBtn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:onClick="onBtnClicked"
-        android:text="Network"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/memoryBtn" />
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>

@@ -5,7 +5,7 @@ import com.smellouk.kamper.api.KamperDslMarker
 import com.smellouk.kamper.api.Logger
 import com.smellouk.kamper.api.Performance
 import com.smellouk.kamper.api.PerformanceModule
-import com.smellouk.kamper.api.Watcher
+import com.smellouk.kamper.api.IWatcher
 import com.smellouk.kamper.memory.repository.MemoryInfoMapper
 import com.smellouk.kamper.memory.repository.MemoryInfoRepositoryImpl
 import com.smellouk.kamper.memory.repository.source.MemoryInfoSource
@@ -27,7 +27,7 @@ fun MemoryModule(
 private fun createPerformance(
     context: Context,
     logger: Logger
-): Performance<MemoryConfig, Watcher<MemoryInfo>, MemoryInfo> = MemoryPerformance(
+): Performance<MemoryConfig, IWatcher<MemoryInfo>, MemoryInfo> = MemoryPerformance(
     watcher = MemoryWatcher(
         defaultDispatcher = Dispatchers.Default,
         mainDispatcher = Dispatchers.Main,

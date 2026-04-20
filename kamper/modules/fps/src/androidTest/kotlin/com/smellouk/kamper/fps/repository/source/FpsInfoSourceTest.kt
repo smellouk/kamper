@@ -2,14 +2,15 @@ package com.smellouk.kamper.fps.repository.source
 
 import com.smellouk.kamper.api.nanosToSeconds
 import com.smellouk.kamper.fps.repository.FpsInfoDto
-import io.mockk.mockk
-import io.mockk.verify
+import dev.mokkery.matcher.any
+import dev.mokkery.spy
+import dev.mokkery.verify
 import org.junit.Before
 import org.junit.Test
 import kotlin.test.assertEquals
 
 class FpsInfoSourceTest {
-    private val choreographer = mockk<FpsChoreographer>(relaxed = true)
+    private val choreographer = spy(FpsChoreographer)
 
     private lateinit var classToTest: FpsInfoSource
     private lateinit var frameListener: FpsChoreographerFrameListener

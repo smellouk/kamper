@@ -4,7 +4,7 @@ import com.smellouk.kamper.api.KamperDslMarker
 import com.smellouk.kamper.api.Logger
 import com.smellouk.kamper.api.Performance
 import com.smellouk.kamper.api.PerformanceModule
-import com.smellouk.kamper.api.Watcher
+import com.smellouk.kamper.api.IWatcher
 import com.smellouk.kamper.fps.repository.FpsInfoMapper
 import com.smellouk.kamper.fps.repository.FpsInfoRepositoryImpl
 import com.smellouk.kamper.fps.repository.source.FpsChoreographer
@@ -30,7 +30,7 @@ fun FpsModule(
 
 private fun createPerformance(
     logger: Logger
-): Performance<FpsConfig, Watcher<FpsInfo>, FpsInfo> = FpsPerformance(
+): Performance<FpsConfig, IWatcher<FpsInfo>, FpsInfo> = FpsPerformance(
     watcher = FpsWatcher(
         defaultDispatcher = Dispatchers.Default,
         mainDispatcher = Dispatchers.Main,

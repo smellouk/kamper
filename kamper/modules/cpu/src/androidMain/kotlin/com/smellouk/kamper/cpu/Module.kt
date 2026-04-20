@@ -4,7 +4,7 @@ import com.smellouk.kamper.api.KamperDslMarker
 import com.smellouk.kamper.api.Logger
 import com.smellouk.kamper.api.Performance
 import com.smellouk.kamper.api.PerformanceModule
-import com.smellouk.kamper.api.Watcher
+import com.smellouk.kamper.api.IWatcher
 import com.smellouk.kamper.cpu.repository.CpuInfoMapper
 import com.smellouk.kamper.cpu.repository.CpuInfoRepositoryImpl
 import com.smellouk.kamper.cpu.repository.source.ProcCpuInfoSource
@@ -30,14 +30,14 @@ fun CpuModule(
 
 private fun createPerformance(
     logger: Logger
-): Performance<CpuConfig, Watcher<CpuInfo>, CpuInfo> = CpuPerformance(
+): Performance<CpuConfig, IWatcher<CpuInfo>, CpuInfo> = CpuPerformance(
     watcher = CpuWatcher(
         defaultDispatcher = Dispatchers.Default,
         mainDispatcher = Dispatchers.Main,
         repository = CpuInfoRepositoryImpl(
             cpuInfoMapper = CpuInfoMapper(),
-            procCpuInfoRawSource = ProcCpuInfoSource(logger),
-            shellCpuInfoRawSource = ShellCpuInfoSource(logger),
+            procCpuInfoSource = ProcCpuInfoSource(logger),
+            shellCpuInfoSource = ShellCpuInfoSource(logger),
         ),
         logger = logger
     ),

@@ -1,14 +1,20 @@
 plugins {
     kotlin("multiplatform")
+    id("dev.mokkery")
     id("com.android.library")
 }
 
-kotlin {
-    sourceSets {
-        android {
-            publishLibraryVariants("release")
-        }
+android {
+    namespace = "io.mellouk.kamper.api"
+}
 
+kotlin {
+    androidTarget()
+    jvm()
+    macosX64()
+    macosArm64()
+
+    sourceSets {
         val commonMain by getting {
             dependencies {
                 implementation(Libs.Kmm.Coroutines.core)

@@ -9,10 +9,10 @@ internal class FpsInfoMapper {
             return FpsInfo.INVALID
         }
 
-        if (currentFrameCount < 1 || currentFrameTimeInSeconds < startFrameTimeInSeconds) {
-            return FpsInfo.INVALID
-        }
-        val fps = currentFrameCount / (currentFrameTimeInSeconds - startFrameTimeInSeconds)
-        return FpsInfo(fps.roundToInt() - 1)
+        if (currentFrameCount < 2) return FpsInfo.INVALID
+        val duration = currentFrameTimeInSeconds - startFrameTimeInSeconds
+        if (duration <= 0.0) return FpsInfo.INVALID
+        val fps = (currentFrameCount - 1) / duration
+        return FpsInfo(fps.roundToInt())
     }
 }

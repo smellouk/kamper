@@ -1,8 +1,9 @@
 package com.smellouk.kamper.cpu.repository
 
 import com.smellouk.kamper.cpu.CpuInfo
-import io.mockk.every
-import io.mockk.mockk
+import dev.mokkery.answering.returns
+import dev.mokkery.every
+import dev.mokkery.mock
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -17,9 +18,14 @@ class CpuInfoMapperTest {
 
     @Test
     fun `map dto should return invalid cpu info when total is negative`() {
-        val dto = mockk<CpuInfoDto>().apply {
-            every { totalTime } returns -1.0
-        }
+        val dto = CpuInfoDto(
+            totalTime = -1.0,
+            userTime = 0.0,
+            systemTime = 0.0,
+            idleTime = 0.0,
+            ioWaitTime = 0.0,
+            appTime = 0.0
+        )
 
         val info = classToTest.map(dto)
 

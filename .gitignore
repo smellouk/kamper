@@ -3,7 +3,10 @@ local.properties
 credentials.properties
 /.idea/*
 .DS_Store
-/build
+**/build/
+**/.kotlin/
+*.kexe
+**/*.dSYM/
 /captures
 .externalNativeBuild
 .cxx

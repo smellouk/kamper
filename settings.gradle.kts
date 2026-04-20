@@ -11,3 +11,5 @@ include(":kamper:modules:network")
 include(":kamper:ui:android")
 
 include(":samples:android")
+include(":samples:jvm")
+include(":samples:macos")

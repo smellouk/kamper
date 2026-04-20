@@ -1,24 +1,28 @@
 object Versions {
-    const val kotlin = "1.6.10"
-    const val coroutines = "1.6.0"
+    const val kotlin = "2.3.20"
+    const val coroutines = "1.10.1"
 
-    const val androidx_app_compat = "1.3.1"
-    const val androidx_annotations = "1.3.0"
-    const val androidx_lifecycle = "2.3.1"
-    const val androidx_material = "1.4.0"
-    const val androidx_constraintlayout = "2.1.1"
-    const val androidx_core_ktx = "1.6.0"
+    const val androidx_app_compat = "1.7.0"
+    const val androidx_annotations = "1.9.1"
+    const val androidx_lifecycle = "2.8.7"
+    const val androidx_material = "1.12.0"
+    const val androidx_constraintlayout = "2.2.1"
+    const val androidx_core_ktx = "1.16.0"
 
-    const val mockk = "1.12.1"
-    const val detekt = "1.18.1"
+    const val mokkery = "3.3.0"
+    const val mockk = "1.14.3"
+    const val detekt = "1.23.7"
 
-    const val gradle_test_logger = "3.1.0"
+    const val gradle_test_logger = "4.0.0"
 }
 
 object Libs {
     object Plugins {
         const val kotlin =
             "org.jetbrains.kotlin:kotlin-gradle-plugin:${Versions.kotlin}"
+
+        const val mokkery =
+            "dev.mokkery:dev.mokkery.gradle.plugin:${Versions.mokkery}"
 
         object Detekt {
             const val id =
@@ -32,9 +36,6 @@ object Libs {
     }
 
     object Kmm {
-        val stdlib =
-            "org.jetbrains.kotlin:kotlin-stdlib-common:${Versions.kotlin}"
-
         object Coroutines {
             const val core =
                 "org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.coroutines}"
@@ -45,8 +46,6 @@ object Libs {
                 "test-common"
             const val kannotationscommon =
                 "test-annotations-common"
-            const val mockk =
-                "io.mockk:mockk-common:${Versions.mockk}"
             const val coroutines =
                 "org.jetbrains.kotlinx:kotlinx-coroutines-test:${Versions.coroutines}"
         }

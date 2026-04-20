@@ -1,6 +1,6 @@
 package com.smellouk.kamper.api
 
-open class Performance<C : Config, W : Watcher<I>, I : Info>(
+open class Performance<C : Config, W : IWatcher<I>, I : Info>(
     private val watcher: W,
     private val logger: Logger
 ) {
@@ -8,7 +8,7 @@ open class Performance<C : Config, W : Watcher<I>, I : Info>(
 
     private var listeners: List<InfoListener<I>> = emptyList()
 
-    fun initialize(config: C, listeners: List<InfoListener<I>>): Boolean {
+    open fun initialize(config: C, listeners: List<InfoListener<I>>): Boolean {
         if (config.intervalInMs <= 0) {
             return false
         }
@@ -37,5 +37,5 @@ open class Performance<C : Config, W : Watcher<I>, I : Info>(
 
 class PerformanceModule<C : Config, I : Info>(
     val config: C,
-    val performance: Performance<C, Watcher<I>, I>
+    val performance: Performance<C, IWatcher<I>, I>
 )

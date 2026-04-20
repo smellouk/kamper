@@ -3,7 +3,6 @@ package com.smellouk.kamper.samples
 import android.app.DownloadManager
 import android.content.Context
 import android.net.Uri
-import android.os.AsyncTask
 import android.os.Environment
 import java.text.DecimalFormat
 import java.util.Random
@@ -14,10 +13,8 @@ class Utils {
         val videoUrl =
             "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
 
-        fun startHeavyWorkOnBackgroundThread(): List<CpuWork> = mutableListOf<CpuWork>().apply {
-            for (i in 1..10) {
-                add(CpuWork().apply { execute() })
-            }
+        fun startHeavyWorkOnBackgroundThread() {
+            repeat(10) { CpuWork().execute() }
         }
 
         fun downloadBigBuckBunnyVideo(context: Context) {
@@ -39,14 +36,16 @@ private val percentFormatter = DecimalFormat("##.##%")
 fun Double.toPercent(): String = percentFormatter.format(this)
 fun Float.toDecimal(): String = String.format("%.2f", this)
 
-class CpuWork : AsyncTask<Void, Void, Unit>() {
-    override fun doInBackground(vararg params: Void?) {
-        val rd = Random()
-        val arr = IntArray(1_000_000)
-        for (i in arr.indices) {
-            arr[i] = rd.nextInt()
-        }
-        RandomSort(arr)
+class CpuWork {
+    fun execute() {
+        Thread {
+            val rd = Random()
+            val arr = IntArray(1_000_000)
+            for (i in arr.indices) {
+                arr[i] = rd.nextInt()
+            }
+            RandomSort(arr)
+        }.start()
     }
 }
 

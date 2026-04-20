@@ -1,10 +1,14 @@
 package com.smellouk.kamper.api
 
-import io.mockk.confirmVerified
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.verify
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import dev.mokkery.MockMode
+import dev.mokkery.answering.returns
+import dev.mokkery.answering.throws
+import dev.mokkery.every
+import dev.mokkery.matcher.any
+import dev.mokkery.mock
+import dev.mokkery.verify
+import dev.mokkery.verify.VerifyMode.Companion.exactly
+import dev.mokkery.verifyNoMoreCalls
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -14,17 +18,16 @@ import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 
-@ExperimentalCoroutinesApi
 @Suppress("IllegalIdentifier")
 class WatcherTest {
-    private val info = mockk<Info>(relaxed = true)
-    private val listener: InfoListener<Info> = mockk()
+    private val info = mock<Info>(MockMode.autofill)
+    private val listener = mock<MockableListener<Info>>()
 
     private val testScope = TestScope()
     private val defaultDispatcher = StandardTestDispatcher(testScope.testScheduler)
     private val mainDispatcher = defaultDispatcher
-    private val infoRepository = mockk<InfoRepository<Info>>()
-    private val logger = mockk<Logger>(relaxed = true)
+    private val infoRepository = mock<InfoRepository<Info>>()
+    private val logger = mock<Logger>(MockMode.autofill)
 
     private val classToTest: Watcher<Info> by lazy {
         Watcher(
@@ -38,53 +41,51 @@ class WatcherTest {
     @Test
     fun `startWatching should run scope loop with 2 runs and should log the gotten info`() =
         runTest {
-            every { listener(info) } returns Unit
+            every { listener.invoke(info) } returns Unit
             every { infoRepository.getInfo() } returns info
+            val infoString = info.toString()
 
             classToTest.startWatching(INTERVAL_IN_MS, listOf(listener)).also {
                 loopTwiceAndCancel()
             }
 
-            verify(exactly = 2) { logger.log(info.toString()) }
-            verify(exactly = 2) { listener.invoke(info) }
-            confirmVerified(logger, listener)
+            verify(exactly(2)) { logger.log(infoString) }
+            verify(exactly(2)) { listener.invoke(info) }
+            verifyNoMoreCalls(logger, listener)
         }
 
     @Test
     fun `startWatching should run scope loop with 2 runs and should not report info when infoRepository throw `() =
         runTest {
-            every { infoRepository.getInfo() } throws mockk<Exception>(relaxed = true)
+            every { infoRepository.getInfo() } throws Exception("test")
 
             classToTest.startWatching(INTERVAL_IN_MS, listOf(listener)).also {
                 loopTwiceAndCancel()
             }
 
-            verify(exactly = 2) { logger.log(any()) }
-            verify(exactly = 0) { listener.invoke(info) }
-            confirmVerified(logger, listener)
+            verify(exactly(2)) { logger.log(any()) }
+            verify(exactly(0)) { listener.invoke(any()) }
+            verifyNoMoreCalls(logger, listener)
         }
 
     @Test
     fun `stopWatching should cancel current job`() {
-        val job = mockk<Job>(relaxed = true)
+        val job = mock<Job>(MockMode.autofill)
         classToTest.job = job
 
         classToTest.stopWatching()
 
         verify { job.cancel() }
-        confirmVerified(job)
+        verifyNoMoreCalls(job)
     }
 
     private fun loopTwiceAndCancel() {
-        // first Run
         testScope.advanceTimeBy(INTERVAL_IN_MS)
         testScope.runCurrent()
 
-        // 2nd Run
         testScope.advanceTimeBy(INTERVAL_IN_MS)
         testScope.runCurrent()
 
-        // Job finished
         defaultDispatcher.cancel()
     }
 }

@@ -3,8 +3,6 @@ package com.smellouk.kamper.fps.respository
 import com.smellouk.kamper.fps.FpsInfo
 import com.smellouk.kamper.fps.repository.FpsInfoDto
 import com.smellouk.kamper.fps.repository.FpsInfoMapper
-import io.mockk.every
-import io.mockk.mockk
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -20,10 +18,25 @@ class FpsInfoMapperTest {
     }
 
     @Test
-    fun `map dto should return invalid fps info when currentFrameCount bellow 1`() {
-        val dto = mockk<FpsInfoDto>().apply {
-            every { currentFrameCount } returns WRONG_CURRENT_FRAME_COUNT
-        }
+    fun `map dto should return invalid fps info when currentFrameCount below 2`() {
+        val dto = FpsInfoDto(
+            currentFrameCount = WRONG_CURRENT_FRAME_COUNT,
+            startFrameTimeInSeconds = 0.0,
+            currentFrameTimeInSeconds = 0.0
+        )
+
+        val fpsInfo = classToTest.map(dto)
+
+        assertEquals(FpsInfo.INVALID, fpsInfo)
+    }
+
+    @Test
+    fun `map dto should return invalid fps info when only one frame was captured`() {
+        val dto = FpsInfoDto(
+            currentFrameCount = 1,
+            startFrameTimeInSeconds = CURRENT_FRAME_TIME,
+            currentFrameTimeInSeconds = CURRENT_FRAME_TIME
+        )
 
         val fpsInfo = classToTest.map(dto)
 

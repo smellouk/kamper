@@ -5,20 +5,23 @@ import com.smellouk.kamper.api.Info
 import com.smellouk.kamper.api.InfoListener
 import com.smellouk.kamper.api.Performance
 import com.smellouk.kamper.api.PerformanceModule
-import com.smellouk.kamper.api.Watcher
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.spyk
-import io.mockk.verify
+import com.smellouk.kamper.api.IWatcher
+import dev.mokkery.MockMode
+import dev.mokkery.answering.returns
+import dev.mokkery.every
+import dev.mokkery.matcher.any
+import dev.mokkery.mock
+import dev.mokkery.verify
+import dev.mokkery.verify.VerifyMode.Companion.exactly
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 @Suppress("IllegalIdentifier")
 class EngineTest {
-    private val performance = mockk<Performance<Config, Watcher<Info>, Info>>(relaxed = true)
+    private val performance = mock<Performance<Config, IWatcher<Info>, Info>>(MockMode.autofill)
 
-    private val classToTest = spyk<Engine>()
+    private val classToTest = Engine()
 
     @BeforeTest
     fun setup() {
@@ -72,7 +75,7 @@ class EngineTest {
     @Test
     fun `removeInfoListener should add remove the added listener from the current map listeners`() {
         classToTest.install(createPerformanceModule(true))
-        val listener = mockk<InfoListener<Info>>(relaxed = true)
+        val listener: InfoListener<Info> = { }
         classToTest.addInfoListener(listener)
 
         classToTest.removeInfoListener<Info>()
@@ -113,23 +116,23 @@ class EngineTest {
 
         assertEquals(1, classToTest.mapListeners.size)
         assertEquals(0, classToTest.performanceList.size)
-        verify(exactly = 0) { performanceMock.initialize(any(), any()) }
+        verify(exactly(0)) { performanceMock.initialize(any(), any()) }
     }
 
-    private fun createPerformance(isInitialized: Boolean): Performance<Config, Watcher<Info>, Info> =
-        mockk<Performance<Config, Watcher<Info>, Info>>().apply {
-            every { initialize(any(), any()) } returns isInitialized
+    private fun createPerformance(isInitialized: Boolean): Performance<Config, IWatcher<Info>, Info> =
+        mock<Performance<Config, IWatcher<Info>, Info>>().also {
+            every { it.initialize(any(), any()) } returns isInitialized
         }
 
     private fun createPerformanceModule(
         isConfigEnabled: Boolean,
-        performanceMock: Performance<Config, Watcher<Info>, Info>? = null
+        performanceMock: Performance<Config, IWatcher<Info>, Info>? = null
     ): PerformanceModule<Config, Info> {
-        return mockk<PerformanceModule<Config, Info>>(relaxed = true).apply {
-            every { config.isEnabled } returns isConfigEnabled
-            if (performanceMock != null) {
-                every { performance } returns performanceMock
-            }
+        val config = mock<Config>().also {
+            every { it.isEnabled } returns isConfigEnabled
+            every { it.intervalInMs } returns 1000L
         }
+        val perf = performanceMock ?: mock<Performance<Config, IWatcher<Info>, Info>>(MockMode.autofill)
+        return PerformanceModule(config, perf)
     }
 }

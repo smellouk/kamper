@@ -125,7 +125,7 @@ class ShellCpuInfoSourceTest {
         val dto = classToTest.getCpuInfoDto()
 
         assertEquals(EXPECTED_VALID_DTO, dto)
-        verify { Runtime.getRuntime().exec("top -n 1") }
+        verify { Runtime.getRuntime().exec("top -n 2 -d 1") }
         verify { android.os.Process.myPid() }
         verify { process.inputStream }
         verify { process.destroy() }
@@ -134,7 +134,7 @@ class ShellCpuInfoSourceTest {
 
     @Test
     fun `getCpuInfoDto should return invalid cpu info when exception is thrown`() {
-        every { Runtime.getRuntime().exec("top -n 1") } throws Exception("ANY_EXCEPTION")
+        every { Runtime.getRuntime().exec("top -n 2 -d 1") } throws Exception("ANY_EXCEPTION")
 
         val dto = classToTest.getCpuInfoDto()
 
@@ -147,7 +147,7 @@ class ShellCpuInfoSourceTest {
         every { inputStream } returns ByteArrayInputStream(cmdLineOutput.toByteArray())
         every { destroy() } returns Unit
     }.also { process ->
-        every { Runtime.getRuntime().exec("top -n 1") } returns process
+        every { Runtime.getRuntime().exec("top -n 2 -d 1") } returns process
     }
 }
 

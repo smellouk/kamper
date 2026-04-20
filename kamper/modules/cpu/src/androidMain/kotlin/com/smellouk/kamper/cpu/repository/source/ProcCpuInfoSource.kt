@@ -1,6 +1,7 @@
 package com.smellouk.kamper.cpu.repository.source
 
 import android.os.Process
+import android.util.Log
 import com.smellouk.kamper.api.Logger
 import com.smellouk.kamper.cpu.repository.CpuInfoDto
 import java.io.BufferedReader
@@ -15,11 +16,13 @@ internal class ProcCpuInfoSource(private val logger: Logger) : CpuInfoSource {
 
     override fun getCpuInfoDto(): CpuInfoDto {
         val pid = Process.myPid()
-        val currentCpuInfoDto = parse(
-            ProcFileReader.getCpuProcStatTime(),
-            ProcFileReader.getCpuProcPidStatTime(pid)
-        )
+        val statLine = try { ProcFileReader.getCpuProcStatTime().also { Log.d("Kamper/CPU/Proc", "/proc/stat first line: $it") } }
+            catch (e: Exception) { Log.e("Kamper/CPU/Proc", "/proc/stat read failed: ${e.message}"); throw e }
+        val pidStatLine = try { ProcFileReader.getCpuProcPidStatTime(pid).also { Log.d("Kamper/CPU/Proc", "/proc/$pid/stat first line: $it") } }
+            catch (e: Exception) { Log.e("Kamper/CPU/Proc", "/proc/$pid/stat read failed: ${e.message}"); throw e }
+        val currentCpuInfoDto = parse(statLine, pidStatLine)
 
+        Log.d("Kamper/CPU/Proc", "parsed current=$currentCpuInfoDto cached=${if (this::cachedDto.isInitialized) cachedDto else null}")
         return if (!this::cachedDto.isInitialized) {
             cachedDto = currentCpuInfoDto
             CpuInfoDto.INVALID
@@ -32,6 +35,7 @@ internal class ProcCpuInfoSource(private val logger: Logger) : CpuInfoSource {
                 systemTime = currentCpuInfoDto.systemTime - cachedDto.systemTime,
                 ioWaitTime = currentCpuInfoDto.ioWaitTime - cachedDto.ioWaitTime
             ).also {
+                Log.d("Kamper/CPU/Proc", "delta dto=$it")
                 cachedDto = currentCpuInfoDto
             }
         }

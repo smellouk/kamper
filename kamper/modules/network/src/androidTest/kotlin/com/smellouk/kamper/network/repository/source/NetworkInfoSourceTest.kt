@@ -39,8 +39,9 @@ class NetworkInfoSourceTest {
     }
 
     @Test
-    fun `getNetworkInfoDto should return not supported dto when device does not supports TrafficStats`() {
-        mockTraffic(NOT_SUPPORTED)
+    fun `getNetworkInfoDto should return not supported dto when system totals are unsupported`() {
+        mockSystemTraffic(NOT_SUPPORTED)
+        mockUidTraffic(NOT_SUPPORTED)
 
         val dto = classToTest.getNetworkInfoDto()
 
@@ -57,9 +58,28 @@ class NetworkInfoSourceTest {
         assertEquals(EXPECTED_DTO, dto)
     }
 
+    @Test
+    fun `getNetworkInfoDto should report system traffic and zero app traffic when uid tracking is unsupported`() {
+        classToTest.cachedDto = CACHED_DTO_UID_ZERO
+        mockSystemTraffic(ONE_MEGABYTE_TRAFFIC_IN_BYTES * 3)
+        mockUidTraffic(NOT_SUPPORTED)
+
+        val dto = classToTest.getNetworkInfoDto()
+
+        assertEquals(EXPECTED_DTO_UID_UNSUPPORTED, dto)
+    }
+
     private fun mockTraffic(trafficInBytes: Long) {
+        mockSystemTraffic(trafficInBytes)
+        mockUidTraffic(trafficInBytes)
+    }
+
+    private fun mockSystemTraffic(trafficInBytes: Long) {
         every { TrafficStats.getTotalRxBytes() } returns trafficInBytes
         every { TrafficStats.getTotalTxBytes() } returns trafficInBytes
+    }
+
+    private fun mockUidTraffic(trafficInBytes: Long) {
         every { TrafficStats.getUidRxBytes(MY_UUID) } returns trafficInBytes
         every { TrafficStats.getUidTxBytes(MY_UUID) } returns trafficInBytes
     }
@@ -75,9 +95,26 @@ private val CACHED_DTO = NetworkInfoDto(
     rxUidInBytes = ONE_MEGABYTE_TRAFFIC_IN_BYTES,
     txUidInBytes = ONE_MEGABYTE_TRAFFIC_IN_BYTES
 )
+
 private val EXPECTED_DTO = NetworkInfoDto(
     rxTotalInBytes = ONE_MEGABYTE_TRAFFIC_IN_BYTES * 2,
     txTotalInBytes = ONE_MEGABYTE_TRAFFIC_IN_BYTES * 2,
     rxUidInBytes = ONE_MEGABYTE_TRAFFIC_IN_BYTES * 2,
     txUidInBytes = ONE_MEGABYTE_TRAFFIC_IN_BYTES * 2
+)
+
+// UID bytes already normalized to 0 in cache (simulates first read on a device
+// where uid tracking is unsupported → coerced from -1 to 0)
+private val CACHED_DTO_UID_ZERO = NetworkInfoDto(
+    rxTotalInBytes = ONE_MEGABYTE_TRAFFIC_IN_BYTES,
+    txTotalInBytes = ONE_MEGABYTE_TRAFFIC_IN_BYTES,
+    rxUidInBytes = 0L,
+    txUidInBytes = 0L
+)
+
+private val EXPECTED_DTO_UID_UNSUPPORTED = NetworkInfoDto(
+    rxTotalInBytes = ONE_MEGABYTE_TRAFFIC_IN_BYTES * 2,
+    txTotalInBytes = ONE_MEGABYTE_TRAFFIC_IN_BYTES * 2,
+    rxUidInBytes = 0L,
+    txUidInBytes = 0L
 )

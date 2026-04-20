@@ -1,7 +1,7 @@
 package com.smellouk.kamper
 
 import com.smellouk.kamper.api.Logger
-import io.mockk.mockk
+import dev.mokkery.mock
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -9,7 +9,7 @@ import kotlin.test.assertEquals
 class KamperConfigBuilderTest {
     @Test
     fun `build should build correct config`() {
-        val logger = mockk<Logger>()
+        val logger = mock<Logger>()
 
         val config = KamperConfig.Builder.apply { this.logger = logger }.build()
 

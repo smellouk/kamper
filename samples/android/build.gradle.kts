@@ -4,6 +4,7 @@ plugins {
 }
 
 android {
+    namespace = "com.smellouk.kamper.samples"
     compileSdk = Config.compileSdk
 
     defaultConfig {
@@ -24,14 +25,16 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = Config.sourceCompatibility
+        targetCompatibility = Config.targetCompatibility
     }
-    kotlinOptions {
-        jvmTarget = Config.jvmTarget
+    kotlin {
+        compilerOptions {
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.fromTarget(Config.jvmTarget))
+        }
     }
     lint {
-        isAbortOnError = false
+        abortOnError = false
     }
 }
 

@@ -4,9 +4,9 @@ import com.smellouk.kamper.api.nanosToSeconds
 import com.smellouk.kamper.fps.repository.FpsInfoDto
 
 internal class FpsInfoSource(choreographer: FpsChoreographer) {
-    private var currentFrameCount: Int = 0
-    private var startFrameTimeNanos: Long = 0
-    private var currentFrameTimeNanos: Long = 0
+    @Volatile private var currentFrameCount: Int = 0
+    @Volatile private var startFrameTimeNanos: Long = 0
+    @Volatile private var currentFrameTimeNanos: Long = 0
 
     // Visible only for testing
     internal val frameListener: FpsChoreographerFrameListener = { frameTimeNanos ->

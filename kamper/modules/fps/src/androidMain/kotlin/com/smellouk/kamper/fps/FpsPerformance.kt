@@ -2,14 +2,14 @@ package com.smellouk.kamper.fps
 
 import com.smellouk.kamper.api.Cleanable
 import com.smellouk.kamper.api.Logger
+import com.smellouk.kamper.api.IWatcher
 import com.smellouk.kamper.api.Performance
-import com.smellouk.kamper.api.Watcher
 import com.smellouk.kamper.fps.repository.source.FpsChoreographer
 
 internal class FpsPerformance(
-    watcher: FpsWatcher,
+    watcher: IWatcher<FpsInfo>,
     logger: Logger
-) : Performance<FpsConfig, Watcher<FpsInfo>, FpsInfo>(watcher, logger), Cleanable {
+) : Performance<FpsConfig, IWatcher<FpsInfo>, FpsInfo>(watcher, logger), Cleanable {
     override fun start() {
         super.start()
         FpsChoreographer.start()

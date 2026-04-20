@@ -8,4 +8,9 @@ object Modules {
         const val MEMORY = ":kamper:modules:memory"
         const val NETWORK = ":kamper:modules:network"
     }
+
+    object Samples {
+        const val JVM = ":samples:jvm"
+        const val MACOS = ":samples:macos"
+    }
 }

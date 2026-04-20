@@ -17,8 +17,8 @@ class CpuInfoRepositoryImplTest {
 
     private val classToTest: CpuInfoRepositoryImpl by lazy {
         CpuInfoRepositoryImpl(
-            procCpuInfoRawSource = procCpuInfoRawSource,
-            shellCpuInfoRawSource = shellCpuInfoRawSource,
+            procCpuInfoSource = procCpuInfoRawSource,
+            shellCpuInfoSource = shellCpuInfoRawSource,
             cpuInfoMapper = cpuInfoMapper
         )
     }
@@ -26,15 +26,17 @@ class CpuInfoRepositoryImplTest {
     @Before
     fun setup() {
         mockkObject(ApiLevelProvider)
+        mockkObject(ProcStatAccessibilityProvider)
     }
 
     @After
     fun tearDown() {
         unmockkObject(ApiLevelProvider)
+        unmockkObject(ProcStatAccessibilityProvider)
     }
 
     @Test
-    fun `getInfo should get it from procCpuInfoRawSource when api level bellow 26`() {
+    fun `getInfo should get it from procCpuInfoRawSource when api level below 26`() {
         val dto = mockk<CpuInfoDto>()
         every { ApiLevelProvider.getApiLevel() } returns 20
         every { procCpuInfoRawSource.getCpuInfoDto() } returns dto
@@ -47,9 +49,24 @@ class CpuInfoRepositoryImplTest {
     }
 
     @Test
-    fun `getInfo should get it from shellCpuInfoRawSource when api level superior or equals to 26`() {
+    fun `getInfo should get it from procCpuInfoRawSource when api level 26+ and proc stat is accessible`() {
         val dto = mockk<CpuInfoDto>()
         every { ApiLevelProvider.getApiLevel() } returns 26
+        every { ProcStatAccessibilityProvider.isAccessible() } returns true
+        every { procCpuInfoRawSource.getCpuInfoDto() } returns dto
+
+        classToTest.getInfo()
+
+        verify { procCpuInfoRawSource.getCpuInfoDto() }
+        verify(exactly = 0) { shellCpuInfoRawSource.getCpuInfoDto() }
+        verify { cpuInfoMapper.map(dto) }
+    }
+
+    @Test
+    fun `getInfo should get it from shellCpuInfoRawSource when api level 26+ and proc stat is not accessible`() {
+        val dto = mockk<CpuInfoDto>()
+        every { ApiLevelProvider.getApiLevel() } returns 26
+        every { ProcStatAccessibilityProvider.isAccessible() } returns false
         every { shellCpuInfoRawSource.getCpuInfoDto() } returns dto
 
         classToTest.getInfo()

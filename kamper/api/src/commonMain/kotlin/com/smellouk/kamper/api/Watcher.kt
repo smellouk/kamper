@@ -13,11 +13,11 @@ open class Watcher<I : Info>(
     private val mainDispatcher: CoroutineDispatcher,
     private val infoRepository: InfoRepository<I>,
     private val logger: Logger
-) {
+) : IWatcher<I> {
     // Visible only for testing
     internal var job: Job? = null
 
-    fun startWatching(intervalInMs: Long, listeners: List<InfoListener<I>>) {
+    override fun startWatching(intervalInMs: Long, listeners: List<InfoListener<I>>) {
         if (job?.isActive == true) {
             return
         }
@@ -43,7 +43,7 @@ open class Watcher<I : Info>(
         }
     }
 
-    fun stopWatching() {
+    override fun stopWatching() {
         job?.cancel()
         job = null
     }

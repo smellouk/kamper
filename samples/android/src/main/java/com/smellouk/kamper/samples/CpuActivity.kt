@@ -8,8 +8,6 @@ import com.smellouk.kamper.cpu.CpuInfo
 import com.smellouk.kamper.cpu.CpuModule
 
 class CpuActivity : AppCompatActivity() {
-    private var cpuWorkList: List<CpuWork> = emptyList()
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_cpu)
@@ -32,11 +30,6 @@ class CpuActivity : AppCompatActivity() {
             }
         }
 
-        cpuWorkList = Utils.startHeavyWorkOnBackgroundThread()
-    }
-
-    override fun onDestroy() {
-        cpuWorkList.forEach { work -> work.cancel(true) }
-        super.onDestroy()
+        Utils.startHeavyWorkOnBackgroundThread()
     }
 }

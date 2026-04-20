@@ -2,29 +2,27 @@ package com.smellouk.kamper.fps.repository
 
 import com.smellouk.kamper.fps.FpsInfo
 import com.smellouk.kamper.fps.repository.source.FpsInfoSource
-import io.mockk.confirmVerified
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.verify
+import dev.mokkery.answering.returns
+import dev.mokkery.every
+import dev.mokkery.mock
+import dev.mokkery.verify
+import dev.mokkery.verifyNoMoreCalls
 import org.junit.Test
 import kotlin.test.assertEquals
 
 class FpsInfoRepositoryImplTest {
-    private val fpsInfoDto = mockk<FpsInfoDto>()
-    private val fpsInfoSource = mockk<FpsInfoSource>().apply {
-        every { getFpsInfoDto() } returns fpsInfoDto
+    private val fpsInfoDto = mock<FpsInfoDto>()
+    private val fpsInfoSource = mock<FpsInfoSource>().also {
+        every { it.getFpsInfoDto() } returns fpsInfoDto
     }
 
-    private val fpsInfo = mockk<FpsInfo>()
-    private val fpsInfoMapper = mockk<FpsInfoMapper>().apply {
-        every { map(fpsInfoDto) } returns fpsInfo
+    private val fpsInfo = mock<FpsInfo>()
+    private val fpsInfoMapper = mock<FpsInfoMapper>().also {
+        every { it.map(fpsInfoDto) } returns fpsInfo
     }
 
     private val classToTest: FpsInfoRepositoryImpl by lazy {
-        FpsInfoRepositoryImpl(
-            fpsInfoSource,
-            fpsInfoMapper
-        )
+        FpsInfoRepositoryImpl(fpsInfoSource, fpsInfoMapper)
     }
 
     @Test
@@ -34,6 +32,6 @@ class FpsInfoRepositoryImplTest {
         assertEquals(this.fpsInfo, fpsInfo)
         verify { fpsInfoSource.getFpsInfoDto() }
         verify { fpsInfoMapper.map(fpsInfoDto) }
-        confirmVerified(fpsInfoSource, fpsInfoMapper)
+        verifyNoMoreCalls(fpsInfoSource, fpsInfoMapper)
     }
 }

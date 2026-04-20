@@ -1,7 +1,7 @@
 package com.smellouk.kamper.memory
 
 import com.smellouk.kamper.api.Logger
-import io.mockk.mockk
+import dev.mokkery.mock
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -10,7 +10,7 @@ import kotlin.test.assertFalse
 class MemoryConfigBuilderTest {
     @Test
     fun `build should build correct config`() {
-        val loggerMock = mockk<Logger>()
+        val loggerMock = mock<Logger>()
         with(MemoryConfig.Builder.DEFAULT.apply {
             isEnabled = false
             intervalInMs = INTERVAL_IN_MS

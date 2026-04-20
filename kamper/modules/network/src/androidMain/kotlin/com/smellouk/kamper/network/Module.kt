@@ -4,7 +4,7 @@ import com.smellouk.kamper.api.KamperDslMarker
 import com.smellouk.kamper.api.Logger
 import com.smellouk.kamper.api.Performance
 import com.smellouk.kamper.api.PerformanceModule
-import com.smellouk.kamper.api.Watcher
+import com.smellouk.kamper.api.IWatcher
 import com.smellouk.kamper.network.repository.NetworkInfoMapper
 import com.smellouk.kamper.network.repository.NetworkInfoRepositoryImpl
 import com.smellouk.kamper.network.repository.source.NetworkInfoSource
@@ -30,7 +30,7 @@ fun NetworkModule(
 
 private fun createPerformance(
     logger: Logger
-): Performance<NetworkConfig, Watcher<NetworkInfo>, NetworkInfo> = NetworkPerformance(
+): Performance<NetworkConfig, IWatcher<NetworkInfo>, NetworkInfo> = NetworkPerformance(
     watcher = NetworkWatcher(
         defaultDispatcher = Dispatchers.Default,
         mainDispatcher = Dispatchers.Main,
