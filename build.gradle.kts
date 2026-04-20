@@ -48,7 +48,9 @@ buildscript {
 }
 
 allprojects {
-    apply(plugin = "com.adarshr.test-logger")
+    if (project.path != Modules.Samples.WEB) {
+        apply(plugin = "com.adarshr.test-logger")
+    }
 
     repositories {
         google()
@@ -59,8 +61,10 @@ allprojects {
         compilerOptions.jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.fromTarget(Config.jvmTarget))
     }
 
-    testLoggerConfig {
-        theme = ThemeType.MOCHA
+    if (project.path != Modules.Samples.WEB) {
+        testLoggerConfig {
+            theme = ThemeType.MOCHA
+        }
     }
 }
 
@@ -83,6 +87,10 @@ subprojects {
             }
 
             sourceSets.findByName("jvmTest")?.dependencies {
+                implementation(kotlin("test"))
+            }
+
+            sourceSets.findByName("jsTest")?.dependencies {
                 implementation(kotlin("test"))
             }
         }
@@ -127,8 +135,8 @@ tasks.named<Detekt>("detekt") {
     }
 }
 
-tasks.register("clean", Delete::class) {
-    delete(rootProject.layout.buildDirectory)
+tasks.withType<Delete>().configureEach {
+    if (name == "clean") delete(rootProject.layout.buildDirectory)
 }
 
 fun Project.testLoggerConfig(configure: Action<TestLoggerExtension>) =

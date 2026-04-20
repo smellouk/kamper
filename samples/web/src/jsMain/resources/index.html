@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kamper Web Demo</title>
+    <style>
+        :root {
+            --bg:       #1e1e2e;
+            --mantle:   #181825;
+            --surface0: #313244;
+            --surface1: #45475a;
+            --overlay1: #7f849c;
+            --subtext1: #bac2de;
+            --text:     #cdd6f4;
+            --lavender: #b4befe;
+            --blue:     #89b4fa;
+            --teal:     #94e2d5;
+            --green:    #a6e3a1;
+            --yellow:   #f9e2af;
+            --peach:    #fab387;
+            --red:      #f38ba8;
+            --mauve:    #cba6f7;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            min-height: 100vh;
+        }
+        header {
+            background: var(--mantle);
+            border-bottom: 1px solid var(--surface1);
+            padding: 14px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .app-title { font-size: 18px; font-weight: 700; color: var(--lavender); }
+        .header-right { display: flex; align-items: center; gap: 12px; }
+        .status-indicator {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: var(--surface1);
+            transition: background 0.3s;
+        }
+        .status-indicator.running { background: var(--green); }
+        .btn {
+            padding: 7px 16px;
+            border: none; border-radius: 6px;
+            cursor: pointer; font-size: 13px; font-weight: 600;
+            transition: opacity 0.15s;
+        }
+        .btn:hover { opacity: 0.85; }
+        .btn-start { background: var(--green); color: var(--mantle); }
+        .btn-stop  { background: var(--red);   color: var(--mantle); }
+        nav {
+            background: var(--mantle);
+            border-bottom: 1px solid var(--surface1);
+            display: flex;
+            padding: 0 24px;
+        }
+        .tab {
+            padding: 11px 18px;
+            background: transparent; border: none;
+            border-bottom: 2px solid transparent;
+            color: var(--overlay1); cursor: pointer;
+            font-size: 14px; font-weight: 500;
+            transition: all 0.15s;
+        }
+        .tab:hover { color: var(--subtext1); }
+        .tab.active { color: var(--blue); border-bottom-color: var(--blue); }
+        main { padding: 24px; max-width: 820px; }
+        .panel { display: none; }
+        .panel.active { display: block; }
+        .card {
+            background: var(--surface0);
+            border-radius: 10px; padding: 20px;
+            margin-bottom: 16px;
+        }
+        .card-title {
+            font-size: 11px; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 1px;
+            color: var(--overlay1); margin-bottom: 16px;
+        }
+        .metric-row {
+            display: flex; align-items: center; gap: 12px;
+            padding: 9px 0;
+            border-bottom: 1px solid var(--surface1);
+        }
+        .metric-row:last-child { border-bottom: none; padding-bottom: 0; }
+        .metric-label {
+            font-size: 13px; color: var(--subtext1);
+            width: 100px; flex-shrink: 0;
+        }
+        .bar-track {
+            flex: 1; background: var(--surface1);
+            height: 7px; border-radius: 4px; overflow: hidden;
+        }
+        .bar-fill {
+            height: 100%; border-radius: 4px;
+            transition: width 0.5s ease; width: 0%;
+        }
+        .metric-value {
+            font-size: 13px; font-family: monospace;
+            width: 72px; text-align: right; flex-shrink: 0;
+        }
+        .fps-hero {
+            text-align: center; padding: 28px 0;
+        }
+        .fps-number {
+            font-size: 80px; font-weight: 700;
+            font-family: monospace; color: var(--blue);
+            line-height: 1; letter-spacing: -2px;
+        }
+        .fps-unit {
+            font-size: 20px; color: var(--overlay1);
+            margin-top: 6px;
+        }
+        .fps-canvas-wrap {
+            display: flex; justify-content: center;
+            margin: 20px 0;
+        }
+        canvas { border-radius: 8px; }
+        .controls { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
+        .btn-action { background: var(--surface1); color: var(--text); }
+        .warning {
+            background: rgba(243,139,168,0.1);
+            border: 1px solid var(--red);
+            border-radius: 8px; padding: 10px 14px;
+            font-size: 13px; color: var(--red);
+            margin-top: 12px; display: none;
+        }
+        .warning.show { display: block; }
+        .unsupported {
+            text-align: center; padding: 40px;
+            color: var(--overlay1); font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div id="app"></div>
+    <script src="web.js"></script>
+</body>
+</html>

@@ -12,5 +12,6 @@ object Modules {
     object Samples {
         const val JVM = ":samples:jvm"
         const val MACOS = ":samples:macos"
+        const val WEB = ":samples:web"
     }
 }
