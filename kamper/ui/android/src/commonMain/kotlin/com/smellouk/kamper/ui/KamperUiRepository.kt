@@ -6,5 +6,6 @@ internal expect class KamperUiRepository {
     val state: StateFlow<KamperUiState>
     val settings: StateFlow<KamperUiSettings>
     fun updateSettings(s: KamperUiSettings)
+    fun clearIssues()
     fun clear()
 }

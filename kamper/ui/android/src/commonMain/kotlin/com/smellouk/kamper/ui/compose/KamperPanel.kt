@@ -9,11 +9,12 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -47,6 +48,7 @@ internal fun KamperPanel(
     state: StateFlow<KamperUiState>,
     settings: StateFlow<KamperUiSettings>,
     onSettingsChange: (KamperUiSettings) -> Unit,
+    onClearIssues: () -> Unit,
     onDismiss: () -> Unit
 ) {
     val s by state.collectAsState()
@@ -71,6 +73,7 @@ internal fun KamperPanel(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .fillMaxHeight(0.75f)
                     .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
                     .background(KamperTheme.SURFACE1)
                     .border(0.5.dp, KamperTheme.BORDER, RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
@@ -103,17 +106,23 @@ internal fun KamperPanel(
                 Row(modifier = Modifier.fillMaxWidth()) {
                     PanelTab("Activity", selectedTab == 0) { selectedTab = 0 }
                     Spacer(Modifier.width(16.dp))
-                    PanelTab("Settings", selectedTab == 1) { selectedTab = 1 }
+                    PanelTab("Issues", selectedTab == 1) { selectedTab = 1 }
+                    Spacer(Modifier.width(16.dp))
+                    PanelTab("Settings", selectedTab == 2) { selectedTab = 2 }
                     Spacer(Modifier.weight(1f))
                 }
 
                 Spacer(Modifier.height(12.dp))
 
-                Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-                    if (selectedTab == 0) {
-                        ActivityContent(s = s)
-                    } else {
-                        SettingsContent(cfg = cfg, onSettingsChange = onSettingsChange)
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .verticalScroll(rememberScrollState())
+                ) {
+                    when (selectedTab) {
+                        0    -> ActivityContent(s = s)
+                        1    -> IssuesTab(issues = s.issues, onClear = onClearIssues)
+                        else -> SettingsContent(cfg = cfg, onSettingsChange = onSettingsChange)
                     }
                     Spacer(Modifier.height(8.dp))
                 }
@@ -151,47 +160,47 @@ private fun PanelTab(label: String, selected: Boolean, onClick: () -> Unit) {
 private fun ActivityContent(s: KamperUiState) {
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         MetricCard(
-            title = "CPU",
+            title   = "CPU",
             current = "${s.cpuPercent.formatDp(1)}%",
             fraction = (s.cpuPercent / 100f).coerceIn(0f, 1f),
-            color = KamperTheme.BLUE,
+            color   = KamperTheme.BLUE,
             history = s.cpuHistory,
-            extra = null
+            extra   = null
         )
         MetricCard(
-            title = "FPS",
+            title   = "FPS",
             current = "${s.fps}",
             fraction = (s.fps / 60f).coerceIn(0f, 1f),
-            color = KamperTheme.GREEN,
+            color   = KamperTheme.GREEN,
             history = s.fpsHistory,
-            extra = if (s.fpsPeak > 0) "Peak ${s.fpsPeak}  Low ${if (s.fpsLow == Int.MAX_VALUE) "—" else "${s.fpsLow}"}" else null
+            extra   = if (s.fpsPeak > 0) "Peak ${s.fpsPeak}  Low ${if (s.fpsLow == Int.MAX_VALUE) "—" else "${s.fpsLow}"}" else null
         )
         MetricCard(
-            title = "Memory",
+            title   = "Memory",
             current = "${s.memoryUsedMb.formatDp(0)} MB",
             fraction = (s.memoryUsedMb / 512f).coerceIn(0f, 1f),
-            color = KamperTheme.PEACH,
+            color   = KamperTheme.PEACH,
             history = s.memoryHistory,
-            extra = null
+            extra   = null
         )
         val netDisplay = if (s.downloadMbps < 0.1f)
             "${(s.downloadMbps * 1024f).formatDp(1)} KB/s"
         else
             "${s.downloadMbps.formatDp(2)} MB/s"
         MetricCard(
-            title = "Network ↓",
+            title   = "Network ↓",
             current = netDisplay,
             fraction = (s.downloadMbps / 10f).coerceIn(0f, 1f),
-            color = KamperTheme.TEAL,
+            color   = KamperTheme.TEAL,
             history = s.downloadHistory,
-            extra = null
+            extra   = null
         )
     }
 }
 
 @Composable
 private fun SettingsContent(cfg: KamperUiSettings, onSettingsChange: (KamperUiSettings) -> Unit) {
-    val enabledCount = listOf(cfg.showCpu, cfg.showFps, cfg.showMemory, cfg.showNetwork).count { it }
+    val enabledCount = listOf(cfg.showCpu, cfg.showFps, cfg.showMemory, cfg.showNetwork, cfg.showIssues).count { it }
 
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(
@@ -201,18 +210,11 @@ private fun SettingsContent(cfg: KamperUiSettings, onSettingsChange: (KamperUiSe
             fontWeight = FontWeight.SemiBold,
             modifier = Modifier.padding(bottom = 2.dp)
         )
-        SettingToggle("⚙  CPU", KamperTheme.BLUE, cfg.showCpu, cfg.showCpu && enabledCount == 1) {
-            onSettingsChange(cfg.copy(showCpu = it))
-        }
-        SettingToggle("◎  FPS", KamperTheme.GREEN, cfg.showFps, cfg.showFps && enabledCount == 1) {
-            onSettingsChange(cfg.copy(showFps = it))
-        }
-        SettingToggle("▦  Memory", KamperTheme.PEACH, cfg.showMemory, cfg.showMemory && enabledCount == 1) {
-            onSettingsChange(cfg.copy(showMemory = it))
-        }
-        SettingToggle("↓  Network", KamperTheme.TEAL, cfg.showNetwork, cfg.showNetwork && enabledCount == 1) {
-            onSettingsChange(cfg.copy(showNetwork = it))
-        }
+        SettingToggle("⚙  CPU",    KamperTheme.BLUE,   cfg.showCpu,     cfg.showCpu     && enabledCount == 1) { onSettingsChange(cfg.copy(showCpu     = it)) }
+        SettingToggle("◎  FPS",    KamperTheme.GREEN,  cfg.showFps,     cfg.showFps     && enabledCount == 1) { onSettingsChange(cfg.copy(showFps     = it)) }
+        SettingToggle("▦  Memory", KamperTheme.PEACH,  cfg.showMemory,  cfg.showMemory  && enabledCount == 1) { onSettingsChange(cfg.copy(showMemory  = it)) }
+        SettingToggle("↓  Network",KamperTheme.TEAL,   cfg.showNetwork, cfg.showNetwork && enabledCount == 1) { onSettingsChange(cfg.copy(showNetwork = it)) }
+        SettingToggle("⚠  Issues", KamperTheme.RED,    cfg.showIssues,  cfg.showIssues  && enabledCount == 1) { onSettingsChange(cfg.copy(showIssues  = it)) }
     }
 }
 
@@ -245,13 +247,13 @@ private fun SettingToggle(
             onCheckedChange = onCheckedChange,
             enabled = !isLastEnabled,
             colors = SwitchDefaults.colors(
-                checkedThumbColor = KamperTheme.BASE,
-                checkedTrackColor = KamperTheme.BLUE,
-                uncheckedThumbColor = KamperTheme.SUBTEXT,
-                uncheckedTrackColor = KamperTheme.SURFACE,
-                uncheckedBorderColor = KamperTheme.BORDER,
-                disabledCheckedThumbColor = KamperTheme.SURFACE,
-                disabledCheckedTrackColor = KamperTheme.SUBTEXT
+                checkedThumbColor          = KamperTheme.BASE,
+                checkedTrackColor          = KamperTheme.BLUE,
+                uncheckedThumbColor        = KamperTheme.SUBTEXT,
+                uncheckedTrackColor        = KamperTheme.SURFACE,
+                uncheckedBorderColor       = KamperTheme.BORDER,
+                disabledCheckedThumbColor  = KamperTheme.SURFACE,
+                disabledCheckedTrackColor  = KamperTheme.SUBTEXT
             )
         )
     }
@@ -295,12 +297,7 @@ private fun MetricCard(
         }
 
         if (extra != null) {
-            Text(
-                extra,
-                color = KamperTheme.SUBTEXT,
-                fontSize = 10.sp,
-                modifier = Modifier.padding(top = 2.dp)
-            )
+            Text(extra, color = KamperTheme.SUBTEXT, fontSize = 10.sp, modifier = Modifier.padding(top = 2.dp))
         }
 
         Spacer(Modifier.height(8.dp))
@@ -326,9 +323,7 @@ private fun MetricCard(
             Sparkline(
                 data = history,
                 color = color,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(48.dp)
+                modifier = Modifier.fillMaxWidth().height(48.dp)
             )
         }
     }

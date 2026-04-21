@@ -25,6 +25,7 @@ class KamperPanelActivity : AppCompatActivity() {
                     state = repo.state,
                     settings = repo.settings,
                     onSettingsChange = { repo.updateSettings(it) },
+                    onClearIssues = { repo.clearIssues() },
                     onDismiss = ::finish
                 )
             }

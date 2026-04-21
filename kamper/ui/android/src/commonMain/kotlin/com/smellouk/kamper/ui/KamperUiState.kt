@@ -1,5 +1,7 @@
 package com.smellouk.kamper.ui
 
+import com.smellouk.kamper.issues.Issue
+
 data class KamperUiState(
     val cpuPercent: Float,
     val cpuHistory: List<Float>,
@@ -10,7 +12,9 @@ data class KamperUiState(
     val memoryUsedMb: Float,
     val memoryHistory: List<Float>,
     val downloadMbps: Float,
-    val downloadHistory: List<Float>
+    val downloadHistory: List<Float>,
+    val issues: List<Issue> = emptyList(),
+    val unreadIssueCount: Int = 0
 ) {
     companion object {
         val EMPTY = KamperUiState(

@@ -4,6 +4,7 @@ import android.view.Choreographer
 
 internal object FpsChoreographer {
     private var choreographer: Choreographer? = null
+    private var isStarted = false
 
     // Visible only for testing
     internal val frameCallback = object : Choreographer.FrameCallback {
@@ -19,6 +20,8 @@ internal object FpsChoreographer {
     }
 
     fun start() {
+        if (isStarted) return
+        isStarted = true
         if (choreographer == null) {
             choreographer = Choreographer.getInstance()
         }
@@ -26,10 +29,12 @@ internal object FpsChoreographer {
     }
 
     fun stop() {
+        isStarted = false
         choreographer?.removeFrameCallback(frameCallback)
     }
 
     fun clean() {
+        isStarted = false
         choreographer = null
         frameListener = null
     }

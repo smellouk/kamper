@@ -8,6 +8,9 @@ import android.view.Choreographer
 import com.smellouk.kamper.Engine
 import com.smellouk.kamper.cpu.CpuInfo
 import com.smellouk.kamper.cpu.CpuModule
+import com.smellouk.kamper.issues.AnrConfig
+import com.smellouk.kamper.issues.IssueInfo
+import com.smellouk.kamper.issues.IssuesModule
 import com.smellouk.kamper.memory.MemoryInfo
 import com.smellouk.kamper.memory.MemoryModule
 import com.smellouk.kamper.network.NetworkInfo
@@ -18,16 +21,19 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
 private const val HISTORY_SIZE = 60
+private const val MAX_ISSUES = 100
+private const val PREF_ISSUES = "issues_list"
 
 internal actual class KamperUiRepository(context: Context) {
     private val prefs = (context.applicationContext as Application)
         .getSharedPreferences("kamper_ui_prefs", Context.MODE_PRIVATE)
 
     private fun loadSettings() = KamperUiSettings(
-        showCpu = prefs.getBoolean("show_cpu", true),
-        showFps = prefs.getBoolean("show_fps", true),
-        showMemory = prefs.getBoolean("show_memory", true),
-        showNetwork = prefs.getBoolean("show_network", true)
+        showCpu     = prefs.getBoolean("show_cpu", true),
+        showFps     = prefs.getBoolean("show_fps", true),
+        showMemory  = prefs.getBoolean("show_memory", true),
+        showNetwork = prefs.getBoolean("show_network", true),
+        showIssues  = prefs.getBoolean("show_issues", true)
     )
 
     private val _settings = MutableStateFlow(loadSettings())
@@ -40,6 +46,7 @@ internal actual class KamperUiRepository(context: Context) {
             .putBoolean("show_fps", s.showFps)
             .putBoolean("show_memory", s.showMemory)
             .putBoolean("show_network", s.showNetwork)
+            .putBoolean("show_issues", s.showIssues)
             .apply()
     }
 
@@ -57,6 +64,24 @@ internal actual class KamperUiRepository(context: Context) {
         addLast(v)
     }
 
+    // Issues persisted as newline-delimited serialized strings
+    private val issuesList = loadPersistedIssues()
+
+    private fun loadPersistedIssues(): MutableList<com.smellouk.kamper.issues.Issue> {
+        val raw = prefs.getString(PREF_ISSUES, "") ?: return mutableListOf()
+        return raw.lines().mapNotNull { it.deserializeIssue() }.toMutableList()
+    }
+
+    private fun saveIssues() {
+        prefs.edit().putString(PREF_ISSUES, issuesList.joinToString("\n") { it.serialize() }).apply()
+    }
+
+    actual fun clearIssues() {
+        issuesList.clear()
+        saveIssues()
+        _state.update { it.copy(issues = emptyList(), unreadIssueCount = 0) }
+    }
+
     private var fpsFrameCount = 0
     private var fpsWindowStartNanos = 0L
 
@@ -72,9 +97,9 @@ internal actual class KamperUiRepository(context: Context) {
                 fpsHist.push(fps.toFloat())
                 _state.update { s ->
                     s.copy(
-                        fps = fps,
+                        fps     = fps,
                         fpsPeak = maxOf(s.fpsPeak, fps),
-                        fpsLow = if (s.fpsLow == Int.MAX_VALUE) fps else minOf(s.fpsLow, fps),
+                        fpsLow  = if (s.fpsLow == Int.MAX_VALUE) fps else minOf(s.fpsLow, fps),
                         fpsHistory = fpsHist.toList()
                     )
                 }
@@ -84,10 +109,16 @@ internal actual class KamperUiRepository(context: Context) {
     }
 
     init {
+        // Emit persisted issues immediately
+        if (issuesList.isNotEmpty()) {
+            _state.update { it.copy(issues = issuesList.toList()) }
+        }
+
         with(engine) {
             install(CpuModule)
             install(MemoryModule(context))
             install(NetworkModule)
+            install(IssuesModule(context, anr = AnrConfig()) { crash { chainToPreviousHandler = false } })
 
             addInfoListener<CpuInfo> { info ->
                 if (info == CpuInfo.INVALID) return@addInfoListener
@@ -108,6 +139,19 @@ internal actual class KamperUiRepository(context: Context) {
                 val v = info.rxSystemTotalInMb
                 netHist.push(v)
                 _state.update { s -> s.copy(downloadMbps = v, downloadHistory = netHist.toList()) }
+            }
+
+            addInfoListener<IssueInfo> { info ->
+                if (info == IssueInfo.INVALID) return@addInfoListener
+                issuesList.add(0, info.issue)
+                if (issuesList.size > MAX_ISSUES) issuesList.removeAt(issuesList.size - 1)
+                saveIssues()
+                _state.update { s ->
+                    s.copy(
+                        issues           = issuesList.toList(),
+                        unreadIssueCount = s.unreadIssueCount + 1
+                    )
+                }
             }
 
             start()

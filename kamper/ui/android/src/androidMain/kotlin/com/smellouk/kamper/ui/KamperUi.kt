@@ -20,7 +20,7 @@ actual object KamperUi {
         if (!config.isEnabled) return
         val app = context.applicationContext as Application
         val repo = KamperUiRepository(app).also { repository = it }
-        overlayManager = AndroidOverlayManager(app, repo.state, repo.settings, config).also { it.show() }
+        overlayManager = AndroidOverlayManager(app, repo.state, repo.settings, config, repo::clearIssues).also { it.show() }
     }
 
     actual fun detach() {

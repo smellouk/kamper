@@ -73,6 +73,7 @@ actual object KamperUi {
             KamperChip(
                 state = s,
                 settings = cfg,
+                chipState = chipState,
                 onClick = {
                     when (chipState) {
                         ChipState.PEEK -> expandChip()
@@ -127,6 +128,7 @@ actual object KamperUi {
                 state = repo.state,
                 settings = repo.settings,
                 onSettingsChange = { repo.updateSettings(it) },
+                onClearIssues = { repo.clearIssues() },
                 onDismiss = { parent.dismissViewControllerAnimated(true, null) }
             )
         }

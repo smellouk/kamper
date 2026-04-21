@@ -13,6 +13,8 @@ internal object KamperTheme {
     val PEACH   = Color(0xFFFAB387)
     val TEAL    = Color(0xFF94E2D5)
     val RED     = Color(0xFFF38BA8)
+    val YELLOW  = Color(0xFFF9E2AF)
+    val MAUVE   = Color(0xFFCBA6F7)
     val TEXT    = Color(0xFFCDD6F4)
     val SUBTEXT = Color(0xFFA6ADC8)
     val SCRIM   = Color(0x991E1E2E)

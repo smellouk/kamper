@@ -9,8 +9,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -22,17 +24,24 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.smellouk.kamper.ui.ChipState
 import com.smellouk.kamper.ui.KamperUiSettings
 import com.smellouk.kamper.ui.KamperUiState
 
 private val CHIP_SHAPE = RoundedCornerShape(10.dp)
 
+// Row = icon(14dp) + label(natural, max 44dp) + spacer + value
+// Total min width ~120dp so PEEK (56dp) always shows icon + label fully
+private const val ROW_WIDTH_DP = 128
+
 @Composable
 internal fun KamperChip(
     state: KamperUiState,
     settings: KamperUiSettings = KamperUiSettings(),
+    chipState: ChipState = ChipState.PEEK,
     onClick: () -> Unit,
     mirrorLayout: Boolean = false,
     onDrag: ((dx: Float, dy: Float) -> Unit)? = null,
@@ -53,18 +62,8 @@ internal fun KamperChip(
                     change.consume()
                     onDrag(dragAmount.x, dragAmount.y)
                 },
-                onDragEnd = {
-                    if (dragging) {
-                        dragging = false
-                        onDragEnd?.invoke()
-                    }
-                },
-                onDragCancel = {
-                    if (dragging) {
-                        dragging = false
-                        onDragEnd?.invoke()
-                    }
-                }
+                onDragEnd   = { if (dragging) { dragging = false; onDragEnd?.invoke() } },
+                onDragCancel = { if (dragging) { dragging = false; onDragEnd?.invoke() } }
             )
         }
     } else Modifier
@@ -76,13 +75,76 @@ internal fun KamperChip(
             .background(KamperTheme.SURFACE1)
             .border(0.5.dp, KamperTheme.BORDER, CHIP_SHAPE)
             .clickable(onClick = onClick)
-            .padding(horizontal = 6.dp, vertical = 6.dp)
+            .padding(
+                start = if (mirrorLayout && chipState == ChipState.PEEK) 6.dp else 6.dp,
+                end   = if (mirrorLayout && chipState == ChipState.PEEK) 3.dp else 6.dp,
+                top   = 6.dp,
+                bottom = 6.dp
+            )
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-            if (settings.showCpu) MetricRow("⚙", KamperTheme.BLUE, "CPU", "${state.cpuPercent.formatDp(1)}%", mirrorLayout)
-            if (settings.showFps) MetricRow("◎", KamperTheme.GREEN, "FPS", "${state.fps} fps", mirrorLayout)
-            if (settings.showMemory) MetricRow("▦", KamperTheme.PEACH, "MEM", "${state.memoryUsedMb.formatDp(0)} MB", mirrorLayout)
-            if (settings.showNetwork) MetricRow("↓", KamperTheme.TEAL, "NET", netDisplay, mirrorLayout)
+            if (settings.showCpu)     MetricRow("⚙", KamperTheme.BLUE,  "CPU",     "${state.cpuPercent.formatDp(1)}%", mirrorLayout)
+            if (settings.showFps)     MetricRow("◎", KamperTheme.GREEN, "FPS",     "${state.fps} fps", mirrorLayout)
+            if (settings.showMemory)  MetricRow("▦", KamperTheme.PEACH, "MEM",     "${state.memoryUsedMb.formatDp(0)} MB", mirrorLayout)
+            if (settings.showNetwork) MetricRow("↓", KamperTheme.TEAL,  "NET",     netDisplay, mirrorLayout)
+
+            if (settings.showIssues) {
+                Box(
+                    Modifier
+                        .width(ROW_WIDTH_DP.dp)
+                        .height(0.5.dp)
+                        .background(KamperTheme.BORDER)
+                )
+                val count  = state.issues.size
+                val unread = state.unreadIssueCount
+                val badgeColor = if (count > 0) KamperTheme.RED else KamperTheme.SUBTEXT
+
+                if (chipState == ChipState.PEEK) {
+                    // PEEK: icon + count badge only, no label
+                    IssueBadgeRow(count, badgeColor, mirrorLayout)
+                } else {
+                    val value = when {
+                        count == 0 -> "none"
+                        unread > 0 -> "$count (+$unread)"
+                        else       -> "$count"
+                    }
+                    MetricRow("⚠", badgeColor, "ISSUES", value, mirrorLayout)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun IssueBadgeRow(count: Int, color: Color, mirror: Boolean) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.width(ROW_WIDTH_DP.dp)
+    ) {
+        if (!mirror) {
+            Text("⚠", color = color, fontSize = 11.sp, fontWeight = FontWeight.Bold, modifier = Modifier.width(14.dp))
+            if (count > 0) {
+                Text(
+                    "$count",
+                    color = color,
+                    fontSize = 11.sp,
+                    fontFamily = FontFamily.Monospace,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+        } else {
+            Spacer(Modifier.weight(1f))
+            if (count > 0) {
+                Text(
+                    "$count",
+                    color = color,
+                    fontSize = 11.sp,
+                    fontFamily = FontFamily.Monospace,
+                    fontWeight = FontWeight.Bold
+                )
+                Spacer(Modifier.width(2.dp))
+            }
+            Text("⚠", color = color, fontSize = 11.sp, fontWeight = FontWeight.Bold, modifier = Modifier.width(14.dp))
         }
     }
 }
@@ -91,18 +153,61 @@ internal fun KamperChip(
 private fun MetricRow(icon: String, color: Color, label: String, value: String, mirror: Boolean) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.width(120.dp)
+        modifier = Modifier.width(ROW_WIDTH_DP.dp)
     ) {
         if (!mirror) {
-            Text(icon, color = color, fontSize = 11.sp, fontWeight = FontWeight.Bold, modifier = Modifier.width(16.dp))
-            Text(label, color = color, fontSize = 11.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.width(30.dp))
+            Text(
+                icon,
+                color = color,
+                fontSize = 11.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.width(14.dp)
+            )
+            Text(
+                label,
+                color = color,
+                fontSize = 11.sp,
+                fontWeight = FontWeight.SemiBold,
+                maxLines = 1,
+                overflow = TextOverflow.Clip,
+                modifier = Modifier.widthIn(max = 44.dp)
+            )
             Spacer(Modifier.weight(1f))
-            Text(value, color = KamperTheme.TEXT, fontSize = 11.sp, fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold)
+            Text(
+                value,
+                color = KamperTheme.TEXT,
+                fontSize = 11.sp,
+                fontFamily = FontFamily.Monospace,
+                fontWeight = FontWeight.Bold,
+                maxLines = 1
+            )
         } else {
-            Text(value, color = KamperTheme.TEXT, fontSize = 11.sp, fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold)
+            Text(
+                value,
+                color = KamperTheme.TEXT,
+                fontSize = 11.sp,
+                fontFamily = FontFamily.Monospace,
+                fontWeight = FontWeight.Bold,
+                maxLines = 1
+            )
             Spacer(Modifier.weight(1f))
-            Text(label, color = color, fontSize = 11.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.width(30.dp))
-            Text(icon, color = color, fontSize = 11.sp, fontWeight = FontWeight.Bold, modifier = Modifier.width(16.dp))
+            Text(
+                label,
+                color = color,
+                fontSize = 11.sp,
+                fontWeight = FontWeight.SemiBold,
+                maxLines = 1,
+                overflow = TextOverflow.Clip,
+                modifier = Modifier.widthIn(max = 44.dp)
+            )
+            Spacer(Modifier.width(2.dp))
+            Text(
+                icon,
+                color = color,
+                fontSize = 11.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.width(14.dp)
+            )
         }
     }
 }

@@ -34,7 +34,8 @@ internal class AndroidOverlayManager(
     private val app: Application,
     private val state: StateFlow<KamperUiState>,
     private val settings: StateFlow<KamperUiSettings>,
-    private val config: KamperUiConfig
+    private val config: KamperUiConfig,
+    private val onClearIssues: () -> Unit
 ) {
     private val density = app.resources.displayMetrics.density
     private val peekWidthPx get() = (PEEK_WIDTH_DP * density).toInt()
@@ -99,6 +100,7 @@ internal class AndroidOverlayManager(
                 KamperChip(
                     state = s,
                     settings = cfg,
+                    chipState = chipState,
                     mirrorLayout = mirrorLayout,
                     onClick = {
                         mainHandler.post {
