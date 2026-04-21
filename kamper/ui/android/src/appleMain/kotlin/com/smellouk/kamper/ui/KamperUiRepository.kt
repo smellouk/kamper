@@ -1,15 +1,27 @@
 package com.smellouk.kamper.ui
 
 import com.smellouk.kamper.Engine
+import com.smellouk.kamper.api.InfoListener
+import com.smellouk.kamper.api.PerformanceModule
+import com.smellouk.kamper.cpu.CpuConfig
 import com.smellouk.kamper.cpu.CpuInfo
 import com.smellouk.kamper.cpu.CpuModule
+import com.smellouk.kamper.fps.FpsConfig
 import com.smellouk.kamper.fps.FpsInfo
 import com.smellouk.kamper.fps.FpsModule
 import com.smellouk.kamper.issues.AnrConfig
+import com.smellouk.kamper.issues.CrashConfig
+import com.smellouk.kamper.issues.DroppedFramesConfig
 import com.smellouk.kamper.issues.IssueInfo
+import com.smellouk.kamper.issues.IssuesConfig
 import com.smellouk.kamper.issues.IssuesModule
+import com.smellouk.kamper.issues.MemoryPressureConfig
+import com.smellouk.kamper.issues.SlowSpanConfig
+import com.smellouk.kamper.issues.SlowStartConfig
+import com.smellouk.kamper.memory.MemoryConfig
 import com.smellouk.kamper.memory.MemoryInfo
 import com.smellouk.kamper.memory.MemoryModule
+import com.smellouk.kamper.network.NetworkConfig
 import com.smellouk.kamper.network.NetworkInfo
 import com.smellouk.kamper.network.NetworkModule
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,30 +37,88 @@ private const val PREF_ISSUES = "kamper_issues_list"
 internal actual class KamperUiRepository {
     private val defaults = NSUserDefaults.standardUserDefaults
 
-    private fun loadSettings(): KamperUiSettings {
-        fun bool(key: String) = if (defaults.objectForKey(key) != null) defaults.boolForKey(key) else true
-        return KamperUiSettings(
-            showCpu     = bool("show_cpu"),
-            showFps     = bool("show_fps"),
-            showMemory  = bool("show_memory"),
-            showNetwork = bool("show_network"),
-            showIssues  = bool("show_issues")
-        )
-    }
+    // ── Settings persistence ──────────────────────────────────────────────────
 
-    private val _settings = MutableStateFlow(loadSettings())
-    actual val settings: StateFlow<KamperUiSettings> = _settings.asStateFlow()
+    private fun bool(key: String, default: Boolean = true) =
+        if (defaults.objectForKey(key) != null) defaults.boolForKey(key) else default
 
-    actual fun updateSettings(s: KamperUiSettings) {
-        _settings.value = s
+    private fun long(key: String, default: Long) =
+        if (defaults.objectForKey(key) != null) defaults.integerForKey(key).toLong() else default
+
+    private fun float(key: String, default: Float) =
+        if (defaults.objectForKey(key) != null) defaults.floatForKey(key) else default
+
+    private fun int(key: String, default: Int) =
+        if (defaults.objectForKey(key) != null) defaults.integerForKey(key).toInt() else default
+
+    private fun loadSettings() = KamperUiSettings(
+        showCpu                           = bool("show_cpu"),
+        showFps                           = bool("show_fps"),
+        showMemory                        = bool("show_memory"),
+        showNetwork                       = bool("show_network"),
+        showIssues                        = bool("show_issues"),
+        cpuEnabled                        = bool("cpu_enabled"),
+        fpsEnabled                        = bool("fps_enabled"),
+        memoryEnabled                     = bool("memory_enabled"),
+        networkEnabled                    = bool("network_enabled"),
+        issuesEnabled                     = bool("issues_enabled"),
+        cpuIntervalMs                     = long("cpu_interval_ms", 1_000L),
+        memoryIntervalMs                  = long("memory_interval_ms", 1_000L),
+        networkIntervalMs                 = long("network_interval_ms", 1_000L),
+        issuesIntervalMs                  = long("issues_interval_ms", 1_000L),
+        slowSpanEnabled                   = bool("slow_span_enabled"),
+        slowSpanThresholdMs               = long("slow_span_threshold_ms", 1_000L),
+        droppedFramesEnabled              = bool("dropped_frames_enabled"),
+        droppedFrameThresholdMs           = long("dropped_frame_threshold_ms", 32L),
+        droppedFrameConsecutiveThreshold  = int("dropped_frame_consecutive", 3),
+        crashEnabled                      = bool("crash_enabled"),
+        memoryPressureEnabled             = bool("mem_pressure_enabled"),
+        memPressureWarningPct             = float("mem_pressure_warning_pct", 0.80f),
+        memPressureCriticalPct            = float("mem_pressure_critical_pct", 0.95f),
+        anrEnabled                        = bool("anr_enabled"),
+        anrThresholdMs                    = long("anr_threshold_ms", 5_000L),
+        slowStartEnabled                  = bool("slow_start_enabled"),
+        slowStartColdThresholdMs          = long("slow_start_cold_ms", 2_000L),
+        slowStartWarmThresholdMs          = long("slow_start_warm_ms", 800L)
+    )
+
+    private fun saveSettings(s: KamperUiSettings) {
         defaults.apply {
             setBool(s.showCpu, "show_cpu")
             setBool(s.showFps, "show_fps")
             setBool(s.showMemory, "show_memory")
             setBool(s.showNetwork, "show_network")
             setBool(s.showIssues, "show_issues")
+            setBool(s.cpuEnabled, "cpu_enabled")
+            setBool(s.fpsEnabled, "fps_enabled")
+            setBool(s.memoryEnabled, "memory_enabled")
+            setBool(s.networkEnabled, "network_enabled")
+            setBool(s.issuesEnabled, "issues_enabled")
+            setInteger(s.cpuIntervalMs, "cpu_interval_ms")
+            setInteger(s.memoryIntervalMs, "memory_interval_ms")
+            setInteger(s.networkIntervalMs, "network_interval_ms")
+            setInteger(s.issuesIntervalMs, "issues_interval_ms")
+            setBool(s.slowSpanEnabled, "slow_span_enabled")
+            setInteger(s.slowSpanThresholdMs, "slow_span_threshold_ms")
+            setBool(s.droppedFramesEnabled, "dropped_frames_enabled")
+            setInteger(s.droppedFrameThresholdMs, "dropped_frame_threshold_ms")
+            setInteger(s.droppedFrameConsecutiveThreshold.toLong(), "dropped_frame_consecutive")
+            setBool(s.crashEnabled, "crash_enabled")
+            setBool(s.memoryPressureEnabled, "mem_pressure_enabled")
+            setFloat(s.memPressureWarningPct, "mem_pressure_warning_pct")
+            setFloat(s.memPressureCriticalPct, "mem_pressure_critical_pct")
+            setBool(s.anrEnabled, "anr_enabled")
+            setInteger(s.anrThresholdMs, "anr_threshold_ms")
+            setBool(s.slowStartEnabled, "slow_start_enabled")
+            setInteger(s.slowStartColdThresholdMs, "slow_start_cold_ms")
+            setInteger(s.slowStartWarmThresholdMs, "slow_start_warm_ms")
         }
     }
+
+    private val _settings = MutableStateFlow(loadSettings())
+    actual val settings: StateFlow<KamperUiSettings> = _settings.asStateFlow()
+
+    // ── Engine and state ──────────────────────────────────────────────────────
 
     private val engine = Engine()
     private val _state = MutableStateFlow(KamperUiState.EMPTY)
@@ -63,6 +133,63 @@ internal actual class KamperUiRepository {
         if (size >= HISTORY_SIZE) removeFirst()
         addLast(v)
     }
+
+    // ── Module references ─────────────────────────────────────────────────────
+
+    private var cpuModule: PerformanceModule<CpuConfig, CpuInfo>? = null
+    private var fpsModule: PerformanceModule<FpsConfig, FpsInfo>? = null
+    private var memModule: PerformanceModule<MemoryConfig, MemoryInfo>? = null
+    private var netModule: PerformanceModule<NetworkConfig, NetworkInfo>? = null
+    private var issuesModule: PerformanceModule<IssuesConfig, IssueInfo>? = null
+
+    // ── Stable listener references ────────────────────────────────────────────
+
+    private val cpuListener: InfoListener<CpuInfo> = listener@{ info ->
+        if (info == CpuInfo.INVALID) return@listener
+        val v = (info.totalUseRatio * 100).toFloat()
+        cpuHist.push(v)
+        _state.update { s -> s.copy(cpuPercent = v, cpuHistory = cpuHist.toList()) }
+    }
+
+    private val fpsListener: InfoListener<FpsInfo> = listener@{ info ->
+        if (info == FpsInfo.INVALID) return@listener
+        val v = info.fps
+        fpsHist.push(v.toFloat())
+        _state.update { s ->
+            s.copy(
+                fps        = v,
+                fpsPeak    = maxOf(s.fpsPeak, v),
+                fpsLow     = if (s.fpsLow == Int.MAX_VALUE) v else minOf(s.fpsLow, v),
+                fpsHistory = fpsHist.toList()
+            )
+        }
+    }
+
+    private val memListener: InfoListener<MemoryInfo> = listener@{ info ->
+        if (info == MemoryInfo.INVALID) return@listener
+        val v = info.heapMemoryInfo.allocatedInMb
+        memHist.push(v)
+        _state.update { s -> s.copy(memoryUsedMb = v, memoryHistory = memHist.toList()) }
+    }
+
+    private val netListener: InfoListener<NetworkInfo> = listener@{ info ->
+        if (info == NetworkInfo.INVALID || info == NetworkInfo.NOT_SUPPORTED) return@listener
+        val v = info.rxSystemTotalInMb
+        netHist.push(v)
+        _state.update { s -> s.copy(downloadMbps = v, downloadHistory = netHist.toList()) }
+    }
+
+    private val issuesListener: InfoListener<IssueInfo> = listener@{ info ->
+        if (info == IssueInfo.INVALID) return@listener
+        issuesList.add(0, info.issue)
+        if (issuesList.size > MAX_ISSUES) issuesList.removeAt(issuesList.size - 1)
+        saveIssues()
+        _state.update { s ->
+            s.copy(issues = issuesList.toList(), unreadIssueCount = s.unreadIssueCount + 1)
+        }
+    }
+
+    // ── Issues persistence ────────────────────────────────────────────────────
 
     private val issuesList = loadPersistedIssues()
 
@@ -81,68 +208,176 @@ internal actual class KamperUiRepository {
         _state.update { it.copy(issues = emptyList(), unreadIssueCount = 0) }
     }
 
+    // ── Module install helpers ────────────────────────────────────────────────
+
+    private fun installCpu(s: KamperUiSettings) {
+        val mod = CpuModule { intervalInMs = s.cpuIntervalMs }
+        engine.install(mod)
+        engine.addInfoListener(cpuListener)
+        cpuModule = mod
+    }
+
+    private fun uninstallCpu() {
+        cpuModule?.let { engine.uninstall(it) }
+        cpuModule = null
+    }
+
+    private fun installFps() {
+        val mod = FpsModule
+        engine.install(mod)
+        engine.addInfoListener(fpsListener)
+        fpsModule = mod
+    }
+
+    private fun uninstallFps() {
+        fpsModule?.let { engine.uninstall(it) }
+        fpsModule = null
+    }
+
+    private fun installMemory(s: KamperUiSettings) {
+        val mod = MemoryModule { intervalInMs = s.memoryIntervalMs }
+        engine.install(mod)
+        engine.addInfoListener(memListener)
+        memModule = mod
+    }
+
+    private fun uninstallMemory() {
+        memModule?.let { engine.uninstall(it) }
+        memModule = null
+    }
+
+    private fun installNetwork(s: KamperUiSettings) {
+        val mod = NetworkModule { intervalInMs = s.networkIntervalMs }
+        engine.install(mod)
+        engine.addInfoListener(netListener)
+        netModule = mod
+    }
+
+    private fun uninstallNetwork() {
+        netModule?.let { engine.uninstall(it) }
+        netModule = null
+    }
+
+    private fun buildIssuesModule(s: KamperUiSettings) = IssuesModule(
+        anr       = AnrConfig(
+            isEnabled   = s.anrEnabled,
+            thresholdMs = s.anrThresholdMs
+        ),
+        slowStart = SlowStartConfig(
+            isEnabled            = s.slowStartEnabled,
+            coldStartThresholdMs = s.slowStartColdThresholdMs,
+            warmStartThresholdMs = s.slowStartWarmThresholdMs
+        )
+    ) {
+        intervalInMs   = s.issuesIntervalMs
+        slowSpan       = SlowSpanConfig(
+            isEnabled          = s.slowSpanEnabled,
+            defaultThresholdMs = s.slowSpanThresholdMs
+        )
+        droppedFrames  = DroppedFramesConfig(
+            isEnabled                  = s.droppedFramesEnabled,
+            frameThresholdMs           = s.droppedFrameThresholdMs,
+            consecutiveFramesThreshold = s.droppedFrameConsecutiveThreshold
+        )
+        crash          = CrashConfig(
+            isEnabled              = s.crashEnabled,
+            chainToPreviousHandler = false
+        )
+        memoryPressure = MemoryPressureConfig(
+            isEnabled                = s.memoryPressureEnabled,
+            warningThresholdPercent  = s.memPressureWarningPct,
+            criticalThresholdPercent = s.memPressureCriticalPct
+        )
+    }
+
+    private fun installIssues(s: KamperUiSettings) {
+        val mod = buildIssuesModule(s)
+        engine.install(mod)
+        engine.addInfoListener(issuesListener)
+        issuesModule = mod
+    }
+
+    private fun uninstallIssues() {
+        issuesModule?.let { engine.uninstall(it) }
+        issuesModule = null
+    }
+
+    // ── Settings update ───────────────────────────────────────────────────────
+
+    private fun KamperUiSettings.issuesConfigKey() =
+        "$issuesIntervalMs|$slowSpanEnabled|$slowSpanThresholdMs" +
+        "|$droppedFramesEnabled|$droppedFrameThresholdMs|$droppedFrameConsecutiveThreshold" +
+        "|$crashEnabled|$memoryPressureEnabled|$memPressureWarningPct|$memPressureCriticalPct" +
+        "|$anrEnabled|$anrThresholdMs|$slowStartEnabled|$slowStartColdThresholdMs|$slowStartWarmThresholdMs"
+
+    actual fun updateSettings(s: KamperUiSettings) {
+        val old = _settings.value
+        _settings.value = s
+        saveSettings(s)
+
+        val cpuConfigChanged    = old.cpuIntervalMs != s.cpuIntervalMs
+        val memConfigChanged    = old.memoryIntervalMs != s.memoryIntervalMs
+        val netConfigChanged    = old.networkIntervalMs != s.networkIntervalMs
+        val issuesConfigChanged = old.issuesConfigKey() != s.issuesConfigKey()
+
+        when {
+            !old.cpuEnabled && s.cpuEnabled     -> installCpu(s)
+            old.cpuEnabled && !s.cpuEnabled     -> uninstallCpu()
+            s.cpuEnabled && cpuConfigChanged    -> { uninstallCpu(); installCpu(s) }
+        }
+        when {
+            !old.fpsEnabled && s.fpsEnabled     -> installFps()
+            old.fpsEnabled && !s.fpsEnabled     -> uninstallFps()
+        }
+        when {
+            !old.memoryEnabled && s.memoryEnabled   -> installMemory(s)
+            old.memoryEnabled && !s.memoryEnabled   -> uninstallMemory()
+            s.memoryEnabled && memConfigChanged     -> { uninstallMemory(); installMemory(s) }
+        }
+        when {
+            !old.networkEnabled && s.networkEnabled -> installNetwork(s)
+            old.networkEnabled && !s.networkEnabled -> uninstallNetwork()
+            s.networkEnabled && netConfigChanged    -> { uninstallNetwork(); installNetwork(s) }
+        }
+        when {
+            !old.issuesEnabled && s.issuesEnabled   -> installIssues(s)
+            old.issuesEnabled && !s.issuesEnabled   -> uninstallIssues()
+            s.issuesEnabled && issuesConfigChanged  -> { uninstallIssues(); installIssues(s) }
+        }
+
+        if (_state.value.engineRunning) engine.start()
+    }
+
+    // ── Engine controls ───────────────────────────────────────────────────────
+
+    actual fun startEngine() {
+        engine.start()
+        _state.update { it.copy(engineRunning = true) }
+    }
+
+    actual fun stopEngine() {
+        engine.stop()
+        _state.update { it.copy(engineRunning = false) }
+    }
+
+    actual fun restartEngine() {
+        stopEngine()
+        startEngine()
+    }
+
+    // ── Lifecycle ─────────────────────────────────────────────────────────────
+
     init {
         if (issuesList.isNotEmpty()) {
             _state.update { it.copy(issues = issuesList.toList()) }
         }
-
-        with(engine) {
-            install(CpuModule)
-            install(FpsModule)
-            install(MemoryModule())
-            install(NetworkModule)
-            install(IssuesModule(anr = AnrConfig()) { crash { chainToPreviousHandler = false } })
-
-            addInfoListener<CpuInfo> { info ->
-                if (info == CpuInfo.INVALID) return@addInfoListener
-                val v = (info.totalUseRatio * 100).toFloat()
-                cpuHist.push(v)
-                _state.update { s -> s.copy(cpuPercent = v, cpuHistory = cpuHist.toList()) }
-            }
-
-            addInfoListener<FpsInfo> { info ->
-                if (info == FpsInfo.INVALID) return@addInfoListener
-                val v = info.fps
-                fpsHist.push(v.toFloat())
-                _state.update { s ->
-                    s.copy(
-                        fps        = v,
-                        fpsPeak    = maxOf(s.fpsPeak, v),
-                        fpsLow     = if (s.fpsLow == Int.MAX_VALUE) v else minOf(s.fpsLow, v),
-                        fpsHistory = fpsHist.toList()
-                    )
-                }
-            }
-
-            addInfoListener<MemoryInfo> { info ->
-                if (info == MemoryInfo.INVALID) return@addInfoListener
-                val v = info.heapMemoryInfo.allocatedInMb
-                memHist.push(v)
-                _state.update { s -> s.copy(memoryUsedMb = v, memoryHistory = memHist.toList()) }
-            }
-
-            addInfoListener<NetworkInfo> { info ->
-                if (info == NetworkInfo.INVALID || info == NetworkInfo.NOT_SUPPORTED) return@addInfoListener
-                val v = info.rxSystemTotalInMb
-                netHist.push(v)
-                _state.update { s -> s.copy(downloadMbps = v, downloadHistory = netHist.toList()) }
-            }
-
-            addInfoListener<IssueInfo> { info ->
-                if (info == IssueInfo.INVALID) return@addInfoListener
-                issuesList.add(0, info.issue)
-                if (issuesList.size > MAX_ISSUES) issuesList.removeAt(issuesList.size - 1)
-                saveIssues()
-                _state.update { s ->
-                    s.copy(
-                        issues           = issuesList.toList(),
-                        unreadIssueCount = s.unreadIssueCount + 1
-                    )
-                }
-            }
-
-            start()
-        }
+        val s = _settings.value
+        if (s.cpuEnabled) installCpu(s)
+        if (s.fpsEnabled) installFps()
+        if (s.memoryEnabled) installMemory(s)
+        if (s.networkEnabled) installNetwork(s)
+        if (s.issuesEnabled) installIssues(s)
+        engine.start()
     }
 
     actual fun clear() = engine.clear()

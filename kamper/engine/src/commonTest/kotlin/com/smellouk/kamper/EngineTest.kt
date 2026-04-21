@@ -73,14 +73,63 @@ class EngineTest {
     }
 
     @Test
-    fun `removeInfoListener should add remove the added listener from the current map listeners`() {
+    fun `removeInfoListener should remove the specific listener while keeping the map entry`() {
         classToTest.install(createPerformanceModule(true))
         val listener: InfoListener<Info> = { }
         classToTest.addInfoListener(listener)
 
-        classToTest.removeInfoListener<Info>()
+        classToTest.removeInfoListener(listener)
 
+        assertEquals(1, classToTest.mapListeners.size)
+        assertEquals(0, classToTest.mapListeners[Info::class]?.size)
+    }
+
+    @Test
+    fun `removeInfoListener should do nothing when listener was not added`() {
+        classToTest.install(createPerformanceModule(true))
+        val listener: InfoListener<Info> = { }
+
+        classToTest.removeInfoListener(listener)
+
+        assertEquals(1, classToTest.mapListeners.size)
+        assertEquals(0, classToTest.mapListeners[Info::class]?.size)
+    }
+
+    @Test
+    fun `uninstall should stop and remove the performance and its listeners`() {
+        val performanceMock = createPerformance(true)
+        val module = createPerformanceModule(true, performanceMock)
+        classToTest.install(module)
+        assertEquals(1, classToTest.performanceList.size)
+        assertEquals(1, classToTest.mapListeners.size)
+
+        classToTest.uninstall(module)
+
+        assertEquals(0, classToTest.performanceList.size)
         assertEquals(0, classToTest.mapListeners.size)
+    }
+
+    @Test
+    fun `uninstall should do nothing when module is not installed`() {
+        val module = createPerformanceModule(true)
+
+        classToTest.uninstall(module)
+
+        assertEquals(0, classToTest.performanceList.size)
+        assertEquals(0, classToTest.mapListeners.size)
+    }
+
+    @Test
+    fun `uninstall should allow reinstall after removal`() {
+        val performanceMock = createPerformance(true)
+        val module = createPerformanceModule(true, performanceMock)
+        classToTest.install(module)
+        classToTest.uninstall(module)
+
+        classToTest.install(module)
+
+        assertEquals(1, classToTest.performanceList.size)
+        assertEquals(1, classToTest.mapListeners.size)
     }
 
     @Test
@@ -122,6 +171,7 @@ class EngineTest {
     private fun createPerformance(isInitialized: Boolean): Performance<Config, IWatcher<Info>, Info> =
         mock<Performance<Config, IWatcher<Info>, Info>>().also {
             every { it.initialize(any(), any()) } returns isInitialized
+            every { it.stop() } returns Unit
         }
 
     private fun createPerformanceModule(

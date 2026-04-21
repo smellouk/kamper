@@ -14,7 +14,8 @@ data class KamperUiState(
     val downloadMbps: Float,
     val downloadHistory: List<Float>,
     val issues: List<Issue> = emptyList(),
-    val unreadIssueCount: Int = 0
+    val unreadIssueCount: Int = 0,
+    val engineRunning: Boolean = true
 ) {
     companion object {
         val EMPTY = KamperUiState(
@@ -27,7 +28,8 @@ data class KamperUiState(
             memoryUsedMb = 0f,
             memoryHistory = emptyList(),
             downloadMbps = 0f,
-            downloadHistory = emptyList()
+            downloadHistory = emptyList(),
+            engineRunning = true
         )
     }
 }

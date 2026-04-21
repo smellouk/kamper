@@ -61,10 +61,16 @@ open class Engine {
         return this
     }
 
-    inline fun <reified I : Info> removeInfoListener() {
-        if (!mapListeners.containsKey(I::class)) {
-            return
-        }
+    inline fun <reified I : Info> removeInfoListener(noinline listener: InfoListener<I>) {
+        mapListeners[I::class]?.remove(listener)
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    inline fun <C : Config, reified I : Info> uninstall(module: PerformanceModule<C, I>) {
+        val target = performanceList.find { it::class == module.performance::class } ?: return
+        target.stop()
+        if (target is Cleanable) (target as Cleanable).clean()
+        performanceList.remove(target)
         mapListeners.remove(I::class)
     }
 

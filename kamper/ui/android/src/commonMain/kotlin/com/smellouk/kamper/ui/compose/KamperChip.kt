@@ -83,12 +83,12 @@ internal fun KamperChip(
             )
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-            if (settings.showCpu)     MetricRow("⚙", KamperTheme.BLUE,  "CPU",     "${state.cpuPercent.formatDp(1)}%", mirrorLayout)
-            if (settings.showFps)     MetricRow("◎", KamperTheme.GREEN, "FPS",     "${state.fps} fps", mirrorLayout)
-            if (settings.showMemory)  MetricRow("▦", KamperTheme.PEACH, "MEM",     "${state.memoryUsedMb.formatDp(0)} MB", mirrorLayout)
-            if (settings.showNetwork) MetricRow("↓", KamperTheme.TEAL,  "NET",     netDisplay, mirrorLayout)
+            if (settings.cpuEnabled && settings.showCpu)       MetricRow("⚙", KamperTheme.BLUE,  "CPU", "${state.cpuPercent.formatDp(1)}%", mirrorLayout)
+            if (settings.fpsEnabled && settings.showFps)       MetricRow("◎", KamperTheme.GREEN, "FPS", "${state.fps} fps", mirrorLayout)
+            if (settings.memoryEnabled && settings.showMemory) MetricRow("▦", KamperTheme.PEACH, "MEM", "${state.memoryUsedMb.formatDp(0)} MB", mirrorLayout)
+            if (settings.networkEnabled && settings.showNetwork) MetricRow("↓", KamperTheme.TEAL, "NET", netDisplay, mirrorLayout)
 
-            if (settings.showIssues) {
+            if (settings.issuesEnabled && settings.showIssues) {
                 Box(
                     Modifier
                         .width(ROW_WIDTH_DP.dp)
