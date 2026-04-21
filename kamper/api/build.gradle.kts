@@ -13,6 +13,10 @@ kotlin {
     jvm()
     macosX64()
     macosArm64()
+    iosArm64()
+    iosSimulatorArm64()
+    tvosArm64()
+    tvosSimulatorArm64()
     js(IR) {
         browser()
     }

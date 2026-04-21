@@ -26,6 +26,15 @@ android {
 kotlin {
     androidTarget()
     jvm("desktop")
+    listOf(
+        iosArm64(),
+        iosSimulatorArm64()
+    ).forEach {
+        it.binaries.framework {
+            baseName = "ComposeApp"
+            isStatic = true
+        }
+    }
     wasmJs {
         outputModuleName = "compose"
         browser {
