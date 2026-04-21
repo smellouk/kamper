@@ -88,6 +88,13 @@ internal fun KamperChip(
             if (settings.memoryEnabled && settings.showMemory) MetricRow("▦", KamperTheme.PEACH, "MEM", "${state.memoryUsedMb.formatDp(0)} MB", mirrorLayout)
             if (settings.networkEnabled && settings.showNetwork) MetricRow("↓", KamperTheme.TEAL, "NET", netDisplay, mirrorLayout)
 
+            if (settings.jankEnabled && settings.showJank && state.jankDroppedFrames >= 0)
+                MetricRow("⚡", KamperTheme.MAUVE, "JANK", "${state.jankDroppedFrames} fr", mirrorLayout)
+            if (settings.gcEnabled && settings.showGc && state.gcCountDelta >= 0)
+                MetricRow("♻", KamperTheme.YELLOW, "GC", "+${state.gcCountDelta}", mirrorLayout)
+            if (settings.thermalEnabled && settings.showThermal)
+                MetricRow("🌡", KamperTheme.PEACH, "THRM", state.thermalState.name, mirrorLayout)
+
             if (settings.issuesEnabled && settings.showIssues) {
                 Box(
                     Modifier
