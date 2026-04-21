@@ -13,8 +13,8 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -33,6 +33,7 @@ import com.smellouk.kamper.samples.compose.ui.KamperColors
 import com.smellouk.kamper.samples.compose.ui.KamperTheme
 import com.smellouk.kamper.samples.compose.ui.tabs.CpuTab
 import com.smellouk.kamper.samples.compose.ui.tabs.FpsTab
+import com.smellouk.kamper.samples.compose.ui.tabs.IssuesTab
 import com.smellouk.kamper.samples.compose.ui.tabs.MemoryTab
 import com.smellouk.kamper.samples.compose.ui.tabs.NetworkTab
 
@@ -95,13 +96,14 @@ private fun Header(isRunning: Boolean) {
 @Composable
 private fun KamperContent(state: KamperState) {
     var selectedTab by remember { mutableIntStateOf(0) }
-    val tabs = listOf("CPU", "FPS", "Memory", "Network")
+    val tabs = listOf("CPU", "FPS", "Memory", "Network", "Issues")
 
     Column(modifier = Modifier.fillMaxSize()) {
-        TabRow(
+        ScrollableTabRow(
             selectedTabIndex = selectedTab,
             containerColor = KamperColors.mantle,
             contentColor = KamperColors.blue,
+            edgePadding = 0.dp,
             divider = {}
         ) {
             tabs.forEachIndexed { index, title ->
@@ -131,6 +133,7 @@ private fun KamperContent(state: KamperState) {
                 1 -> FpsTab(info = state.fpsInfo)
                 2 -> MemoryTab(info = state.memoryInfo)
                 3 -> NetworkTab(info = state.networkInfo)
+                4 -> IssuesTab(issues = state.issues, onClear = { state.clearIssues() })
             }
         }
     }

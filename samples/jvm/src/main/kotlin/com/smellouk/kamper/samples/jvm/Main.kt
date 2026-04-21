@@ -5,12 +5,16 @@ import com.smellouk.kamper.cpu.CpuInfo
 import com.smellouk.kamper.cpu.CpuModule
 import com.smellouk.kamper.fps.FpsInfo
 import com.smellouk.kamper.fps.FpsModule
+import com.smellouk.kamper.issues.AnrConfig
+import com.smellouk.kamper.issues.IssueInfo
+import com.smellouk.kamper.issues.IssuesModule
 import com.smellouk.kamper.memory.MemoryInfo
 import com.smellouk.kamper.memory.MemoryModule
 import com.smellouk.kamper.network.NetworkInfo
 import com.smellouk.kamper.network.NetworkModule
 import com.smellouk.kamper.samples.jvm.ui.CpuPanel
 import com.smellouk.kamper.samples.jvm.ui.FpsPanel
+import com.smellouk.kamper.samples.jvm.ui.IssuesPanel
 import com.smellouk.kamper.samples.jvm.ui.MemoryPanel
 import com.smellouk.kamper.samples.jvm.ui.NetworkPanel
 import com.smellouk.kamper.samples.jvm.ui.Theme
@@ -39,6 +43,7 @@ private class KamperDemoWindow : JFrame("K|JVM") {
     private val fpsPanel     = FpsPanel()
     private val memoryPanel  = MemoryPanel()
     private val networkPanel = NetworkPanel()
+    private val issuesPanel  = IssuesPanel()
 
     init {
         defaultCloseOperation = EXIT_ON_CLOSE
@@ -55,6 +60,7 @@ private class KamperDemoWindow : JFrame("K|JVM") {
             addTab("  FPS  ",     fpsPanel)
             addTab("  Memory  ",  memoryPanel)
             addTab("  Network  ", networkPanel)
+            addTab("  Issues  ",  issuesPanel)
         }
 
         contentPane.add(HeaderPanel(), BorderLayout.NORTH)
@@ -71,11 +77,13 @@ private class KamperDemoWindow : JFrame("K|JVM") {
             install(FpsModule)
             install(MemoryModule())
             install(NetworkModule)
+            install(IssuesModule(anr = AnrConfig()) { crash { chainToPreviousHandler = false } })
 
             addInfoListener<CpuInfo>     { cpuPanel.update(it) }
             addInfoListener<FpsInfo>     { fpsPanel.update(it) }
             addInfoListener<MemoryInfo>  { memoryPanel.update(it) }
             addInfoListener<NetworkInfo> { networkPanel.update(it) }
+            addInfoListener<IssueInfo>   { issuesPanel.addIssue(it.issue) }
         }
         Kamper.start()
 

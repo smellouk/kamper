@@ -46,13 +46,25 @@ internal fun KamperChip(
 
     val dragModifier = if (onDrag != null) {
         Modifier.pointerInput(Unit) {
+            var dragging = false
             detectDragGestures(
+                onDragStart = { dragging = true },
                 onDrag = { change, dragAmount ->
                     change.consume()
                     onDrag(dragAmount.x, dragAmount.y)
                 },
-                onDragEnd = { onDragEnd?.invoke() },
-                onDragCancel = { onDragEnd?.invoke() }
+                onDragEnd = {
+                    if (dragging) {
+                        dragging = false
+                        onDragEnd?.invoke()
+                    }
+                },
+                onDragCancel = {
+                    if (dragging) {
+                        dragging = false
+                        onDragEnd?.invoke()
+                    }
+                }
             )
         }
     } else Modifier

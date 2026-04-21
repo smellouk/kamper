@@ -6,6 +6,9 @@ import com.smellouk.kamper.cpu.CpuInfo
 import com.smellouk.kamper.cpu.CpuModule
 import com.smellouk.kamper.fps.FpsInfo
 import com.smellouk.kamper.fps.FpsModule
+import com.smellouk.kamper.issues.AnrConfig
+import com.smellouk.kamper.issues.IssueInfo
+import com.smellouk.kamper.issues.IssuesModule
 import com.smellouk.kamper.memory.MemoryInfo
 import com.smellouk.kamper.memory.MemoryModule
 import com.smellouk.kamper.network.NetworkInfo
@@ -14,16 +17,22 @@ import com.smellouk.kamper.samples.ios.ui.*
 import kotlinx.cinterop.*
 import platform.CoreGraphics.*
 import platform.Foundation.*
+import platform.Foundation.NSStringFromClass
 import platform.UIKit.*
 import platform.darwin.NSObject
 import platform.darwin.dispatch_async
 import platform.darwin.dispatch_get_main_queue
 
 fun main() {
-    UIApplicationMain(0, null, null, "AppDelegate")
+    val delegateClass = NSStringFromClass(AppDelegate().`class`()!!)
+    UIApplicationMain(0, null, null, delegateClass)
 }
 
-class AppDelegate : NSObject(), UIApplicationDelegateProtocol {
+@OptIn(kotlin.experimental.ExperimentalObjCName::class)
+@ObjCName("AppDelegate")
+class AppDelegate : NSObject, UIApplicationDelegateProtocol {
+    @OverrideInit constructor() : super()
+
     private var appWindow: UIWindow? = null
 
     override fun applicationDidFinishLaunching(application: UIApplication) {
@@ -34,20 +43,28 @@ class AppDelegate : NSObject(), UIApplicationDelegateProtocol {
 }
 
 class RootViewController : UITabBarController(nibName = null, bundle = null) {
-    private val cpuVC     = CpuViewController()
-    private val fpsVC     = FpsViewController()
-    private val memoryVC  = MemoryViewController()
-    private val networkVC = NetworkViewController()
+    private lateinit var cpuVC:     CpuViewController
+    private lateinit var fpsVC:     FpsViewController
+    private lateinit var memoryVC:  MemoryViewController
+    private lateinit var networkVC: NetworkViewController
+    private lateinit var issuesVC:  IssuesViewController
 
     override fun viewDidLoad() {
         super.viewDidLoad()
+
+        cpuVC     = CpuViewController()
+        fpsVC     = FpsViewController()
+        memoryVC  = MemoryViewController()
+        networkVC = NetworkViewController()
+        issuesVC  = IssuesViewController()
 
         cpuVC.tabBarItem     = UITabBarItem(title = "CPU",     image = null, tag = 0)
         fpsVC.tabBarItem     = UITabBarItem(title = "FPS",     image = null, tag = 1)
         memoryVC.tabBarItem  = UITabBarItem(title = "Memory",  image = null, tag = 2)
         networkVC.tabBarItem = UITabBarItem(title = "Network", image = null, tag = 3)
+        issuesVC.tabBarItem  = UITabBarItem(title = "Issues",  image = null, tag = 4)
 
-        setViewControllers(listOf(cpuVC, fpsVC, memoryVC, networkVC), animated = false)
+        setViewControllers(listOf(cpuVC, fpsVC, memoryVC, networkVC, issuesVC), animated = false)
 
         tabBar.barTintColor           = Theme.MANTLE
         tabBar.tintColor              = Theme.BLUE
@@ -62,11 +79,13 @@ class RootViewController : UITabBarController(nibName = null, bundle = null) {
             install(FpsModule)
             install(MemoryModule())
             install(NetworkModule)
+            install(IssuesModule(anr = AnrConfig()) { crash { chainToPreviousHandler = false } })
 
-            addInfoListener<CpuInfo>    { info -> dispatch_async(dispatch_get_main_queue()) { cpuVC.update(info) } }
-            addInfoListener<FpsInfo>    { info -> dispatch_async(dispatch_get_main_queue()) { fpsVC.update(info) } }
-            addInfoListener<MemoryInfo> { info -> dispatch_async(dispatch_get_main_queue()) { memoryVC.update(info) } }
-            addInfoListener<NetworkInfo>{ info -> dispatch_async(dispatch_get_main_queue()) { networkVC.update(info) } }
+            addInfoListener<CpuInfo>    { info -> dispatch_async(dispatch_get_main_queue()) { if (cpuVC.isViewLoaded())     cpuVC.update(info) } }
+            addInfoListener<FpsInfo>    { info -> dispatch_async(dispatch_get_main_queue()) { if (fpsVC.isViewLoaded())     fpsVC.update(info) } }
+            addInfoListener<MemoryInfo> { info -> dispatch_async(dispatch_get_main_queue()) { if (memoryVC.isViewLoaded()) memoryVC.update(info) } }
+            addInfoListener<NetworkInfo>{ info -> dispatch_async(dispatch_get_main_queue()) { if (networkVC.isViewLoaded()) networkVC.update(info) } }
+            addInfoListener<IssueInfo>  { info -> if (issuesVC.isViewLoaded()) issuesVC.addIssue(info.issue) }
         }
         Kamper.start()
     }

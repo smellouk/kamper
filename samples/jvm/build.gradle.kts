@@ -29,4 +29,5 @@ dependencies {
     implementation(project(Modules.Performances.FPS))
     implementation(project(Modules.Performances.MEMORY))
     implementation(project(Modules.Performances.NETWORK))
+    implementation(project(Modules.Performances.ISSUES))
 }

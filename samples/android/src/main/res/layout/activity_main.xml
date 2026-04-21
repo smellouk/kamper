@@ -51,8 +51,8 @@
         app:tabSelectedTextColor="@color/color_text"
         app:tabTextColor="@color/color_muted"
         app:tabIndicatorColor="@color/color_blue"
-        app:tabMode="fixed"
-        app:tabGravity="fill"/>
+        app:tabMode="scrollable"
+        app:tabGravity="start"/>
 
     <!-- Fragment container -->
     <FrameLayout

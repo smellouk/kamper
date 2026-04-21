@@ -137,6 +137,24 @@
             text-align: center; padding: 40px;
             color: var(--overlay1); font-size: 14px;
         }
+        .issue-controls { display: flex; gap: 8px; margin-bottom: 16px; }
+        .issue-empty { color: var(--overlay1); font-size: 14px; text-align: center; padding: 40px 0; }
+        .issue-list { display: flex; flex-direction: column; gap: 1px; }
+        .issue-row {
+            display: flex; background: var(--surface0);
+            border-radius: 6px; overflow: hidden;
+        }
+        .issue-bar { width: 4px; flex-shrink: 0; }
+        .issue-content { flex: 1; padding: 8px 12px; }
+        .issue-header { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+        .issue-type-chip {
+            font-size: 10px; font-weight: 700; font-family: monospace;
+            border: 1px solid; border-radius: 3px; padding: 1px 5px;
+        }
+        .issue-severity { font-size: 11px; }
+        .issue-time { font-size: 11px; font-family: monospace; color: var(--overlay1); margin-left: auto; }
+        .issue-msg { font-size: 12px; color: var(--text); }
+        .issue-details { font-size: 11px; font-family: monospace; color: var(--overlay1); margin-top: 2px; }
     </style>
 </head>
 <body>

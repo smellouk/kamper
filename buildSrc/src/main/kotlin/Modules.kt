@@ -7,6 +7,7 @@ object Modules {
         const val FPS = ":kamper:modules:fps"
         const val MEMORY = ":kamper:modules:memory"
         const val NETWORK = ":kamper:modules:network"
+        const val ISSUES = ":kamper:modules:issues"
     }
 
     object Ui {

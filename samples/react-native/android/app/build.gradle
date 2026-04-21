@@ -122,5 +122,6 @@ dependencies {
     implementation("com.smellouk.kamper:fps-module:1.0.0")
     implementation("com.smellouk.kamper:memory-module:1.0.0")
     implementation("com.smellouk.kamper:network-module:1.0.0")
+    implementation("com.smellouk.kamper:issues-module:1.0.0")
     debugImplementation("com.smellouk.kamper:ui-android:1.0.0")
 }

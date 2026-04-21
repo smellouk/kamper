@@ -8,6 +8,11 @@ import com.smellouk.kamper.cpu.CpuInfo
 import com.smellouk.kamper.cpu.CpuModule
 import com.smellouk.kamper.fps.FpsInfo
 import com.smellouk.kamper.fps.FpsModule
+import com.smellouk.kamper.issues.AnrConfig
+import com.smellouk.kamper.issues.IssueInfo
+import com.smellouk.kamper.issues.IssuesModule
+import com.smellouk.kamper.issues.SlowStartConfig
+import com.smellouk.kamper.issues.StrictModeConfig
 import com.smellouk.kamper.memory.MemoryInfo
 import com.smellouk.kamper.memory.MemoryModule
 import com.smellouk.kamper.network.NetworkInfo
@@ -19,8 +24,9 @@ class MainActivity : AppCompatActivity() {
     private val fpsFragment = FpsFragment()
     private val memoryFragment = MemoryFragment()
     private val networkFragment = NetworkFragment()
-    private val fragments = listOf(cpuFragment, fpsFragment, memoryFragment, networkFragment)
-    private val tabTitles = listOf("CPU", "FPS", "Memory", "Network")
+    private val issuesFragment = IssuesFragment()
+    private val fragments = listOf(cpuFragment, fpsFragment, memoryFragment, networkFragment, issuesFragment)
+    private val tabTitles = listOf("CPU", "FPS", "Memory", "Network", "Issues")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,11 +67,22 @@ class MainActivity : AppCompatActivity() {
             install(FpsModule)
             install(MemoryModule(applicationContext))
             install(NetworkModule)
+            install(
+                IssuesModule(
+                    context = applicationContext,
+                    anr = AnrConfig(thresholdMs = 5_000L),
+                    slowStart = SlowStartConfig(coldStartThresholdMs = 1_500L),
+                    strictMode = StrictModeConfig()
+                ) {
+                    crash { chainToPreviousHandler = false }
+                }
+            )
 
             addInfoListener<CpuInfo>     { if (it != CpuInfo.INVALID)     cpuFragment.update(it) }
             addInfoListener<FpsInfo>     { if (it != FpsInfo.INVALID)     fpsFragment.update(it) }
             addInfoListener<MemoryInfo>  { if (it != MemoryInfo.INVALID)  memoryFragment.update(it) }
             addInfoListener<NetworkInfo> { if (it != NetworkInfo.INVALID) networkFragment.update(it) }
+            addInfoListener<IssueInfo>   { issuesFragment.addIssue(it.issue) }
         }
     }
 }

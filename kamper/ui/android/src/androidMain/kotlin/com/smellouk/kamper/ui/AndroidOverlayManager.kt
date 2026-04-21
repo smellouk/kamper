@@ -101,15 +101,17 @@ internal class AndroidOverlayManager(
                     settings = cfg,
                     mirrorLayout = mirrorLayout,
                     onClick = {
-                        when (chipState) {
-                            ChipState.PEEK -> expandChip()
-                            ChipState.EXPANDED -> {
-                                mainHandler.removeCallbacks(autoCollapseRunnable)
-                                panelOpened = true
-                                activity.startActivity(
-                                    Intent(activity, KamperPanelActivity::class.java)
-                                        .addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
-                                )
+                        mainHandler.post {
+                            when (chipState) {
+                                ChipState.PEEK -> expandChip()
+                                ChipState.EXPANDED -> {
+                                    mainHandler.removeCallbacks(autoCollapseRunnable)
+                                    panelOpened = true
+                                    activity.startActivity(
+                                        Intent(activity, KamperPanelActivity::class.java)
+                                            .addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
+                                    )
+                                }
                             }
                         }
                     },

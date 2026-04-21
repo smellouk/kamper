@@ -8,6 +8,7 @@ include(":kamper:modules:cpu")
 include(":kamper:modules:fps")
 include(":kamper:modules:memory")
 include(":kamper:modules:network")
+include(":kamper:modules:issues")
 
 include(":kamper:ui:android")
 

@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/color_base">
+
+    <!-- Footer pinned to bottom — horizontally scrollable trigger buttons -->
+    <HorizontalScrollView
+        android:id="@+id/footer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="@color/color_mantle"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:gravity="center_vertical">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSlowSpan"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Slow Span"
+                android:textColor="@color/color_blue"
+                android:textSize="12sp"
+                app:strokeColor="@color/color_blue"
+                app:backgroundTint="@color/color_surface0"
+                android:layout_marginEnd="8dp"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnBlockUi"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Block UI 6s"
+                android:textColor="@color/color_yellow"
+                android:textSize="12sp"
+                app:strokeColor="@color/color_yellow"
+                app:backgroundTint="@color/color_surface0"
+                android:layout_marginEnd="8dp"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnCrash"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Demo Crash"
+                android:textColor="@color/color_red"
+                android:textSize="12sp"
+                app:strokeColor="@color/color_red"
+                app:backgroundTint="@color/color_surface0"
+                android:layout_marginEnd="8dp"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnMemory"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Alloc Memory"
+                android:textColor="@color/color_peach"
+                android:textSize="12sp"
+                app:strokeColor="@color/color_peach"
+                app:backgroundTint="@color/color_surface0"
+                android:layout_marginEnd="8dp"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnStrictMode"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Main IO"
+                android:textColor="@color/color_mauve"
+                android:textSize="12sp"
+                app:strokeColor="@color/color_mauve"
+                app:backgroundTint="@color/color_surface0"
+                android:layout_marginEnd="8dp"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnClearIssues"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Clear"
+                android:textColor="@color/color_subtext"
+                android:textSize="12sp"
+                app:strokeColor="@color/color_overlay"
+                app:backgroundTint="@color/color_surface0"/>
+
+        </LinearLayout>
+    </HorizontalScrollView>
+
+    <!-- Issue list fills above the footer -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/issuesList"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/footer"
+        android:clipToPadding="false"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"/>
+
+    <!-- Empty state (same bounds as the list) -->
+    <TextView
+        android:id="@+id/emptyText"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/footer"
+        android:gravity="center"
+        android:text="No issues detected"
+        android:textColor="@color/color_muted"
+        android:textSize="14sp"
+        android:visibility="gone"/>
+
+</RelativeLayout>

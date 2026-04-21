@@ -53,6 +53,10 @@ interface MemoryData {
   isLowMemory: boolean;
 }
 interface NetworkData {rxMb: number; txMb: number}
+interface IssueData {
+  id: string; type: string; severity: string; message: string;
+  timestamp: number; durationMs?: number; threadName?: string;
+}
 
 // ── Format helpers ─────────────────────────────────────────────────────────────
 const pct = (v: number) => `${(v * 100).toFixed(1)}%`;
@@ -411,8 +415,77 @@ function NetworkTab({
   );
 }
 
+// ── Issues Tab ─────────────────────────────────────────────────────────────────
+const SEVERITY_COLOR: Record<string, string> = {
+  CRITICAL: C.red, ERROR: C.peach, WARNING: C.yellow, INFO: C.green,
+};
+const TYPE_COLOR: Record<string, string> = {
+  ANR: C.red, CRASH: C.red,
+  SLOW_COLD_START: C.peach, SLOW_WARM_START: C.peach, SLOW_HOT_START: C.peach,
+  DROPPED_FRAME: C.yellow,
+  SLOW_SPAN: C.blue,
+  MEMORY_PRESSURE: C.mauve, NEAR_OOM: C.mauve,
+  STRICT_VIOLATION: C.teal,
+};
+const TYPE_SHORT: Record<string, string> = {
+  ANR: 'ANR', CRASH: 'CRASH', SLOW_COLD_START: 'COLD', SLOW_WARM_START: 'WARM',
+  SLOW_HOT_START: 'HOT', DROPPED_FRAME: 'JANK', SLOW_SPAN: 'SPAN',
+  MEMORY_PRESSURE: 'MEM', NEAR_OOM: 'OOM', STRICT_VIOLATION: 'STRICT',
+};
+function fmtTimestamp(ms: number): string {
+  const sec = Math.floor(ms / 1000) % 86400;
+  const h = Math.floor(sec / 3600), m = Math.floor((sec % 3600) / 60), s = sec % 60;
+  return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+}
+
+function IssueRow({issue}: {issue: IssueData}) {
+  const sevColor  = SEVERITY_COLOR[issue.severity] ?? C.overlay1;
+  const typeColor = TYPE_COLOR[issue.type] ?? C.overlay1;
+  const typeShort = TYPE_SHORT[issue.type] ?? issue.type;
+  const details   = [
+    issue.durationMs != null ? `${issue.durationMs}ms` : null,
+    issue.threadName  ? `thread=${issue.threadName}` : null,
+  ].filter(Boolean).join('  ·  ');
+
+  return (
+    <View style={s.issueRow}>
+      <View style={[s.issueSevBar, {backgroundColor: sevColor}]} />
+      <View style={s.issueContent}>
+        <View style={s.issueHeaderRow}>
+          <View style={[s.issueTypeChip, {borderColor: typeColor}]}>
+            <Text style={[s.issueTypeText, {color: typeColor}]}>{typeShort}</Text>
+          </View>
+          <Text style={[s.issueSeverity, {color: sevColor}]}>{issue.severity}</Text>
+          <Text style={s.issueTime}>{fmtTimestamp(issue.timestamp)}</Text>
+        </View>
+        <Text style={s.issueMsg} numberOfLines={2}>{issue.message}</Text>
+        {details ? <Text style={s.issueDetails}>{details}</Text> : null}
+      </View>
+    </View>
+  );
+}
+
+function IssuesTab({issues, onClear}: {issues: IssueData[]; onClear: () => void}) {
+  return (
+    <View style={s.tabContent}>
+      {issues.length === 0
+        ? <View style={s.issueEmpty}><Text style={s.issueEmptyText}>No issues detected</Text></View>
+        : <ScrollView showsVerticalScrollIndicator={false}>
+            {issues.map(issue => <IssueRow key={issue.id} issue={issue} />)}
+          </ScrollView>
+      }
+      <View style={[s.footer, {justifyContent: 'flex-start', gap: 8}]}>
+        <Btn label="SLOW SPAN" onPress={() => {
+          const start = Date.now(); while(Date.now() - start < 800) {}
+        }} />
+        <Btn label="CLEAR" onPress={onClear} />
+      </View>
+    </View>
+  );
+}
+
 // ── App ────────────────────────────────────────────────────────────────────────
-const TABS = ['CPU', 'FPS', 'MEMORY', 'NETWORK'];
+const TABS = ['CPU', 'FPS', 'MEMORY', 'NETWORK', 'ISSUES'];
 
 export default function App() {
   const [activeTab, setActiveTab] = useState(0);
@@ -421,6 +494,7 @@ export default function App() {
   const [fps, setFps]             = useState<FpsData | null>(null);
   const [mem, setMem]             = useState<MemoryData | null>(null);
   const [net, setNet]             = useState<NetworkData | null>(null);
+  const [issues, setIssues]       = useState<IssueData[]>([]);
   const peakRxRef                 = useRef(0);
   const peakTxRef                 = useRef(0);
 
@@ -434,6 +508,9 @@ export default function App() {
         peakTxRef.current = Math.max(peakTxRef.current, d.txMb);
         setNet(d);
       }),
+      emitter.addListener('kamper_issues', (d: IssueData) => {
+        setIssues(prev => [d, ...prev].slice(0, 100));
+      }),
     ];
     return () => subs.forEach(sub => sub.remove());
   }, []);
@@ -442,7 +519,7 @@ export default function App() {
     if (running) {
       KamperModule.stop();
       setRunning(false);
-      setCpu(null); setFps(null); setMem(null); setNet(null);
+      setCpu(null); setFps(null); setMem(null); setNet(null); setIssues([]);
       peakRxRef.current = 0; peakTxRef.current = 0;
     } else {
       KamperModule.start();
@@ -496,6 +573,7 @@ export default function App() {
           running={running}
         />
       )}
+      {activeTab === 4 && <IssuesTab issues={issues} onClear={() => setIssues([])} />}
     </SafeAreaView>
     </SafeAreaProvider>
   );
@@ -587,4 +665,23 @@ const s = StyleSheet.create({
   placeholder: {fontSize: 13, color: C.muted, marginTop: 4},
   lowMem:      {fontSize: 13, color: C.red, marginTop: 8},
   dlStatus:    {fontSize: 12, color: C.overlay1, marginTop: 8, fontFamily: MONO},
+
+  // Issues tab
+  issueEmpty:     {flex: 1, alignItems: 'center', justifyContent: 'center'},
+  issueEmptyText: {fontSize: 14, color: C.overlay1},
+  issueRow: {
+    flexDirection: 'row', backgroundColor: C.surface0,
+    marginHorizontal: 0, marginBottom: 1,
+  },
+  issueSevBar: {width: 4},
+  issueContent: {flex: 1, paddingHorizontal: 12, paddingVertical: 8},
+  issueHeaderRow: {flexDirection: 'row', alignItems: 'center', marginBottom: 4, gap: 6},
+  issueTypeChip: {
+    borderWidth: 1, borderRadius: 3, paddingHorizontal: 5, paddingVertical: 1,
+  },
+  issueTypeText: {fontSize: 10, fontWeight: '700', fontFamily: MONO},
+  issueSeverity: {fontSize: 11},
+  issueTime: {fontSize: 11, fontFamily: MONO, color: C.overlay1, marginLeft: 'auto'},
+  issueMsg: {fontSize: 12, color: C.text},
+  issueDetails: {fontSize: 11, fontFamily: MONO, color: C.overlay1, marginTop: 2},
 });

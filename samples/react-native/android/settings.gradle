@@ -13,6 +13,7 @@ includeBuild('../../..') {
         substitute(module('com.smellouk.kamper:fps-module:1.0.0')).using(project(':kamper:modules:fps'))
         substitute(module('com.smellouk.kamper:memory-module:1.0.0')).using(project(':kamper:modules:memory'))
         substitute(module('com.smellouk.kamper:network-module:1.0.0')).using(project(':kamper:modules:network'))
+        substitute(module('com.smellouk.kamper:issues-module:1.0.0')).using(project(':kamper:modules:issues'))
         substitute(module('com.smellouk.kamper:ui-android:1.0.0')).using(project(':kamper:ui:android'))
     }
 }
