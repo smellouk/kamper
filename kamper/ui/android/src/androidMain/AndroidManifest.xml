@@ -7,6 +7,16 @@
             android:authorities="${applicationId}.kamper_ui_provider"
             android:exported="false" />
 
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.kamper.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/kamper_file_paths" />
+        </provider>
+
         <activity
             android:name=".KamperPanelActivity"
             android:exported="false"

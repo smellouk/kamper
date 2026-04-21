@@ -75,6 +75,9 @@ internal actual class KamperUiRepository {
         defaults.setObject(issuesList.joinToString("\n") { it.serialize() }, PREF_ISSUES)
     }
 
+    actual fun startCapture() = Unit
+    actual fun stopCapture() = Unit
+
     actual fun clearIssues() {
         issuesList.clear()
         saveIssues()

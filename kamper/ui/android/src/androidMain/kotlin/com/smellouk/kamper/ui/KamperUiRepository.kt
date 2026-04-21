@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.Context
 import android.os.Handler
 import android.os.Looper
+import android.os.Trace
 import android.view.Choreographer
 import com.smellouk.kamper.Engine
 import com.smellouk.kamper.cpu.CpuInfo
@@ -15,10 +16,15 @@ import com.smellouk.kamper.memory.MemoryInfo
 import com.smellouk.kamper.memory.MemoryModule
 import com.smellouk.kamper.network.NetworkInfo
 import com.smellouk.kamper.network.NetworkModule
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 private const val HISTORY_SIZE = 60
 private const val MAX_ISSUES = 100
@@ -54,6 +60,9 @@ internal actual class KamperUiRepository(context: Context) {
     private val _state = MutableStateFlow(KamperUiState.EMPTY)
     actual val state: StateFlow<KamperUiState> = _state.asStateFlow()
 
+    private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+    private val perfettoCapture = PerfettoCapture(context)
+
     private val cpuHist = ArrayDeque<Float>()
     private val fpsHist = ArrayDeque<Float>()
     private val memHist = ArrayDeque<Float>()
@@ -64,7 +73,6 @@ internal actual class KamperUiRepository(context: Context) {
         addLast(v)
     }
 
-    // Issues persisted as newline-delimited serialized strings
     private val issuesList = loadPersistedIssues()
 
     private fun loadPersistedIssues(): MutableList<com.smellouk.kamper.issues.Issue> {
@@ -80,6 +88,25 @@ internal actual class KamperUiRepository(context: Context) {
         issuesList.clear()
         saveIssues()
         _state.update { it.copy(issues = emptyList(), unreadIssueCount = 0) }
+    }
+
+    actual fun startCapture() {
+        if (!perfettoCapture.isAvailable) return
+        _state.update { it.copy(isRecordingTrace = true, traceSpans = emptyList(), traceFilePath = null) }
+        scope.launch { perfettoCapture.start() }
+    }
+
+    actual fun stopCapture() {
+        scope.launch {
+            perfettoCapture.stop()
+            val file = perfettoCapture.traceFile()
+            val spans = if (file != null) PerfettoParser.parse(file) else emptyList()
+            _state.update { it.copy(
+                isRecordingTrace = false,
+                traceSpans = spans,
+                traceFilePath = file?.absolutePath
+            )}
+        }
     }
 
     private var fpsFrameCount = 0
@@ -109,7 +136,6 @@ internal actual class KamperUiRepository(context: Context) {
     }
 
     init {
-        // Emit persisted issues immediately
         if (issuesList.isNotEmpty()) {
             _state.update { it.copy(issues = issuesList.toList()) }
         }
@@ -143,6 +169,8 @@ internal actual class KamperUiRepository(context: Context) {
 
             addInfoListener<IssueInfo> { info ->
                 if (info == IssueInfo.INVALID) return@addInfoListener
+                Trace.beginSection("Kamper:${info.issue.type.name}")
+                Trace.endSection()
                 issuesList.add(0, info.issue)
                 if (issuesList.size > MAX_ISSUES) issuesList.removeAt(issuesList.size - 1)
                 saveIssues()
@@ -162,6 +190,7 @@ internal actual class KamperUiRepository(context: Context) {
     }
 
     actual fun clear() {
+        scope.cancel()
         Handler(Looper.getMainLooper()).post {
             Choreographer.getInstance().removeFrameCallback(fpsCallback)
         }
