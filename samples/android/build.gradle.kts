@@ -49,4 +49,5 @@ dependencies {
     implementation(project(Modules.Performances.FPS))
     implementation(project(Modules.Performances.MEMORY))
     implementation(project(Modules.Performances.NETWORK))
+    debugImplementation(project(Modules.Ui.ANDROID))
 }

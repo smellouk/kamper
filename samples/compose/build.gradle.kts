@@ -66,8 +66,18 @@ kotlin {
             dependencies {
                 implementation(compose.preview)
                 implementation("androidx.activity:activity-compose:1.10.1")
+                implementation(project(Modules.Ui.ANDROID))
             }
         }
+
+        val iosMain by creating {
+            dependsOn(commonMain)
+            dependencies {
+                implementation(project(Modules.Ui.ANDROID))
+            }
+        }
+        val iosArm64Main by getting { dependsOn(iosMain) }
+        val iosSimulatorArm64Main by getting { dependsOn(iosMain) }
 
         val desktopMain by getting {
             dependencies {

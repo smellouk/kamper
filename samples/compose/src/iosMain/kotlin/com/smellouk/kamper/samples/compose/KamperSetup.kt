@@ -1,6 +1,7 @@
 package com.smellouk.kamper.samples.compose
 
 import com.smellouk.kamper.Kamper
+import com.smellouk.kamper.ui.KamperUi
 import com.smellouk.kamper.cpu.CpuInfo
 import com.smellouk.kamper.cpu.CpuModule
 import com.smellouk.kamper.fps.FpsInfo
@@ -24,9 +25,13 @@ actual fun KamperState.initialize(scope: CoroutineScope) {
     Kamper.addInfoListener<NetworkInfo> { info -> scope.launch { networkInfo = info } }
 }
 
-actual fun startKamper() = Kamper.start()
+actual fun startKamper() {
+    Kamper.start()
+    KamperUi.attach()
+}
 actual fun stopKamper() = Kamper.stop()
 actual fun disposeKamper() {
+    KamperUi.detach()
     Kamper.stop()
     Kamper.clear()
 }
