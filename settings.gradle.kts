@@ -10,6 +10,7 @@ include(":kamper:modules:memory")
 include(":kamper:modules:network")
 include(":kamper:modules:issues")
 include(":kamper:modules:jank")
+include(":kamper:modules:gc")
 
 include(":kamper:ui:android")
 

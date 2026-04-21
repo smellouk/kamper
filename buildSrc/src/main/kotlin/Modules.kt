@@ -9,6 +9,7 @@ object Modules {
         const val NETWORK = ":kamper:modules:network"
         const val ISSUES = ":kamper:modules:issues"
         const val JANK = ":kamper:modules:jank"
+        const val GC = ":kamper:modules:gc"
     }
 
     object Ui {
