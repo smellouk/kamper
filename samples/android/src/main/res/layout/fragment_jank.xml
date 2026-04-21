@@ -1,55 +1,78 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:background="@color/color_base">
 
     <LinearLayout
+        android:id="@+id/footer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:gravity="center"
-        android:paddingTop="24dp"
-        android:paddingBottom="16dp"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal"
+        android:gravity="end"
         android:paddingStart="20dp"
-        android:paddingEnd="20dp">
+        android:paddingEnd="20dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        android:background="@color/color_mantle">
 
-        <TextView
-            android:id="@+id/jankDroppedLabel"
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/jankSimulateButton"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="--"
-            android:textColor="@color/color_mauve"
-            android:textSize="72sp"
-            android:textStyle="bold"
-            android:fontFamily="monospace"/>
+            android:text="Simulate Jank"
+            android:textColor="@color/color_text"
+            app:strokeColor="@color/color_overlay"
+            app:backgroundTint="@color/color_surface0"/>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="dropped frames / window"
-            android:textColor="@color/color_muted"
-            android:textSize="16sp"/>
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:orientation="vertical"
-        android:gravity="center"
-        android:paddingStart="24dp"
-        android:paddingEnd="24dp">
+        android:layout_height="match_parent"
+        android:layout_above="@id/footer"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:paddingTop="24dp"
+            android:paddingBottom="16dp"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp">
+
+            <TextView
+                android:id="@+id/jankDroppedLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="--"
+                android:textColor="@color/color_mauve"
+                android:textSize="72sp"
+                android:textStyle="bold"
+                android:fontFamily="monospace"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="dropped frames / window"
+                android:textColor="@color/color_muted"
+                android:textSize="16sp"/>
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:paddingTop="10dp"
-            android:paddingBottom="10dp">
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:paddingTop="12dp"
+            android:paddingBottom="12dp">
 
             <TextView
                 android:layout_width="0dp"
@@ -73,14 +96,18 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="0.5dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
             android:background="@color/color_surface0"/>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:paddingTop="10dp"
-            android:paddingBottom="10dp">
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:paddingTop="12dp"
+            android:paddingBottom="12dp">
 
             <TextView
                 android:layout_width="0dp"
@@ -101,35 +128,6 @@
                 android:fontFamily="monospace"/>
         </LinearLayout>
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/jankSimulateButton"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:text="Simulate Jank"
-            android:textColor="@color/color_text"
-            app:strokeColor="@color/color_mauve"
-            app:backgroundTint="@color/color_surface0"/>
-
     </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:paddingStart="20dp"
-        android:paddingEnd="20dp"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp"
-        android:background="@color/color_mantle">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Window.OnFrameMetricsAvailableListener (API 24+)"
-            android:textColor="@color/color_muted"
-            android:textSize="11sp"/>
-    </LinearLayout>
-
-</LinearLayout>
+</RelativeLayout>

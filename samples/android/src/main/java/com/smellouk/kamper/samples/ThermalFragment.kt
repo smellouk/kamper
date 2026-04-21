@@ -1,6 +1,5 @@
 package com.smellouk.kamper.samples
 
-import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -55,7 +54,6 @@ class ThermalFragment : Fragment() {
         isStressing = !isStressing
         if (isStressing) {
             simulateButton?.text = "Stop CPU Stress"
-            simulateButton?.strokeColor = ColorStateList.valueOf(0xFFF38BA8.toInt())
             val cores = Runtime.getRuntime().availableProcessors()
             repeat(cores) {
                 Thread {
@@ -65,7 +63,6 @@ class ThermalFragment : Fragment() {
             }
         } else {
             simulateButton?.text = "Start CPU Stress"
-            simulateButton?.strokeColor = ColorStateList.valueOf(0xFFFAB387.toInt())
         }
     }
 
