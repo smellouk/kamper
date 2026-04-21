@@ -91,20 +91,30 @@ internal actual class KamperUiRepository(context: Context) {
     }
 
     actual fun startCapture() {
-        if (!perfettoCapture.isAvailable) return
-        _state.update { it.copy(isRecordingTrace = true, traceSpans = emptyList(), traceFilePath = null) }
+        if (!perfettoCapture.isAvailable) {
+            _state.update { it.copy(traceStatus = "perfetto binary not found on this device") }
+            return
+        }
+        _state.update { it.copy(isRecordingTrace = true, traceSpans = emptyList(), traceFilePath = null, traceStatus = null) }
         scope.launch { perfettoCapture.start() }
     }
 
     actual fun stopCapture() {
+        _state.update { it.copy(isRecordingTrace = false) }
         scope.launch {
             perfettoCapture.stop()
             val file = perfettoCapture.traceFile()
             val spans = if (file != null) PerfettoParser.parse(file) else emptyList()
+            val status = when {
+                file == null -> "No trace file — perfetto may have failed to start"
+                file.length() == 0L -> "Trace file empty — try recording for a few seconds"
+                spans.isEmpty() -> "Captured ${file.length() / 1024}KB but no ATrace spans found"
+                else -> null
+            }
             _state.update { it.copy(
-                isRecordingTrace = false,
                 traceSpans = spans,
-                traceFilePath = file?.absolutePath
+                traceFilePath = file?.absolutePath,
+                traceStatus = status
             )}
         }
     }

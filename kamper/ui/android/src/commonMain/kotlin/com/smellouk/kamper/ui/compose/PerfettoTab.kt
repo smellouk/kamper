@@ -83,23 +83,36 @@ internal fun PerfettoTab(
                 }
             }
             else -> {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(100.dp)
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(KamperTheme.BASE)
-                        .border(0.5.dp, KamperTheme.BORDER, RoundedCornerShape(8.dp)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        "Press Start to record an ATrace capture",
-                        color = KamperTheme.SUBTEXT,
-                        fontSize = 12.sp
-                    )
-                }
+                EmptyTraceBox(
+                    message = state.traceStatus ?: "Press Start to record an ATrace capture",
+                    isError = state.traceStatus != null
+                )
             }
         }
+    }
+}
+
+@Composable
+private fun EmptyTraceBox(message: String, isError: Boolean) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(100.dp)
+            .clip(RoundedCornerShape(8.dp))
+            .background(KamperTheme.BASE)
+            .border(
+                0.5.dp,
+                if (isError) KamperTheme.PEACH.copy(alpha = 0.5f) else KamperTheme.BORDER,
+                RoundedCornerShape(8.dp)
+            ),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = message,
+            color = if (isError) KamperTheme.PEACH else KamperTheme.SUBTEXT,
+            fontSize = 12.sp,
+            modifier = Modifier.padding(horizontal = 16.dp)
+        )
     }
 }
 

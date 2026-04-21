@@ -26,11 +26,24 @@ internal class PerfettoCapture(private val context: Context) {
     fun stop() {
         val p = process ?: return
         process = null
-        p.destroy()
-        try { p.waitFor(2, TimeUnit.SECONDS) } catch (_: Exception) {}
+        // Try SIGTERM first so perfetto can flush its ring buffer
+        val pid = reflectPid(p)
+        if (pid > 0) {
+            try { Runtime.getRuntime().exec(arrayOf("kill", "-15", pid.toString())).waitFor() }
+            catch (_: Exception) {}
+        }
+        if (!p.waitFor(4, TimeUnit.SECONDS)) {
+            p.destroyForcibly()
+        }
     }
 
     fun traceFile(): File? = _traceFile?.takeIf { it.exists() && it.length() > 0L }
+
+    private fun reflectPid(p: Process): Int = try {
+        val f = p.javaClass.getDeclaredField("pid")
+        f.isAccessible = true
+        f.getInt(p)
+    } catch (_: Exception) { -1 }
 
     private companion object {
         val CONFIG = """
@@ -42,6 +55,9 @@ data_sources: {
       ftrace_events: "ftrace/print"
       atrace_apps: "*"
       atrace_categories: "app"
+      atrace_categories: "view"
+      atrace_categories: "res"
+      atrace_categories: "am"
     }
   }
 }
