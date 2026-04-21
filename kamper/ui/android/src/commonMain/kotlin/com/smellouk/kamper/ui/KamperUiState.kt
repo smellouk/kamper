@@ -1,6 +1,7 @@
 package com.smellouk.kamper.ui
 
 import com.smellouk.kamper.issues.Issue
+import com.smellouk.kamper.thermal.ThermalState
 
 data class KamperUiState(
     val cpuPercent: Float,
@@ -15,7 +16,13 @@ data class KamperUiState(
     val downloadHistory: List<Float>,
     val issues: List<Issue> = emptyList(),
     val unreadIssueCount: Int = 0,
-    val engineRunning: Boolean = true
+    val engineRunning: Boolean = true,
+    val jankDroppedFrames: Int = 0,
+    val jankRatio: Float = 0f,
+    val gcCountDelta: Long = 0L,
+    val gcPauseMsDelta: Long = 0L,
+    val thermalState: ThermalState = ThermalState.NONE,
+    val isThrottling: Boolean = false
 ) {
     companion object {
         val EMPTY = KamperUiState(

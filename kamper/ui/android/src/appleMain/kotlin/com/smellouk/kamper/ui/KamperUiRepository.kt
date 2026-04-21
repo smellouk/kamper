@@ -18,12 +18,21 @@ import com.smellouk.kamper.issues.IssuesModule
 import com.smellouk.kamper.issues.MemoryPressureConfig
 import com.smellouk.kamper.issues.SlowSpanConfig
 import com.smellouk.kamper.issues.SlowStartConfig
+import com.smellouk.kamper.gc.GcConfig
+import com.smellouk.kamper.gc.GcInfo
+import com.smellouk.kamper.gc.GcModule
+import com.smellouk.kamper.jank.JankConfig
+import com.smellouk.kamper.jank.JankInfo
+import com.smellouk.kamper.jank.JankModule
 import com.smellouk.kamper.memory.MemoryConfig
 import com.smellouk.kamper.memory.MemoryInfo
 import com.smellouk.kamper.memory.MemoryModule
 import com.smellouk.kamper.network.NetworkConfig
 import com.smellouk.kamper.network.NetworkInfo
 import com.smellouk.kamper.network.NetworkModule
+import com.smellouk.kamper.thermal.ThermalConfig
+import com.smellouk.kamper.thermal.ThermalInfo
+import com.smellouk.kamper.thermal.ThermalModule
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -79,7 +88,13 @@ internal actual class KamperUiRepository {
         anrThresholdMs                    = long("anr_threshold_ms", 5_000L),
         slowStartEnabled                  = bool("slow_start_enabled"),
         slowStartColdThresholdMs          = long("slow_start_cold_ms", 2_000L),
-        slowStartWarmThresholdMs          = long("slow_start_warm_ms", 800L)
+        slowStartWarmThresholdMs          = long("slow_start_warm_ms", 800L),
+        showJank                          = bool("show_jank"),
+        showGc                            = bool("show_gc"),
+        showThermal                       = bool("show_thermal"),
+        jankEnabled                       = bool("jank_enabled"),
+        gcEnabled                         = bool("gc_enabled"),
+        thermalEnabled                    = bool("thermal_enabled")
     )
 
     private fun saveSettings(s: KamperUiSettings) {
@@ -112,6 +127,12 @@ internal actual class KamperUiRepository {
             setBool(s.slowStartEnabled, "slow_start_enabled")
             setInteger(s.slowStartColdThresholdMs, "slow_start_cold_ms")
             setInteger(s.slowStartWarmThresholdMs, "slow_start_warm_ms")
+            setBool(s.showJank, "show_jank")
+            setBool(s.showGc, "show_gc")
+            setBool(s.showThermal, "show_thermal")
+            setBool(s.jankEnabled, "jank_enabled")
+            setBool(s.gcEnabled, "gc_enabled")
+            setBool(s.thermalEnabled, "thermal_enabled")
         }
     }
 
@@ -141,6 +162,9 @@ internal actual class KamperUiRepository {
     private var memModule: PerformanceModule<MemoryConfig, MemoryInfo>? = null
     private var netModule: PerformanceModule<NetworkConfig, NetworkInfo>? = null
     private var issuesModule: PerformanceModule<IssuesConfig, IssueInfo>? = null
+    private var jankModule: PerformanceModule<JankConfig, JankInfo>? = null
+    private var gcModule: PerformanceModule<GcConfig, GcInfo>? = null
+    private var thermalModule: PerformanceModule<ThermalConfig, ThermalInfo>? = null
 
     // ── Stable listener references ────────────────────────────────────────────
 
@@ -186,6 +210,27 @@ internal actual class KamperUiRepository {
         saveIssues()
         _state.update { s ->
             s.copy(issues = issuesList.toList(), unreadIssueCount = s.unreadIssueCount + 1)
+        }
+    }
+
+    private val jankListener: InfoListener<JankInfo> = listener@{ info ->
+        if (info == JankInfo.INVALID) return@listener
+        _state.update { s ->
+            s.copy(jankDroppedFrames = info.droppedFrames, jankRatio = info.jankyFrameRatio)
+        }
+    }
+
+    private val gcListener: InfoListener<GcInfo> = listener@{ info ->
+        if (info == GcInfo.INVALID) return@listener
+        _state.update { s ->
+            s.copy(gcCountDelta = info.gcCountDelta, gcPauseMsDelta = info.gcPauseMsDelta)
+        }
+    }
+
+    private val thermalListener: InfoListener<ThermalInfo> = listener@{ info ->
+        if (info == ThermalInfo.INVALID) return@listener
+        _state.update { s ->
+            s.copy(thermalState = info.state, isThrottling = info.isThrottling)
         }
     }
 
@@ -302,6 +347,42 @@ internal actual class KamperUiRepository {
         issuesModule = null
     }
 
+    private fun installJank() {
+        val mod = JankModule
+        engine.install(mod)
+        engine.addInfoListener(jankListener)
+        jankModule = mod
+    }
+
+    private fun uninstallJank() {
+        jankModule?.let { engine.uninstall(it) }
+        jankModule = null
+    }
+
+    private fun installGc() {
+        val mod = GcModule
+        engine.install(mod)
+        engine.addInfoListener(gcListener)
+        gcModule = mod
+    }
+
+    private fun uninstallGc() {
+        gcModule?.let { engine.uninstall(it) }
+        gcModule = null
+    }
+
+    private fun installThermal() {
+        val mod = ThermalModule
+        engine.install(mod)
+        engine.addInfoListener(thermalListener)
+        thermalModule = mod
+    }
+
+    private fun uninstallThermal() {
+        thermalModule?.let { engine.uninstall(it) }
+        thermalModule = null
+    }
+
     // ── Settings update ───────────────────────────────────────────────────────
 
     private fun KamperUiSettings.issuesConfigKey() =
@@ -344,6 +425,18 @@ internal actual class KamperUiRepository {
             old.issuesEnabled && !s.issuesEnabled   -> uninstallIssues()
             s.issuesEnabled && issuesConfigChanged  -> { uninstallIssues(); installIssues(s) }
         }
+        when {
+            !old.jankEnabled && s.jankEnabled       -> installJank()
+            old.jankEnabled && !s.jankEnabled       -> uninstallJank()
+        }
+        when {
+            !old.gcEnabled && s.gcEnabled           -> installGc()
+            old.gcEnabled && !s.gcEnabled           -> uninstallGc()
+        }
+        when {
+            !old.thermalEnabled && s.thermalEnabled -> installThermal()
+            old.thermalEnabled && !s.thermalEnabled -> uninstallThermal()
+        }
 
         if (_state.value.engineRunning) engine.start()
     }
@@ -377,8 +470,21 @@ internal actual class KamperUiRepository {
         if (s.memoryEnabled) installMemory(s)
         if (s.networkEnabled) installNetwork(s)
         if (s.issuesEnabled) installIssues(s)
+        if (s.jankEnabled) installJank()
+        if (s.gcEnabled) installGc()
+        if (s.thermalEnabled) installThermal()
         engine.start()
     }
 
-    actual fun clear() = engine.clear()
+    actual fun clear() {
+        engine.clear()
+        cpuModule = null
+        fpsModule = null
+        memModule = null
+        netModule = null
+        issuesModule = null
+        jankModule = null
+        gcModule = null
+        thermalModule = null
+    }
 }

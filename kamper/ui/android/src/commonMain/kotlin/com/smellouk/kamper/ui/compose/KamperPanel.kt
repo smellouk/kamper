@@ -227,6 +227,50 @@ private fun ActivityContent(s: KamperUiState, cfg: KamperUiSettings) {
                 dimmed   = !cfg.showNetwork
             )
         }
+        if (cfg.jankEnabled) {
+            MetricCard(
+                title    = "Jank",
+                current  = "${s.jankDroppedFrames} dropped",
+                fraction = (s.jankRatio).coerceIn(0f, 1f),
+                color    = KamperTheme.MAUVE,
+                history  = emptyList(),
+                extra    = "ratio ${(s.jankRatio * 100).formatDp(1)}%",
+                dimmed   = !cfg.showJank
+            )
+        }
+        if (cfg.gcEnabled) {
+            MetricCard(
+                title    = "GC",
+                current  = "+${s.gcCountDelta} runs",
+                fraction = (s.gcCountDelta / 10f).coerceIn(0f, 1f),
+                color    = KamperTheme.YELLOW,
+                history  = emptyList(),
+                extra    = "+${s.gcPauseMsDelta} ms pause",
+                dimmed   = !cfg.showGc
+            )
+        }
+        if (cfg.thermalEnabled) {
+            val thermalFraction = when (s.thermalState) {
+                com.smellouk.kamper.thermal.ThermalState.NONE      -> 0f
+                com.smellouk.kamper.thermal.ThermalState.LIGHT     -> 0.2f
+                com.smellouk.kamper.thermal.ThermalState.MODERATE  -> 0.4f
+                com.smellouk.kamper.thermal.ThermalState.SEVERE    -> 0.6f
+                com.smellouk.kamper.thermal.ThermalState.CRITICAL  -> 0.8f
+                com.smellouk.kamper.thermal.ThermalState.EMERGENCY,
+                com.smellouk.kamper.thermal.ThermalState.SHUTDOWN  -> 1.0f
+                com.smellouk.kamper.thermal.ThermalState.UNKNOWN   -> 0f
+            }
+            val thermalColor = if (s.isThrottling) KamperTheme.PEACH else KamperTheme.GREEN
+            MetricCard(
+                title    = "Thermal",
+                current  = s.thermalState.name,
+                fraction = thermalFraction,
+                color    = thermalColor,
+                history  = emptyList(),
+                extra    = if (s.isThrottling) "THROTTLING" else null,
+                dimmed   = !cfg.showThermal
+            )
+        }
     }
 }
 
@@ -316,6 +360,45 @@ private fun SettingsContent(
             onShowInChipChange = { onSettingsChange(cfg.copy(showIssues = it)) },
             onIntervalChange = { onSettingsChange(cfg.copy(issuesIntervalMs = it)) },
             extraContent = { IssuesSubConfig(cfg = cfg, onChange = onSettingsChange) }
+        )
+
+        ModuleCard(
+            icon = "⚡",
+            name = "Jank",
+            color = KamperTheme.MAUVE,
+            enabled = cfg.jankEnabled,
+            showInChip = cfg.showJank,
+            intervalMs = null,
+            intervalOptions = emptyList(),
+            onEnabledChange = { onSettingsChange(cfg.copy(jankEnabled = it)) },
+            onShowInChipChange = { onSettingsChange(cfg.copy(showJank = it)) },
+            onIntervalChange = {}
+        )
+
+        ModuleCard(
+            icon = "♻",
+            name = "GC",
+            color = KamperTheme.YELLOW,
+            enabled = cfg.gcEnabled,
+            showInChip = cfg.showGc,
+            intervalMs = null,
+            intervalOptions = emptyList(),
+            onEnabledChange = { onSettingsChange(cfg.copy(gcEnabled = it)) },
+            onShowInChipChange = { onSettingsChange(cfg.copy(showGc = it)) },
+            onIntervalChange = {}
+        )
+
+        ModuleCard(
+            icon = "🌡",
+            name = "Thermal",
+            color = KamperTheme.PEACH,
+            enabled = cfg.thermalEnabled,
+            showInChip = cfg.showThermal,
+            intervalMs = null,
+            intervalOptions = emptyList(),
+            onEnabledChange = { onSettingsChange(cfg.copy(thermalEnabled = it)) },
+            onShowInChipChange = { onSettingsChange(cfg.copy(showThermal = it)) },
+            onIntervalChange = {}
         )
     }
 }
