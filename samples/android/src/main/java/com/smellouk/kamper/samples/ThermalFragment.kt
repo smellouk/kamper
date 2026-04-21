@@ -1,34 +1,38 @@
 package com.smellouk.kamper.samples
 
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import com.google.android.material.button.MaterialButton
 import com.smellouk.kamper.thermal.ThermalInfo
 import com.smellouk.kamper.thermal.ThermalState
-import com.smellouk.kamper.samples.views.MetricRowView
 
 class ThermalFragment : Fragment() {
 
     private var stateLabel: TextView? = null
-    private var throttlingRow: MetricRowView? = null
+    private var throttlingValue: TextView? = null
+    private var simulateButton: MaterialButton? = null
+
+    @Volatile private var isStressing = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View = inflater.inflate(R.layout.fragment_thermal, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        stateLabel = view.findViewById(R.id.thermalStateLabel)
-        throttlingRow = view.findViewById<MetricRowView>(R.id.thermalThrottlingRow).also {
-            it.label = "Throttling"
-            it.barColor = 0xFFA6E3A1.toInt()
-        }
+        stateLabel      = view.findViewById(R.id.thermalStateLabel)
+        throttlingValue = view.findViewById(R.id.thermalThrottlingValue)
+        simulateButton  = view.findViewById(R.id.thermalSimulateButton)
+        simulateButton?.setOnClickListener { toggleStress() }
     }
 
     override fun onDestroyView() {
-        stateLabel = null; throttlingRow = null
+        isStressing = false
+        stateLabel = null; throttlingValue = null; simulateButton = null
         super.onDestroyView()
     }
 
@@ -38,11 +42,30 @@ class ThermalFragment : Fragment() {
                 text = info.state.name
                 setTextColor(colorForState(info.state))
             }
-            throttlingRow?.apply {
-                fraction = if (info.isThrottling) 1f else 0f
-                valueText = if (info.isThrottling) "YES" else "NO"
-                barColor = if (info.isThrottling) 0xFFFAB387.toInt() else 0xFFA6E3A1.toInt()
+            throttlingValue?.apply {
+                text = if (info.isThrottling) "YES" else "NO"
+                setTextColor(
+                    if (info.isThrottling) 0xFFFAB387.toInt() else 0xFFA6E3A1.toInt()
+                )
             }
+        }
+    }
+
+    private fun toggleStress() {
+        isStressing = !isStressing
+        if (isStressing) {
+            simulateButton?.text = "Stop CPU Stress"
+            simulateButton?.strokeColor = ColorStateList.valueOf(0xFFF38BA8.toInt())
+            val cores = Runtime.getRuntime().availableProcessors()
+            repeat(cores) {
+                Thread {
+                    var x = 0.0
+                    while (isStressing) { x = Math.sin(x + Math.PI) }
+                }.apply { isDaemon = true; start() }
+            }
+        } else {
+            simulateButton?.text = "Start CPU Stress"
+            simulateButton?.strokeColor = ColorStateList.valueOf(0xFFFAB387.toInt())
         }
     }
 

@@ -6,14 +6,15 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import com.google.android.material.button.MaterialButton
 import com.smellouk.kamper.gc.GcInfo
-import com.smellouk.kamper.samples.views.MetricRowView
 
 class GcFragment : Fragment() {
 
     private var countDeltaLabel: TextView? = null
-    private var pauseDeltaRow: MetricRowView? = null
-    private var totalCountRow: MetricRowView? = null
+    private var pauseValue: TextView? = null
+    private var totalValue: TextView? = null
+    private var simulateButton: MaterialButton? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -21,34 +22,29 @@ class GcFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         countDeltaLabel = view.findViewById(R.id.gcCountDeltaLabel)
-        pauseDeltaRow = view.findViewById<MetricRowView>(R.id.gcPauseDeltaRow).also {
-            it.label = "GC pause"
-            it.barColor = 0xFF94E2D5.toInt()
-        }
-        totalCountRow = view.findViewById<MetricRowView>(R.id.gcTotalCountRow).also {
-            it.label = "Total GCs"
-            it.barColor = 0xFF94E2D5.toInt()
-        }
+        pauseValue      = view.findViewById(R.id.gcPauseValue)
+        totalValue      = view.findViewById(R.id.gcTotalValue)
+        simulateButton  = view.findViewById(R.id.gcSimulateButton)
+        simulateButton?.setOnClickListener { simulateGc() }
     }
 
     override fun onDestroyView() {
-        countDeltaLabel = null; pauseDeltaRow = null; totalCountRow = null
+        countDeltaLabel = null; pauseValue = null; totalValue = null; simulateButton = null
         super.onDestroyView()
     }
 
     fun update(info: GcInfo) {
         activity?.runOnUiThread {
             countDeltaLabel?.text = info.gcCountDelta.toString()
-            pauseDeltaRow?.apply {
-                val cap = 100f
-                fraction = (info.gcPauseMsDelta / cap).coerceIn(0f, 1f)
-                valueText = "${info.gcPauseMsDelta}ms"
-            }
-            totalCountRow?.apply {
-                val cap = 1000f
-                fraction = (info.gcCount / cap).coerceIn(0f, 1f)
-                valueText = info.gcCount.toString()
-            }
+            pauseValue?.text      = "${info.gcPauseMsDelta} ms"
+            totalValue?.text      = info.gcCount.toString()
         }
+    }
+
+    // Allocate and discard large arrays to pressure the GC
+    private fun simulateGc() {
+        Thread {
+            repeat(200_000) { ByteArray(1024) }
+        }.apply { isDaemon = true; start() }
     }
 }
