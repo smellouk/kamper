@@ -17,6 +17,7 @@ data class KamperUiState(
     val unreadIssueCount: Int = 0,
     val traceSpans: List<TraceSpan> = emptyList(),
     val isRecordingTrace: Boolean = false,
+    val isProcessingTrace: Boolean = false,
     val traceFilePath: String? = null,
     val traceStatus: String? = null
 ) {

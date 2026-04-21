@@ -43,29 +43,22 @@ internal fun PerfettoTab(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.fillMaxWidth()
         ) {
-            if (state.isRecordingTrace) {
-                RecordingBadge()
-                Spacer(Modifier.weight(1f))
-                PerfettoButton(
-                    label = "Stop",
-                    color = KamperTheme.RED,
-                    onClick = onStopCapture
-                )
-            } else {
-                PerfettoButton(
-                    label = "Start",
-                    color = KamperTheme.RED,
-                    dotShape = false,
-                    onClick = onStartCapture
-                )
-                Spacer(Modifier.weight(1f))
-                if (onShareTrace != null && state.traceFilePath != null) {
-                    PerfettoButton(
-                        label = "Share",
-                        color = KamperTheme.TEAL,
-                        dotShape = false,
-                        onClick = onShareTrace
-                    )
+            when {
+                state.isRecordingTrace -> {
+                    RecordingBadge()
+                    Spacer(Modifier.weight(1f))
+                    PerfettoButton(label = "Stop", color = KamperTheme.RED, onClick = onStopCapture)
+                }
+                state.isProcessingTrace -> {
+                    Text("Processing…", color = KamperTheme.BLUE, fontSize = 12.sp)
+                    Spacer(Modifier.weight(1f))
+                }
+                else -> {
+                    PerfettoButton(label = "Start", color = KamperTheme.RED, dotShape = false, onClick = onStartCapture)
+                    Spacer(Modifier.weight(1f))
+                    if (onShareTrace != null && state.traceFilePath != null) {
+                        PerfettoButton(label = "Share", color = KamperTheme.TEAL, dotShape = false, onClick = onShareTrace)
+                    }
                 }
             }
         }
@@ -80,6 +73,14 @@ internal fun PerfettoTab(
                     contentAlignment = Alignment.Center
                 ) {
                     Text("Recording…", color = KamperTheme.SUBTEXT, fontSize = 13.sp)
+                }
+            }
+            state.isProcessingTrace -> {
+                Box(
+                    modifier = Modifier.fillMaxWidth().height(100.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text("Processing trace…", color = KamperTheme.BLUE, fontSize = 13.sp)
                 }
             }
             else -> {

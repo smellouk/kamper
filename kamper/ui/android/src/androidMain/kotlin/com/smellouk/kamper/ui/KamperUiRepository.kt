@@ -100,7 +100,7 @@ internal actual class KamperUiRepository(context: Context) {
     }
 
     actual fun stopCapture() {
-        _state.update { it.copy(isRecordingTrace = false) }
+        _state.update { it.copy(isRecordingTrace = false, isProcessingTrace = true) }
         scope.launch {
             perfettoCapture.stop()
             val file = perfettoCapture.traceFile()
@@ -112,6 +112,7 @@ internal actual class KamperUiRepository(context: Context) {
                 else -> null
             }
             _state.update { it.copy(
+                isProcessingTrace = false,
                 traceSpans = spans,
                 traceFilePath = file?.absolutePath,
                 traceStatus = status
@@ -158,23 +159,29 @@ internal actual class KamperUiRepository(context: Context) {
 
             addInfoListener<CpuInfo> { info ->
                 if (info == CpuInfo.INVALID) return@addInfoListener
+                Trace.beginSection("kamper.cpu")
                 val v = (info.totalUseRatio * 100).toFloat()
                 cpuHist.push(v)
                 _state.update { s -> s.copy(cpuPercent = v, cpuHistory = cpuHist.toList()) }
+                Trace.endSection()
             }
 
             addInfoListener<MemoryInfo> { info ->
                 if (info == MemoryInfo.INVALID) return@addInfoListener
+                Trace.beginSection("kamper.memory")
                 val v = info.heapMemoryInfo.allocatedInMb
                 memHist.push(v)
                 _state.update { s -> s.copy(memoryUsedMb = v, memoryHistory = memHist.toList()) }
+                Trace.endSection()
             }
 
             addInfoListener<NetworkInfo> { info ->
                 if (info == NetworkInfo.INVALID || info == NetworkInfo.NOT_SUPPORTED) return@addInfoListener
+                Trace.beginSection("kamper.network")
                 val v = info.rxSystemTotalInMb
                 netHist.push(v)
                 _state.update { s -> s.copy(downloadMbps = v, downloadHistory = netHist.toList()) }
+                Trace.endSection()
             }
 
             addInfoListener<IssueInfo> { info ->
