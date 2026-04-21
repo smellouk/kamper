@@ -8,6 +8,7 @@ object Modules {
         const val MEMORY = ":kamper:modules:memory"
         const val NETWORK = ":kamper:modules:network"
         const val ISSUES = ":kamper:modules:issues"
+        const val JANK = ":kamper:modules:jank"
     }
 
     object Ui {
