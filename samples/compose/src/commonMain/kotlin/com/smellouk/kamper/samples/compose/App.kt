@@ -33,9 +33,12 @@ import com.smellouk.kamper.samples.compose.ui.KamperColors
 import com.smellouk.kamper.samples.compose.ui.KamperTheme
 import com.smellouk.kamper.samples.compose.ui.tabs.CpuTab
 import com.smellouk.kamper.samples.compose.ui.tabs.FpsTab
+import com.smellouk.kamper.samples.compose.ui.tabs.GcTab
 import com.smellouk.kamper.samples.compose.ui.tabs.IssuesTab
+import com.smellouk.kamper.samples.compose.ui.tabs.JankTab
 import com.smellouk.kamper.samples.compose.ui.tabs.MemoryTab
 import com.smellouk.kamper.samples.compose.ui.tabs.NetworkTab
+import com.smellouk.kamper.samples.compose.ui.tabs.ThermalTab
 
 @Composable
 fun App() {
@@ -96,7 +99,7 @@ private fun Header(isRunning: Boolean) {
 @Composable
 private fun KamperContent(state: KamperState) {
     var selectedTab by remember { mutableIntStateOf(0) }
-    val tabs = listOf("CPU", "FPS", "Memory", "Network", "Issues")
+    val tabs = listOf("CPU", "FPS", "Memory", "Network", "Issues", "Jank", "GC", "Thermal")
 
     Column(modifier = Modifier.fillMaxSize()) {
         ScrollableTabRow(
@@ -134,6 +137,9 @@ private fun KamperContent(state: KamperState) {
                 2 -> MemoryTab(info = state.memoryInfo)
                 3 -> NetworkTab(info = state.networkInfo)
                 4 -> IssuesTab(issues = state.issues, onClear = { state.clearIssues() })
+                5 -> JankTab(info = state.jankInfo)
+                6 -> GcTab(info = state.gcInfo)
+                7 -> ThermalTab(info = state.thermalInfo)
             }
         }
     }

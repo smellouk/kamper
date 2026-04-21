@@ -47,7 +47,7 @@ class IssuesView : NSView {
         }
 
         scrollView = NSScrollView().apply {
-            contentView = clipView
+            setContentView(clipView)
             hasVerticalScroller = true
             hasHorizontalScroller = false
             translatesAutoresizingMaskIntoConstraints = false
@@ -112,14 +112,14 @@ class IssuesView : NSView {
     }
 
     private fun refresh() {
-        stackView.arrangedSubviews.forEach { it.removeFromSuperview() }
+        stackView.arrangedSubviews.forEach { (it as? NSView)?.removeFromSuperview() }
         issues.forEach { stackView.addArrangedSubview(issueRowView(it)) }
         updateEmpty()
     }
 
     private fun updateEmpty() {
-        emptyLabel.isHidden = issues.isNotEmpty()
-        scrollView.isHidden = issues.isEmpty()
+        emptyLabel.setHidden(issues.isNotEmpty())
+        scrollView.setHidden(issues.isEmpty())
     }
 
     @OptIn(ExperimentalForeignApi::class)

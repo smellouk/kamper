@@ -6,9 +6,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.smellouk.kamper.cpu.CpuInfo
 import com.smellouk.kamper.fps.FpsInfo
+import com.smellouk.kamper.gc.GcInfo
 import com.smellouk.kamper.issues.Issue
+import com.smellouk.kamper.jank.JankInfo
 import com.smellouk.kamper.memory.MemoryInfo
 import com.smellouk.kamper.network.NetworkInfo
+import com.smellouk.kamper.thermal.ThermalInfo
 import kotlinx.coroutines.CoroutineScope
 
 class KamperState {
@@ -18,6 +21,9 @@ class KamperState {
     var networkInfo by mutableStateOf(NetworkInfo.INVALID)
     var isRunning by mutableStateOf(false)
     val issues = mutableStateListOf<Issue>()
+    var jankInfo by mutableStateOf(JankInfo.INVALID)
+    var gcInfo by mutableStateOf(GcInfo.INVALID)
+    var thermalInfo by mutableStateOf(ThermalInfo.INVALID)
 
     fun addIssue(issue: Issue) {
         issues.add(0, issue)

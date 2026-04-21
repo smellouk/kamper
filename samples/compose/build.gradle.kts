@@ -60,6 +60,9 @@ kotlin {
                 implementation(project(Modules.Performances.MEMORY))
                 implementation(project(Modules.Performances.NETWORK))
                 implementation(project(Modules.Performances.ISSUES))
+                implementation(project(Modules.Performances.JANK))
+                implementation(project(Modules.Performances.GC))
+                implementation(project(Modules.Performances.THERMAL))
             }
         }
 

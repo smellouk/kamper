@@ -6,13 +6,19 @@ import com.smellouk.kamper.cpu.CpuInfo
 import com.smellouk.kamper.cpu.CpuModule
 import com.smellouk.kamper.fps.FpsInfo
 import com.smellouk.kamper.fps.FpsModule
+import com.smellouk.kamper.gc.GcInfo
+import com.smellouk.kamper.gc.GcModule
 import com.smellouk.kamper.issues.AnrConfig
 import com.smellouk.kamper.issues.IssueInfo
 import com.smellouk.kamper.issues.IssuesModule
+import com.smellouk.kamper.jank.JankInfo
+import com.smellouk.kamper.jank.JankModule
 import com.smellouk.kamper.memory.MemoryInfo
 import com.smellouk.kamper.memory.MemoryModule
 import com.smellouk.kamper.network.NetworkInfo
 import com.smellouk.kamper.network.NetworkModule
+import com.smellouk.kamper.thermal.ThermalInfo
+import com.smellouk.kamper.thermal.ThermalModule
 import com.smellouk.kamper.samples.ios.ui.*
 import kotlinx.cinterop.*
 import platform.CoreGraphics.*
@@ -48,6 +54,9 @@ class RootViewController : UITabBarController(nibName = null, bundle = null) {
     private lateinit var memoryVC:  MemoryViewController
     private lateinit var networkVC: NetworkViewController
     private lateinit var issuesVC:  IssuesViewController
+    private lateinit var jankVC:    JankViewController
+    private lateinit var gcVC:      GcViewController
+    private lateinit var thermalVC: ThermalViewController
 
     override fun viewDidLoad() {
         super.viewDidLoad()
@@ -57,14 +66,20 @@ class RootViewController : UITabBarController(nibName = null, bundle = null) {
         memoryVC  = MemoryViewController()
         networkVC = NetworkViewController()
         issuesVC  = IssuesViewController()
+        jankVC    = JankViewController()
+        gcVC      = GcViewController()
+        thermalVC = ThermalViewController()
 
         cpuVC.tabBarItem     = UITabBarItem(title = "CPU",     image = null, tag = 0)
         fpsVC.tabBarItem     = UITabBarItem(title = "FPS",     image = null, tag = 1)
         memoryVC.tabBarItem  = UITabBarItem(title = "Memory",  image = null, tag = 2)
         networkVC.tabBarItem = UITabBarItem(title = "Network", image = null, tag = 3)
         issuesVC.tabBarItem  = UITabBarItem(title = "Issues",  image = null, tag = 4)
+        jankVC.tabBarItem    = UITabBarItem(title = "Jank",    image = null, tag = 5)
+        gcVC.tabBarItem      = UITabBarItem(title = "GC",      image = null, tag = 6)
+        thermalVC.tabBarItem = UITabBarItem(title = "Thermal", image = null, tag = 7)
 
-        setViewControllers(listOf(cpuVC, fpsVC, memoryVC, networkVC, issuesVC), animated = false)
+        setViewControllers(listOf(cpuVC, fpsVC, memoryVC, networkVC, issuesVC, jankVC, gcVC, thermalVC), animated = false)
 
         tabBar.barTintColor           = Theme.MANTLE
         tabBar.tintColor              = Theme.BLUE
@@ -80,12 +95,18 @@ class RootViewController : UITabBarController(nibName = null, bundle = null) {
             install(MemoryModule())
             install(NetworkModule)
             install(IssuesModule(anr = AnrConfig()) { crash { chainToPreviousHandler = false } })
+            install(JankModule)
+            install(GcModule)
+            install(ThermalModule)
 
-            addInfoListener<CpuInfo>    { info -> dispatch_async(dispatch_get_main_queue()) { if (cpuVC.isViewLoaded())     cpuVC.update(info) } }
-            addInfoListener<FpsInfo>    { info -> dispatch_async(dispatch_get_main_queue()) { if (fpsVC.isViewLoaded())     fpsVC.update(info) } }
-            addInfoListener<MemoryInfo> { info -> dispatch_async(dispatch_get_main_queue()) { if (memoryVC.isViewLoaded()) memoryVC.update(info) } }
-            addInfoListener<NetworkInfo>{ info -> dispatch_async(dispatch_get_main_queue()) { if (networkVC.isViewLoaded()) networkVC.update(info) } }
-            addInfoListener<IssueInfo>  { info -> if (issuesVC.isViewLoaded()) issuesVC.addIssue(info.issue) }
+            addInfoListener<CpuInfo>     { info -> dispatch_async(dispatch_get_main_queue()) { if (cpuVC.isViewLoaded())     cpuVC.update(info) } }
+            addInfoListener<FpsInfo>     { info -> dispatch_async(dispatch_get_main_queue()) { if (fpsVC.isViewLoaded())     fpsVC.update(info) } }
+            addInfoListener<MemoryInfo>  { info -> dispatch_async(dispatch_get_main_queue()) { if (memoryVC.isViewLoaded()) memoryVC.update(info) } }
+            addInfoListener<NetworkInfo> { info -> dispatch_async(dispatch_get_main_queue()) { if (networkVC.isViewLoaded()) networkVC.update(info) } }
+            addInfoListener<IssueInfo>   { info -> if (issuesVC.isViewLoaded()) issuesVC.addIssue(info.issue) }
+            addInfoListener<JankInfo>    { info -> dispatch_async(dispatch_get_main_queue()) { if (jankVC.isViewLoaded())    jankVC.update(info) } }
+            addInfoListener<GcInfo>      { info -> dispatch_async(dispatch_get_main_queue()) { if (gcVC.isViewLoaded())      gcVC.update(info) } }
+            addInfoListener<ThermalInfo> { info -> dispatch_async(dispatch_get_main_queue()) { if (thermalVC.isViewLoaded()) thermalVC.update(info) } }
         }
         Kamper.start()
     }

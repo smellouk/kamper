@@ -6,19 +6,28 @@ import com.smellouk.kamper.cpu.CpuInfo
 import com.smellouk.kamper.cpu.CpuModule
 import com.smellouk.kamper.fps.FpsInfo
 import com.smellouk.kamper.fps.FpsModule
+import com.smellouk.kamper.gc.GcInfo
+import com.smellouk.kamper.gc.GcModule
 import com.smellouk.kamper.issues.AnrConfig
 import com.smellouk.kamper.issues.IssueInfo
 import com.smellouk.kamper.issues.IssuesModule
+import com.smellouk.kamper.jank.JankInfo
+import com.smellouk.kamper.jank.JankModule
 import com.smellouk.kamper.memory.MemoryInfo
 import com.smellouk.kamper.memory.MemoryModule
 import com.smellouk.kamper.network.NetworkInfo
 import com.smellouk.kamper.network.NetworkModule
+import com.smellouk.kamper.thermal.ThermalInfo
+import com.smellouk.kamper.thermal.ThermalModule
 import com.smellouk.kamper.samples.macos.ui.ActionTarget
 import com.smellouk.kamper.samples.macos.ui.CpuView
 import com.smellouk.kamper.samples.macos.ui.FpsView
+import com.smellouk.kamper.samples.macos.ui.GcView
 import com.smellouk.kamper.samples.macos.ui.IssuesView
+import com.smellouk.kamper.samples.macos.ui.JankView
 import com.smellouk.kamper.samples.macos.ui.MemoryView
 import com.smellouk.kamper.samples.macos.ui.NetworkView
+import com.smellouk.kamper.samples.macos.ui.ThermalView
 import com.smellouk.kamper.samples.macos.ui.Theme
 import kotlinx.cinterop.*
 import platform.AppKit.*
@@ -58,6 +67,9 @@ class KamperDemoWindow : NSWindow(
     private val memoryView  = MemoryView(NSMakeRect(0.0, 0.0, 0.0, 0.0))
     private val networkView = NetworkView(NSMakeRect(0.0, 0.0, 0.0, 0.0))
     private val issuesView  = IssuesView(NSMakeRect(0.0, 0.0, 0.0, 0.0))
+    private val jankView    = JankView(NSMakeRect(0.0, 0.0, 0.0, 0.0))
+    private val gcView      = GcView(NSMakeRect(0.0, 0.0, 0.0, 0.0))
+    private val thermalView = ThermalView(NSMakeRect(0.0, 0.0, 0.0, 0.0))
     private var tabSwitchTarget: ActionTarget? = null
 
     init {
@@ -124,14 +136,20 @@ class KamperDemoWindow : NSWindow(
         addTab("Memory",  memoryView)
         addTab("Network", networkView)
         addTab("Issues",  issuesView)
+        addTab("Jank",    jankView)
+        addTab("GC",      gcView)
+        addTab("Thermal", thermalView)
 
         val seg = NSSegmentedControl()
-        seg.segmentCount = 5
+        seg.segmentCount = 8
         seg.setLabel("CPU",     forSegment = 0)
         seg.setLabel("FPS",     forSegment = 1)
         seg.setLabel("Memory",  forSegment = 2)
         seg.setLabel("Network", forSegment = 3)
         seg.setLabel("Issues",  forSegment = 4)
+        seg.setLabel("Jank",    forSegment = 5)
+        seg.setLabel("GC",      forSegment = 6)
+        seg.setLabel("Thermal", forSegment = 7)
         seg.selectedSegment = 0
         seg.segmentStyle = NSSegmentStyleRounded
         seg.trackingMode = NSSegmentSwitchTrackingSelectOne
@@ -152,12 +170,18 @@ class KamperDemoWindow : NSWindow(
             install(MemoryModule())
             install(NetworkModule)
             install(IssuesModule(anr = AnrConfig()) { crash { chainToPreviousHandler = false } })
+            install(JankModule)
+            install(GcModule)
+            install(ThermalModule)
 
             addInfoListener<CpuInfo>     { cpuView.update(it) }
             addInfoListener<FpsInfo>     { fpsView.update(it) }
             addInfoListener<MemoryInfo>  { memoryView.update(it) }
             addInfoListener<NetworkInfo> { networkView.update(it) }
             addInfoListener<IssueInfo>   { issuesView.addIssue(it.issue) }
+            addInfoListener<JankInfo>    { jankView.update(it) }
+            addInfoListener<GcInfo>      { gcView.update(it) }
+            addInfoListener<ThermalInfo> { thermalView.update(it) }
         }
         Kamper.start()
     }

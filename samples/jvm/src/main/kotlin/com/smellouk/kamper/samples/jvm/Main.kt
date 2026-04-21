@@ -5,18 +5,27 @@ import com.smellouk.kamper.cpu.CpuInfo
 import com.smellouk.kamper.cpu.CpuModule
 import com.smellouk.kamper.fps.FpsInfo
 import com.smellouk.kamper.fps.FpsModule
+import com.smellouk.kamper.gc.GcInfo
+import com.smellouk.kamper.gc.GcModule
 import com.smellouk.kamper.issues.AnrConfig
 import com.smellouk.kamper.issues.IssueInfo
 import com.smellouk.kamper.issues.IssuesModule
+import com.smellouk.kamper.jank.JankInfo
+import com.smellouk.kamper.jank.JankModule
 import com.smellouk.kamper.memory.MemoryInfo
 import com.smellouk.kamper.memory.MemoryModule
 import com.smellouk.kamper.network.NetworkInfo
 import com.smellouk.kamper.network.NetworkModule
+import com.smellouk.kamper.thermal.ThermalInfo
+import com.smellouk.kamper.thermal.ThermalModule
 import com.smellouk.kamper.samples.jvm.ui.CpuPanel
 import com.smellouk.kamper.samples.jvm.ui.FpsPanel
+import com.smellouk.kamper.samples.jvm.ui.GcPanel
 import com.smellouk.kamper.samples.jvm.ui.IssuesPanel
+import com.smellouk.kamper.samples.jvm.ui.JankPanel
 import com.smellouk.kamper.samples.jvm.ui.MemoryPanel
 import com.smellouk.kamper.samples.jvm.ui.NetworkPanel
+import com.smellouk.kamper.samples.jvm.ui.ThermalPanel
 import com.smellouk.kamper.samples.jvm.ui.Theme
 import java.awt.BorderLayout
 import java.awt.Color
@@ -44,6 +53,9 @@ private class KamperDemoWindow : JFrame("K|JVM") {
     private val memoryPanel  = MemoryPanel()
     private val networkPanel = NetworkPanel()
     private val issuesPanel  = IssuesPanel()
+    private val jankPanel    = JankPanel()
+    private val gcPanel      = GcPanel()
+    private val thermalPanel = ThermalPanel()
 
     init {
         defaultCloseOperation = EXIT_ON_CLOSE
@@ -61,6 +73,9 @@ private class KamperDemoWindow : JFrame("K|JVM") {
             addTab("  Memory  ",  memoryPanel)
             addTab("  Network  ", networkPanel)
             addTab("  Issues  ",  issuesPanel)
+            addTab("  Jank  ",    jankPanel)
+            addTab("  GC  ",      gcPanel)
+            addTab("  Thermal  ", thermalPanel)
         }
 
         contentPane.add(HeaderPanel(), BorderLayout.NORTH)
@@ -78,12 +93,18 @@ private class KamperDemoWindow : JFrame("K|JVM") {
             install(MemoryModule())
             install(NetworkModule)
             install(IssuesModule(anr = AnrConfig()) { crash { chainToPreviousHandler = false } })
+            install(JankModule)
+            install(GcModule)
+            install(ThermalModule)
 
             addInfoListener<CpuInfo>     { cpuPanel.update(it) }
             addInfoListener<FpsInfo>     { fpsPanel.update(it) }
             addInfoListener<MemoryInfo>  { memoryPanel.update(it) }
             addInfoListener<NetworkInfo> { networkPanel.update(it) }
             addInfoListener<IssueInfo>   { issuesPanel.addIssue(it.issue) }
+            addInfoListener<JankInfo>    { jankPanel.update(it) }
+            addInfoListener<GcInfo>      { gcPanel.update(it) }
+            addInfoListener<ThermalInfo> { thermalPanel.update(it) }
         }
         Kamper.start()
 

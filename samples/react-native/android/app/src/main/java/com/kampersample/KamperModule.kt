@@ -11,13 +11,19 @@ import com.smellouk.kamper.cpu.CpuInfo
 import com.smellouk.kamper.cpu.CpuModule
 import com.smellouk.kamper.fps.FpsInfo
 import com.smellouk.kamper.fps.FpsModule
+import com.smellouk.kamper.gc.GcInfo
+import com.smellouk.kamper.gc.GcModule
 import com.smellouk.kamper.issues.AnrConfig
 import com.smellouk.kamper.issues.IssueInfo
 import com.smellouk.kamper.issues.IssuesModule
+import com.smellouk.kamper.jank.JankInfo
+import com.smellouk.kamper.jank.JankModule
 import com.smellouk.kamper.memory.MemoryInfo
 import com.smellouk.kamper.memory.MemoryModule
 import com.smellouk.kamper.network.NetworkInfo
 import com.smellouk.kamper.network.NetworkModule
+import com.smellouk.kamper.thermal.ThermalInfo
+import com.smellouk.kamper.thermal.ThermalModule
 
 class KamperModule(private val ctx: ReactApplicationContext) :
     ReactContextBaseJavaModule(ctx) {
@@ -34,6 +40,9 @@ class KamperModule(private val ctx: ReactApplicationContext) :
             install(IssuesModule(ctx, anr = AnrConfig(thresholdMs = 5_000L)) {
                 crash { chainToPreviousHandler = false }
             })
+            install(JankModule(ctx.applicationContext as android.app.Application))
+            install(GcModule)
+            install(ThermalModule(ctx))
 
             addInfoListener<CpuInfo> { info ->
                 if (info == CpuInfo.INVALID) return@addInfoListener
@@ -77,6 +86,29 @@ class KamperModule(private val ctx: ReactApplicationContext) :
                     putDouble("timestamp", info.issue.timestampMs.toDouble())
                     info.issue.durationMs?.let { putDouble("durationMs", it.toDouble()) }
                     info.issue.threadName?.let { putString("threadName", it) }
+                })
+            }
+            addInfoListener<JankInfo> { info ->
+                if (info == JankInfo.INVALID) return@addInfoListener
+                emit("kamper_jank", Arguments.createMap().apply {
+                    putInt("droppedFrames",   info.droppedFrames)
+                    putDouble("jankyRatio",   info.jankyFrameRatio.toDouble())
+                    putDouble("worstFrameMs", info.worstFrameMs.toDouble())
+                })
+            }
+            addInfoListener<GcInfo> { info ->
+                if (info == GcInfo.INVALID) return@addInfoListener
+                emit("kamper_gc", Arguments.createMap().apply {
+                    putDouble("gcCountDelta",   info.gcCountDelta.toDouble())
+                    putDouble("gcPauseMsDelta", info.gcPauseMsDelta.toDouble())
+                    putDouble("gcCount",        info.gcCount.toDouble())
+                })
+            }
+            addInfoListener<ThermalInfo> { info ->
+                if (info == ThermalInfo.INVALID) return@addInfoListener
+                emit("kamper_thermal", Arguments.createMap().apply {
+                    putString("state",        info.state.name)
+                    putBoolean("isThrottling", info.isThrottling)
                 })
             }
         }
