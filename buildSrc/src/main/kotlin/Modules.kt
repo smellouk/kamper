@@ -9,9 +9,16 @@ object Modules {
         const val NETWORK = ":kamper:modules:network"
     }
 
+    object Ui {
+        const val ANDROID = ":kamper:ui:android"
+    }
+
+    const val XCFRAMEWORK = ":kamper:xcframework"
+
     object Samples {
         const val JVM = ":samples:jvm"
         const val MACOS = ":samples:macos"
+        const val IOS = ":samples:ios"
         const val WEB = ":samples:web"
         const val COMPOSE = ":samples:compose"
     }

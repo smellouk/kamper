@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <application>
+        <provider
+            android:name=".KamperUiInitProvider"
+            android:authorities="${applicationId}.kamper_ui_provider"
+            android:exported="false" />
+
+        <activity
+            android:name=".KamperPanelActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Kamper.Transparent" />
+    </application>
+
+</manifest>
