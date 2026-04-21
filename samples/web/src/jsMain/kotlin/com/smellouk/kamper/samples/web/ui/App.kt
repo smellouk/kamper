@@ -35,7 +35,7 @@ internal object App {
 
         val title = document.createElement("div") as HTMLElement
         title.className = "app-title"
-        title.textContent = "Kamper Performance Monitor"
+        title.textContent = "K|Web"
         header.appendChild(title)
 
         val right = header.div("header-right")

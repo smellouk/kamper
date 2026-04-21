@@ -34,7 +34,7 @@ fun main() {
     SwingUtilities.invokeLater { KamperDemoWindow().isVisible = true }
 }
 
-private class KamperDemoWindow : JFrame("Kamper – JVM Performance Monitor") {
+private class KamperDemoWindow : JFrame("K|JVM") {
     private val cpuPanel     = CpuPanel()
     private val fpsPanel     = FpsPanel()
     private val memoryPanel  = MemoryPanel()

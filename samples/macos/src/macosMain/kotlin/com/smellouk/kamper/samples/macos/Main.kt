@@ -56,7 +56,7 @@ class KamperDemoWindow : NSWindow(
     private var tabSwitchTarget: ActionTarget? = null
 
     init {
-        title = "Kamper – macOS Performance Monitor"
+        title = "K|macOS"
         minSize = NSSizeFromString("{560, 440}")
         backgroundColor = Theme.BASE
         contentView?.let { setupContent(it) }
