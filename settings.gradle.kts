@@ -11,6 +11,7 @@ include(":kamper:modules:network")
 include(":kamper:modules:issues")
 include(":kamper:modules:jank")
 include(":kamper:modules:gc")
+include(":kamper:modules:thermal")
 
 include(":kamper:ui:android")
 

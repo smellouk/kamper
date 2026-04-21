@@ -10,6 +10,7 @@ object Modules {
         const val ISSUES = ":kamper:modules:issues"
         const val JANK = ":kamper:modules:jank"
         const val GC = ":kamper:modules:gc"
+        const val THERMAL = ":kamper:modules:thermal"
     }
 
     object Ui {
