@@ -4,7 +4,6 @@ import com.android.build.gradle.LibraryExtension
 import io.gitlab.arturbosch.detekt.Detekt
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import java.io.ByteArrayOutputStream
 import java.lang.System.getenv as Env
 
 plugins {
@@ -40,11 +39,11 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath("com.android.tools.build:gradle:8.7.3")
-        classpath(Libs.Plugins.kotlin)
-        classpath(Libs.Plugins.mokkery)
-        classpath(Libs.Plugins.test_logger)
-        classpath(Libs.Plugins.Compose.classpath)
+        classpath("com.android.tools.build:gradle:8.12.0")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:2.3.20")
+        classpath("dev.mokkery:dev.mokkery.gradle.plugin:3.3.0")
+        classpath("com.adarshr:gradle-test-logger-plugin:4.0.0")
+        classpath("org.jetbrains.compose:compose-gradle-plugin:1.8.0")
     }
 }
 
@@ -162,13 +161,10 @@ fun generateVersionName(): String {
 }
 
 fun String.execute(currentWorkingDir: File = file("./")): String? = try {
-    val byteOut = ByteArrayOutputStream()
-    project.exec {
-        workingDir = currentWorkingDir
-        commandLine = this@execute.split("\\s".toRegex())
-        standardOutput = byteOut
-    }
-    String(byteOut.toByteArray()).trim()
+    providers.exec {
+        workingDir(currentWorkingDir)
+        commandLine(this@execute.split("\\s".toRegex()))
+    }.standardOutput.asText.get().trim()
 } catch (e: Exception) {
     null
 }
