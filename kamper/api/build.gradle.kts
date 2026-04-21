@@ -16,6 +16,9 @@ kotlin {
     js(IR) {
         browser()
     }
+    wasmJs {
+        browser()
+    }
 
     sourceSets {
         val commonMain by getting {

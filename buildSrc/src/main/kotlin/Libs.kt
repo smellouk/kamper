@@ -1,6 +1,7 @@
 object Versions {
     const val kotlin = "2.3.20"
     const val coroutines = "1.10.1"
+    const val compose = "1.8.0"
 
     const val androidx_app_compat = "1.7.0"
     const val androidx_annotations = "1.9.1"
@@ -23,6 +24,12 @@ object Libs {
 
         const val mokkery =
             "dev.mokkery:dev.mokkery.gradle.plugin:${Versions.mokkery}"
+
+        object Compose {
+            const val id = "org.jetbrains.compose"
+            const val kotlinPluginId = "org.jetbrains.kotlin.plugin.compose"
+            const val classpath = "org.jetbrains.compose:compose-gradle-plugin:${Versions.compose}"
+        }
 
         object Detekt {
             const val id =

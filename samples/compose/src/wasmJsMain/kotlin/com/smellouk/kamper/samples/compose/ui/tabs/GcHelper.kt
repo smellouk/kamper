@@ -1,0 +1,3 @@
+package com.smellouk.kamper.samples.compose.ui.tabs
+
+actual fun gc() = Unit

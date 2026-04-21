@@ -44,11 +44,12 @@ buildscript {
         classpath(Libs.Plugins.kotlin)
         classpath(Libs.Plugins.mokkery)
         classpath(Libs.Plugins.test_logger)
+        classpath(Libs.Plugins.Compose.classpath)
     }
 }
 
 allprojects {
-    if (project.path != Modules.Samples.WEB) {
+    if (project.path != Modules.Samples.WEB && project.path != Modules.Samples.COMPOSE) {
         apply(plugin = "com.adarshr.test-logger")
     }
 
@@ -61,7 +62,7 @@ allprojects {
         compilerOptions.jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.fromTarget(Config.jvmTarget))
     }
 
-    if (project.path != Modules.Samples.WEB) {
+    if (project.path != Modules.Samples.WEB && project.path != Modules.Samples.COMPOSE) {
         testLoggerConfig {
             theme = ThemeType.MOCHA
         }

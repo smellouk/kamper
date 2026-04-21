@@ -13,5 +13,6 @@ object Modules {
         const val JVM = ":samples:jvm"
         const val MACOS = ":samples:macos"
         const val WEB = ":samples:web"
+        const val COMPOSE = ":samples:compose"
     }
 }
