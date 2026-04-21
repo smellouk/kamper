@@ -1,0 +1,18 @@
+pluginManagement { includeBuild("../node_modules/@react-native/gradle-plugin") }
+plugins { id("com.facebook.react.settings") }
+extensions.configure(com.facebook.react.ReactSettingsExtension){ ex -> ex.autolinkLibrariesFromCommand() }
+rootProject.name = 'KamperSample'
+include ':app'
+includeBuild('../node_modules/@react-native/gradle-plugin')
+
+// Use Kamper modules from source (composite build with dependency substitution)
+includeBuild('../../..') {
+    dependencySubstitution {
+        substitute(module('com.smellouk.kamper:engine:1.0.0')).using(project(':kamper:engine'))
+        substitute(module('com.smellouk.kamper:cpu-module:1.0.0')).using(project(':kamper:modules:cpu'))
+        substitute(module('com.smellouk.kamper:fps-module:1.0.0')).using(project(':kamper:modules:fps'))
+        substitute(module('com.smellouk.kamper:memory-module:1.0.0')).using(project(':kamper:modules:memory'))
+        substitute(module('com.smellouk.kamper:network-module:1.0.0')).using(project(':kamper:modules:network'))
+        substitute(module('com.smellouk.kamper:ui-android:1.0.0')).using(project(':kamper:ui:android'))
+    }
+}
