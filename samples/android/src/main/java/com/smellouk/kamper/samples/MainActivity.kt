@@ -8,25 +8,38 @@ import com.smellouk.kamper.cpu.CpuInfo
 import com.smellouk.kamper.cpu.CpuModule
 import com.smellouk.kamper.fps.FpsInfo
 import com.smellouk.kamper.fps.FpsModule
+import com.smellouk.kamper.gc.GcInfo
+import com.smellouk.kamper.gc.GcModule
 import com.smellouk.kamper.issues.AnrConfig
 import com.smellouk.kamper.issues.IssueInfo
 import com.smellouk.kamper.issues.IssuesModule
 import com.smellouk.kamper.issues.SlowStartConfig
 import com.smellouk.kamper.issues.StrictModeConfig
+import com.smellouk.kamper.jank.JankInfo
+import com.smellouk.kamper.jank.JankModule
 import com.smellouk.kamper.memory.MemoryInfo
 import com.smellouk.kamper.memory.MemoryModule
 import com.smellouk.kamper.network.NetworkInfo
 import com.smellouk.kamper.network.NetworkModule
+import com.smellouk.kamper.thermal.ThermalInfo
+import com.smellouk.kamper.thermal.ThermalModule
 
 class MainActivity : AppCompatActivity() {
 
-    private val cpuFragment = CpuFragment()
-    private val fpsFragment = FpsFragment()
-    private val memoryFragment = MemoryFragment()
+    private val cpuFragment     = CpuFragment()
+    private val fpsFragment     = FpsFragment()
+    private val memoryFragment  = MemoryFragment()
     private val networkFragment = NetworkFragment()
-    private val issuesFragment = IssuesFragment()
-    private val fragments = listOf(cpuFragment, fpsFragment, memoryFragment, networkFragment, issuesFragment)
-    private val tabTitles = listOf("CPU", "FPS", "Memory", "Network", "Issues")
+    private val issuesFragment  = IssuesFragment()
+    private val jankFragment    = JankFragment()
+    private val gcFragment      = GcFragment()
+    private val thermalFragment = ThermalFragment()
+
+    private val fragments  = listOf(
+        cpuFragment, fpsFragment, memoryFragment, networkFragment,
+        issuesFragment, jankFragment, gcFragment, thermalFragment
+    )
+    private val tabTitles = listOf("CPU", "FPS", "Memory", "Network", "Issues", "Jank", "GC", "Thermal")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -67,6 +80,9 @@ class MainActivity : AppCompatActivity() {
             install(FpsModule)
             install(MemoryModule(applicationContext))
             install(NetworkModule)
+            install(JankModule(application))
+            install(GcModule)
+            install(ThermalModule(applicationContext))
             install(
                 IssuesModule(
                     context = applicationContext,
@@ -83,6 +99,9 @@ class MainActivity : AppCompatActivity() {
             addInfoListener<MemoryInfo>  { if (it != MemoryInfo.INVALID)  memoryFragment.update(it) }
             addInfoListener<NetworkInfo> { if (it != NetworkInfo.INVALID) networkFragment.update(it) }
             addInfoListener<IssueInfo>   { issuesFragment.addIssue(it.issue) }
+            addInfoListener<JankInfo>    { if (it != JankInfo.INVALID)    jankFragment.update(it) }
+            addInfoListener<GcInfo>      { if (it != GcInfo.INVALID)      gcFragment.update(it) }
+            addInfoListener<ThermalInfo> { if (it != ThermalInfo.INVALID) thermalFragment.update(it) }
         }
     }
 }
