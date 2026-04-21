@@ -129,10 +129,7 @@ actual object KamperUi {
                 settings = repo.settings,
                 onSettingsChange = { repo.updateSettings(it) },
                 onClearIssues = { repo.clearIssues() },
-                onDismiss = { parent.dismissViewControllerAnimated(true, null) },
-                onStartCapture = { repo.startCapture() },
-                onStopCapture = { repo.stopCapture() },
-                onShareTrace = null
+                onDismiss = { parent.dismissViewControllerAnimated(true, null) }
             )
         }
         panelVC.modalPresentationStyle = UIModalPresentationOverCurrentContext

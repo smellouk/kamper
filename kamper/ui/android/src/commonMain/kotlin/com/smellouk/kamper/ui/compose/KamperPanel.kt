@@ -49,10 +49,7 @@ internal fun KamperPanel(
     settings: StateFlow<KamperUiSettings>,
     onSettingsChange: (KamperUiSettings) -> Unit,
     onClearIssues: () -> Unit,
-    onDismiss: () -> Unit,
-    onStartCapture: () -> Unit = {},
-    onStopCapture: () -> Unit = {},
-    onShareTrace: (() -> Unit)? = null
+    onDismiss: () -> Unit
 ) {
     val s by state.collectAsState()
     val cfg by settings.collectAsState()
@@ -127,12 +124,7 @@ internal fun KamperPanel(
                     when (selectedTab) {
                         0    -> ActivityContent(s = s)
                         1    -> IssuesTab(issues = s.issues, onClear = onClearIssues)
-                        2    -> PerfettoTab(
-                            state = s,
-                            onStartCapture = onStartCapture,
-                            onStopCapture = onStopCapture,
-                            onShareTrace = onShareTrace
-                        )
+                        2    -> PerfettoTab()
                         else -> SettingsContent(cfg = cfg, onSettingsChange = onSettingsChange)
                     }
                     Spacer(Modifier.height(8.dp))

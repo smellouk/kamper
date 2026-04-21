@@ -4,7 +4,6 @@ import android.app.Application
 import android.content.Context
 import android.os.Handler
 import android.os.Looper
-import android.os.Trace
 import android.view.Choreographer
 import com.smellouk.kamper.Engine
 import com.smellouk.kamper.cpu.CpuInfo
@@ -16,16 +15,10 @@ import com.smellouk.kamper.memory.MemoryInfo
 import com.smellouk.kamper.memory.MemoryModule
 import com.smellouk.kamper.network.NetworkInfo
 import com.smellouk.kamper.network.NetworkModule
-import android.util.Log
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 
 private const val HISTORY_SIZE = 60
 private const val MAX_ISSUES = 100
@@ -61,9 +54,6 @@ internal actual class KamperUiRepository(context: Context) {
     private val _state = MutableStateFlow(KamperUiState.EMPTY)
     actual val state: StateFlow<KamperUiState> = _state.asStateFlow()
 
-    private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
-    private val perfettoCapture = PerfettoCapture(context)
-
     private val cpuHist = ArrayDeque<Float>()
     private val fpsHist = ArrayDeque<Float>()
     private val memHist = ArrayDeque<Float>()
@@ -89,51 +79,6 @@ internal actual class KamperUiRepository(context: Context) {
         issuesList.clear()
         saveIssues()
         _state.update { it.copy(issues = emptyList(), unreadIssueCount = 0) }
-    }
-
-    actual fun startCapture() {
-        Log.d(TAG, "startCapture()")
-        _state.update { it.copy(isRecordingTrace = true, traceSpans = emptyList(), traceFilePath = null, traceStatus = null) }
-        scope.launch {
-            val err = perfettoCapture.start()
-            if (err != null) {
-                Log.e(TAG, "startCapture failed: $err")
-                _state.update { it.copy(isRecordingTrace = false, traceStatus = err) }
-            } else {
-                Log.i(TAG, "startCapture succeeded — perfetto is recording")
-            }
-        }
-    }
-
-    actual fun stopCapture() {
-        Log.d(TAG, "stopCapture()")
-        _state.update { it.copy(isRecordingTrace = false, isProcessingTrace = true) }
-        scope.launch {
-            perfettoCapture.stop()
-            val file = perfettoCapture.traceFile()
-            Log.d(TAG, "trace file after stop: ${file?.absolutePath} (${file?.length() ?: 0} bytes)")
-            val spans = if (file != null) PerfettoParser.parse(file) else emptyList()
-            Log.i(TAG, "parsed ${spans.size} spans from trace")
-            val perfettoErr = perfettoCapture.lastError()
-            val status = when {
-                file == null && perfettoErr.isNotEmpty() -> perfettoErr
-                file == null -> "No trace file — perfetto may have failed to start"
-                file.length() == 0L -> "Trace file empty — try recording for a few seconds"
-                spans.isEmpty() -> "Captured ${file.length() / 1024}KB — no ATrace spans found"
-                else -> null
-            }
-            if (status != null) Log.w(TAG, "capture result: $status")
-            _state.update { it.copy(
-                isProcessingTrace = false,
-                traceSpans = spans,
-                traceFilePath = file?.absolutePath,
-                traceStatus = status
-            )}
-        }
-    }
-
-    private companion object {
-        const val TAG = "Kamper.Repository"
     }
 
     private var fpsFrameCount = 0
@@ -175,35 +120,27 @@ internal actual class KamperUiRepository(context: Context) {
 
             addInfoListener<CpuInfo> { info ->
                 if (info == CpuInfo.INVALID) return@addInfoListener
-                Trace.beginSection("kamper.cpu")
                 val v = (info.totalUseRatio * 100).toFloat()
                 cpuHist.push(v)
                 _state.update { s -> s.copy(cpuPercent = v, cpuHistory = cpuHist.toList()) }
-                Trace.endSection()
             }
 
             addInfoListener<MemoryInfo> { info ->
                 if (info == MemoryInfo.INVALID) return@addInfoListener
-                Trace.beginSection("kamper.memory")
                 val v = info.heapMemoryInfo.allocatedInMb
                 memHist.push(v)
                 _state.update { s -> s.copy(memoryUsedMb = v, memoryHistory = memHist.toList()) }
-                Trace.endSection()
             }
 
             addInfoListener<NetworkInfo> { info ->
                 if (info == NetworkInfo.INVALID || info == NetworkInfo.NOT_SUPPORTED) return@addInfoListener
-                Trace.beginSection("kamper.network")
                 val v = info.rxSystemTotalInMb
                 netHist.push(v)
                 _state.update { s -> s.copy(downloadMbps = v, downloadHistory = netHist.toList()) }
-                Trace.endSection()
             }
 
             addInfoListener<IssueInfo> { info ->
                 if (info == IssueInfo.INVALID) return@addInfoListener
-                Trace.beginSection("Kamper:${info.issue.type.name}")
-                Trace.endSection()
                 issuesList.add(0, info.issue)
                 if (issuesList.size > MAX_ISSUES) issuesList.removeAt(issuesList.size - 1)
                 saveIssues()
@@ -223,7 +160,6 @@ internal actual class KamperUiRepository(context: Context) {
     }
 
     actual fun clear() {
-        scope.cancel()
         Handler(Looper.getMainLooper()).post {
             Choreographer.getInstance().removeFrameCallback(fpsCallback)
         }

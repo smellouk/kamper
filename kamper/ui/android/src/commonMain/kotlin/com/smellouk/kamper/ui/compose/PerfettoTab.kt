@@ -4,172 +4,134 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.smellouk.kamper.ui.KamperUiState
-import kotlinx.coroutines.delay
+
+private const val CMD_RECORD = "adb shell perfetto -o /data/misc/perfetto-traces/trace.perfetto-trace -t 10s sched freq am wm view app"
+private const val CMD_PULL   = "adb pull /data/misc/perfetto-traces/trace.perfetto-trace"
+private const val URL_UI     = "https://ui.perfetto.dev"
 
 @Composable
-internal fun PerfettoTab(
-    state: KamperUiState,
-    onStartCapture: () -> Unit,
-    onStopCapture: () -> Unit,
-    onShareTrace: (() -> Unit)?
-) {
+internal fun PerfettoTab() {
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        // Controls row
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            when {
-                state.isRecordingTrace -> {
-                    RecordingBadge()
-                    Spacer(Modifier.weight(1f))
-                    PerfettoButton(label = "Stop", color = KamperTheme.RED, onClick = onStopCapture)
-                }
-                state.isProcessingTrace -> {
-                    Text("Processing…", color = KamperTheme.BLUE, fontSize = 12.sp)
-                    Spacer(Modifier.weight(1f))
-                }
-                else -> {
-                    PerfettoButton(label = "Start", color = KamperTheme.RED, dotShape = false, onClick = onStartCapture)
-                    Spacer(Modifier.weight(1f))
-                    if (onShareTrace != null && state.traceFilePath != null) {
-                        PerfettoButton(label = "Share", color = KamperTheme.TEAL, dotShape = false, onClick = onShareTrace)
-                    }
-                }
-            }
-        }
+        Text(
+            "Perfetto is a system-level profiler. Run these commands from your machine while the app is running.",
+            color = KamperTheme.SUBTEXT,
+            fontSize = 12.sp,
+            lineHeight = 18.sp
+        )
 
-        when {
-            state.traceSpans.isNotEmpty() -> {
-                FlameChart(spans = state.traceSpans)
-            }
-            state.isRecordingTrace -> {
-                Box(
-                    modifier = Modifier.fillMaxWidth().height(100.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text("Recording…", color = KamperTheme.SUBTEXT, fontSize = 13.sp)
-                }
-            }
-            state.isProcessingTrace -> {
-                Box(
-                    modifier = Modifier.fillMaxWidth().height(100.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text("Processing trace…", color = KamperTheme.BLUE, fontSize = 13.sp)
-                }
-            }
-            else -> {
-                EmptyTraceBox(
-                    message = state.traceStatus ?: "Press Start to record an ATrace capture",
-                    isError = state.traceStatus != null
+        GuideStep(
+            number = "1",
+            label  = "Start a 10-second trace",
+            cmd    = CMD_RECORD
+        )
+        GuideStep(
+            number = "2",
+            label  = "Pull the trace file",
+            cmd    = CMD_PULL
+        )
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(8.dp))
+                .background(KamperTheme.BASE)
+                .border(0.5.dp, KamperTheme.BORDER, RoundedCornerShape(8.dp))
+                .padding(12.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    "3",
+                    color = KamperTheme.BLUE,
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(4.dp))
+                        .background(KamperTheme.BLUE.copy(alpha = 0.15f))
+                        .padding(horizontal = 6.dp, vertical = 2.dp)
                 )
+                Spacer(Modifier.padding(4.dp))
+                Text("Open in Perfetto UI", color = KamperTheme.TEXT, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
             }
+            Text(URL_UI, color = KamperTheme.TEAL, fontSize = 11.sp, fontFamily = FontFamily.Monospace)
         }
     }
 }
 
 @Composable
-private fun EmptyTraceBox(message: String, isError: Boolean) {
-    Box(
+private fun GuideStep(number: String, label: String, cmd: String) {
+    val clipboard = LocalClipboardManager.current
+    Column(
         modifier = Modifier
             .fillMaxWidth()
-            .height(100.dp)
             .clip(RoundedCornerShape(8.dp))
             .background(KamperTheme.BASE)
-            .border(
-                0.5.dp,
-                if (isError) KamperTheme.PEACH.copy(alpha = 0.5f) else KamperTheme.BORDER,
-                RoundedCornerShape(8.dp)
-            ),
-        contentAlignment = Alignment.Center
+            .border(0.5.dp, KamperTheme.BORDER, RoundedCornerShape(8.dp))
+            .padding(12.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        Text(
-            text = message,
-            color = if (isError) KamperTheme.PEACH else KamperTheme.SUBTEXT,
-            fontSize = 12.sp,
-            modifier = Modifier.padding(horizontal = 16.dp)
-        )
-    }
-}
-
-@Composable
-private fun RecordingBadge() {
-    var visible by remember { mutableStateOf(true) }
-    LaunchedEffect(Unit) {
-        while (true) {
-            delay(600)
-            visible = !visible
-        }
-    }
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(6.dp)
-    ) {
-        Box(
-            modifier = Modifier
-                .size(8.dp)
-                .clip(CircleShape)
-                .background(if (visible) KamperTheme.RED else KamperTheme.SURFACE1)
-        )
-        Text(
-            "Recording…",
-            color = KamperTheme.RED,
-            fontSize = 12.sp,
-            fontWeight = FontWeight.SemiBold
-        )
-    }
-}
-
-@Composable
-private fun PerfettoButton(
-    label: String,
-    color: androidx.compose.ui.graphics.Color,
-    dotShape: Boolean = true,
-    onClick: () -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .clip(RoundedCornerShape(6.dp))
-            .background(color.copy(alpha = 0.12f))
-            .border(0.5.dp, color.copy(alpha = 0.4f), RoundedCornerShape(6.dp))
-            .clickable(onClick = onClick)
-            .padding(horizontal = 10.dp, vertical = 5.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(6.dp)
-    ) {
-        if (dotShape) {
-            Box(
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                number,
+                color = KamperTheme.BLUE,
+                fontSize = 11.sp,
+                fontWeight = FontWeight.Bold,
                 modifier = Modifier
-                    .size(7.dp)
-                    .clip(CircleShape)
-                    .background(color)
+                    .clip(RoundedCornerShape(4.dp))
+                    .background(KamperTheme.BLUE.copy(alpha = 0.15f))
+                    .padding(horizontal = 6.dp, vertical = 2.dp)
+            )
+            Spacer(Modifier.padding(4.dp))
+            Text(label, color = KamperTheme.TEXT, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+        }
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(6.dp))
+                .background(KamperTheme.SURFACE)
+                .border(0.5.dp, KamperTheme.BORDER, RoundedCornerShape(6.dp))
+                .padding(horizontal = 10.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                cmd,
+                color = KamperTheme.GREEN,
+                fontSize = 10.sp,
+                fontFamily = FontFamily.Monospace,
+                modifier = Modifier.weight(1f)
+            )
+            Spacer(Modifier.padding(6.dp))
+            Text(
+                "Copy",
+                color = KamperTheme.BLUE,
+                fontSize = 10.sp,
+                fontWeight = FontWeight.SemiBold,
+                modifier = Modifier
+                    .clip(RoundedCornerShape(4.dp))
+                    .background(KamperTheme.BLUE.copy(alpha = 0.12f))
+                    .clickable { clipboard.setText(AnnotatedString(cmd)) }
+                    .padding(horizontal = 6.dp, vertical = 3.dp)
             )
         }
-        Text(label, color = color, fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
+        Spacer(Modifier.height(0.dp))
     }
 }

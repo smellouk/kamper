@@ -14,12 +14,7 @@ data class KamperUiState(
     val downloadMbps: Float,
     val downloadHistory: List<Float>,
     val issues: List<Issue> = emptyList(),
-    val unreadIssueCount: Int = 0,
-    val traceSpans: List<TraceSpan> = emptyList(),
-    val isRecordingTrace: Boolean = false,
-    val isProcessingTrace: Boolean = false,
-    val traceFilePath: String? = null,
-    val traceStatus: String? = null
+    val unreadIssueCount: Int = 0
 ) {
     companion object {
         val EMPTY = KamperUiState(
