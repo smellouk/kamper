@@ -1,4 +1,4 @@
-package com.kampersample
+package com.smellouk.kamper.rn
 
 import com.facebook.react.ReactPackage
 import com.facebook.react.bridge.ReactApplicationContext

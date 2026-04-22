@@ -20,7 +20,7 @@ pre_install do |installer|
   system("cd '#{repo_root}' && ./gradlew :kamper:xcframework:assembleKamperReleaseXCFramework")
 end
 
-target 'KamperSample' do
+target 'KamperRn' do
   config = use_native_modules!
 
   use_react_native!(
