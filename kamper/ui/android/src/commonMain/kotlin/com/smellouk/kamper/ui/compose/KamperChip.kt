@@ -69,7 +69,7 @@ internal fun KamperChip(
         }
     } else Modifier
 
-    val chipShape = if (mirrorLayout) CHIP_SHAPE_RIGHT else CHIP_SHAPE_LEFT
+    val chipShape = if (mirrorLayout) CHIP_SHAPE_LEFT else CHIP_SHAPE_RIGHT
     Box(
         modifier = dragModifier
             .shadow(8.dp, chipShape)
