@@ -160,24 +160,24 @@ internal fun PerfettoTab(
             }
         }
 
-        // ── Manual (adb) section ──────────────────────────────────────────────
+        // ── Manual (adb) section — Android only ──────────────────────────────
 
-        Text(
+        if (showAdbGuide) Text(
             "MANUAL (ADB)",
             color = KamperTheme.SUBTEXT,
             fontSize = 10.sp,
             fontWeight = FontWeight.SemiBold,
             modifier = Modifier.padding(top = 4.dp)
         )
-        Text(
+        if (showAdbGuide) Text(
             "Run a system-level trace directly from your machine while the app is running.",
             color = KamperTheme.SUBTEXT,
             fontSize = 11.sp,
             lineHeight = 16.sp
         )
-        GuideStep(number = "1", label = "Start a 10-second trace", cmd = CMD_RECORD)
-        GuideStep(number = "2", label = "Pull the trace file", cmd = CMD_PULL)
-        Column(
+        if (showAdbGuide) GuideStep(number = "1", label = "Start a 10-second trace", cmd = CMD_RECORD)
+        if (showAdbGuide) GuideStep(number = "2", label = "Pull the trace file", cmd = CMD_PULL)
+        if (showAdbGuide) Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(8.dp))
@@ -195,6 +195,8 @@ internal fun PerfettoTab(
         }
     }
 }
+
+internal expect val showAdbGuide: Boolean
 
 // ── Recording badge with live elapsed timer ───────────────────────────────────
 
