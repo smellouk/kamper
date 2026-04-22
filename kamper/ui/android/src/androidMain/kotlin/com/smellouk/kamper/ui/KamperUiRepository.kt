@@ -138,7 +138,7 @@ internal actual class KamperUiRepository(context: Context) {
     private val _recordingSampleCount = MutableStateFlow(0)
     actual val recordingSampleCount: StateFlow<Int> = _recordingSampleCount.asStateFlow()
 
-    private fun nowNs(): Long = System.currentTimeMillis() * 1_000_000L
+    private fun nowNs(): Long = android.os.SystemClock.elapsedRealtimeNanos()
 
     private fun record(trackId: Int, value: Double) {
         if (!_isRecording.value) return

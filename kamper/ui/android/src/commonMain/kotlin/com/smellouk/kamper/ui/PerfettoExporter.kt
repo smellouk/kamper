@@ -67,7 +67,7 @@ internal class ProtoWriter {
 internal object PerfettoExporter {
 
     private const val SEQ_ID = 1
-    private const val CLOCK_REALTIME = 1
+    private const val CLOCK_BOOTTIME = 6
 
     fun export(samples: List<RecordedSample>): ByteArray {
         val root = ProtoWriter()
@@ -89,7 +89,7 @@ internal object PerfettoExporter {
             root.message(1) {             // Trace.packet
                 uint64(8, sample.timestampNs)
                 uint32(10, SEQ_ID)
-                uint32(58, CLOCK_REALTIME)
+                uint32(58, CLOCK_BOOTTIME)
                 message(11) {             // track_event
                     uint64(11, sample.trackId.toLong())
                     uint32(9, 4)          // TYPE_COUNTER
