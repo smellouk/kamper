@@ -107,22 +107,22 @@ internal fun KamperPanel(
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.weight(1f)
                     )
-                    Text(
-                        if (cfg.isDarkTheme) "☀" else "🌙",
-                        color = KamperTheme.SUBTEXT,
-                        fontSize = 16.sp,
-                        modifier = Modifier
-                            .clickable { onSettingsChange(cfg.copy(isDarkTheme = !cfg.isDarkTheme)) }
-                            .padding(horizontal = 8.dp, vertical = 4.dp)
+                    ThemeToggle(
+                        isDark = cfg.isDarkTheme,
+                        onToggle = { onSettingsChange(cfg.copy(isDarkTheme = !cfg.isDarkTheme)) }
                     )
-                    Text(
-                        "✕",
-                        color = KamperTheme.SUBTEXT,
-                        fontSize = 18.sp,
+                    Spacer(Modifier.width(8.dp))
+                    Box(
+                        contentAlignment = Alignment.Center,
                         modifier = Modifier
+                            .size(28.dp)
+                            .clip(RoundedCornerShape(6.dp))
+                            .background(KamperTheme.BASE)
+                            .border(0.5.dp, KamperTheme.BORDER, RoundedCornerShape(6.dp))
                             .clickable(onClick = onDismiss)
-                            .padding(4.dp)
-                    )
+                    ) {
+                        Text("✕", color = KamperTheme.SUBTEXT, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                    }
                 }
 
                 Spacer(Modifier.height(12.dp))
@@ -170,6 +170,44 @@ internal fun KamperPanel(
         }
     }
     } // KamperThemeProvider
+}
+
+@Composable
+private fun ThemeToggle(isDark: Boolean, onToggle: () -> Unit) {
+    val outerShape = RoundedCornerShape(8.dp)
+    val innerShape = RoundedCornerShape(6.dp)
+    Row(
+        modifier = Modifier
+            .clip(outerShape)
+            .background(KamperTheme.BASE)
+            .border(0.5.dp, KamperTheme.BORDER, outerShape)
+            .padding(2.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        ThemeSegment(icon = "🌙", label = "Dark",  active = isDark,  shape = innerShape, onClick = { if (!isDark) onToggle() })
+        ThemeSegment(icon = "☀",  label = "Light", active = !isDark, shape = innerShape, onClick = { if (isDark)  onToggle() })
+    }
+}
+
+@Composable
+private fun ThemeSegment(icon: String, label: String, active: Boolean, shape: RoundedCornerShape, onClick: () -> Unit) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(3.dp),
+        modifier = Modifier
+            .clip(shape)
+            .background(if (active) KamperTheme.SURFACE1 else Color.Transparent)
+            .clickable(onClick = onClick)
+            .padding(horizontal = 7.dp, vertical = 4.dp)
+    ) {
+        Text(icon, fontSize = 10.sp)
+        Text(
+            label,
+            color = if (active) KamperTheme.TEXT else KamperTheme.SUBTEXT,
+            fontSize = 11.sp,
+            fontWeight = if (active) FontWeight.SemiBold else FontWeight.Normal
+        )
+    }
 }
 
 @Composable
