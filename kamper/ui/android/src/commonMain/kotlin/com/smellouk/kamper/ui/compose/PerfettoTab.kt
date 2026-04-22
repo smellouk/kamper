@@ -55,6 +55,24 @@ internal fun PerfettoTab(
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
 
+        // ── Automatic section ─────────────────────────────────────────────────
+
+        Text(
+            "AUTOMATIC",
+            color = KamperTheme.SUBTEXT,
+            fontSize = 10.sp,
+            fontWeight = FontWeight.SemiBold,
+            modifier = Modifier.padding(top = 4.dp)
+        )
+        Text(
+            "Kamper records performance metrics directly from the app. " +
+            "Hit Record, use your app, then export a .perfetto-trace file " +
+            "you can open at ui.perfetto.dev — no ADB or Android Studio required.",
+            color = KamperTheme.SUBTEXT,
+            fontSize = 11.sp,
+            lineHeight = 16.sp
+        )
+
         // ── Recorder card ─────────────────────────────────────────────────────
 
         Column(
