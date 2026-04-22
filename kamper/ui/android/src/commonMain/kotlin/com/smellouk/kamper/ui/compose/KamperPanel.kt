@@ -121,9 +121,9 @@ internal fun KamperPanel(
                 Row(modifier = Modifier.fillMaxWidth()) {
                     PanelTab("Activity", selectedTab == 0) { selectedTab = 0 }
                     Spacer(Modifier.width(14.dp))
-                    PanelTab("Issues", selectedTab == 1) { selectedTab = 1 }
+                    PanelTab("Perfetto", selectedTab == 1) { selectedTab = 1 }
                     Spacer(Modifier.width(14.dp))
-                    PanelTab("Perfetto", selectedTab == 2) { selectedTab = 2 }
+                    PanelTab("Issues", selectedTab == 2) { selectedTab = 2 }
                     Spacer(Modifier.width(14.dp))
                     PanelTab("Settings", selectedTab == 3) { selectedTab = 3 }
                     Spacer(Modifier.weight(1f))
@@ -138,14 +138,14 @@ internal fun KamperPanel(
                 ) {
                     when (selectedTab) {
                         0    -> ActivityContent(s = s, cfg = cfg)
-                        1    -> IssuesTab(issues = s.issues, onClear = onClearIssues)
-                        2    -> PerfettoTab(
+                        1    -> PerfettoTab(
                             isRecording = recording,
                             sampleCount = sampleCount,
                             onStartRecording = onStartRecording,
                             onStopRecording = onStopRecording,
                             onExportTrace = onExportTrace
                         )
+                        2    -> IssuesTab(issues = s.issues, onClear = onClearIssues)
                         else -> SettingsContent(
                             s = s,
                             cfg = cfg,
