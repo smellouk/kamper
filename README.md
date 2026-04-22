@@ -5,18 +5,79 @@
 [![Issues](https://img.shields.io/github/issues/smellouk/kamper)](https://github.com/smellouk/kamper/issues)
 [![Stars](https://img.shields.io/github/stars/smellouk/kamper?style=social)](https://github.com/smellouk/kamper/stargazers)
 
-**Kotlin Multiplatform performance monitoring.** A plugin-based library that gives you live CPU, FPS, memory, and network metrics across Android, JVM, macOS, and Web — through a single unified API.
+**Kotlin Multiplatform performance monitoring.** A plugin-based library that gives you live CPU, FPS, memory, network, jank, GC, thermal, and issue detection across Android, iOS, JVM, macOS, and Web — through a single unified API.
+
+<img src="screenshots/1.gif" width="320" align="right"/>
+
+### Highlights
+
+- **Zero-boilerplate** — one `install()` call per module
+- **Kamper UI** — floating debug overlay for Android, auto-enabled in debug builds, zero app code required
+- **8 modules** — CPU, FPS, Memory, Network, Jank, GC, Thermal, Issues
+- **Multiplatform** — Android, iOS, JVM, macOS, Web (JS + Wasm)
+- **Perfetto export** — record a session and open it at [ui.perfetto.dev](https://ui.perfetto.dev) with one tap
+
+<br clear="right"/>
+
+---
+
+## Kamper UI
+
+A floating chip overlay that sits over any screen and shows live performance metrics. Tap to expand, tap again to open the full panel. Drag to either edge — it snaps flush with no extra rounded corner on the anchored side. Shake the device to restore a collapsed chip.
+
+**Android: zero app code required.** A `ContentProvider` auto-initialises the overlay in debug builds and disables it automatically in release.
+
+<p align="center">
+  <img src="screenshots/2.gif" width="300"/>
+</p>
+
+### Panel tabs
+
+<table>
+  <tr>
+    <td align="center"><b>Activity</b></td>
+    <td align="center"><b>Perfetto</b></td>
+    <td align="center"><b>Issues</b></td>
+    <td align="center"><b>Settings</b></td>
+  </tr>
+  <tr>
+    <td><img src="screenshots/7.png" width="160"/></td>
+    <td><img src="screenshots/8.png" width="160"/></td>
+    <td><img src="screenshots/9.png" width="160"/></td>
+    <td><img src="screenshots/10.png" width="160"/></td>
+  </tr>
+</table>
+
+### Chip states
+
+<table>
+  <tr>
+    <td align="center">Peek (default)</td>
+    <td align="center">Expanded — core metrics</td>
+    <td align="center">Expanded — all metrics</td>
+  </tr>
+  <tr>
+    <td><img src="screenshots/3.png" width="160"/></td>
+    <td><img src="screenshots/5.png" width="160"/></td>
+    <td><img src="screenshots/4.png" width="160"/></td>
+  </tr>
+</table>
 
 ---
 
 ## Platform support
 
-| Module  | Android | JVM | macOS | Web (JS) |
-|---------|:-------:|:---:|:-----:|:--------:|
-| CPU     | ✅ | ✅ | ✅ | ✅ |
-| FPS     | ✅ | ✅ | ✅ | ✅ |
-| Memory  | ✅ | ✅ | ✅ | ✅¹ |
-| Network | ✅² | ✅ | ✅ | ✅³ |
+| Module   | Android | iOS | JVM | macOS | Web |
+|----------|:-------:|:---:|:---:|:-----:|:---:|
+| CPU      | ✅ | ✅ | ✅ | ✅ | ✅ |
+| FPS      | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Memory   | ✅ | ✅ | ✅ | ✅ | ✅¹ |
+| Network  | ✅² | ✅ | ✅ | ✅ | ✅³ |
+| Jank     | ✅ | ❌ | ✅ | ❌ | ❌ |
+| GC       | ✅ | ❌ | ✅ | ❌ | ❌ |
+| Thermal  | ✅ | ❌ | ❌ | ❌ | ❌ |
+| Issues   | ✅ | ❌ | ✅ | ❌ | ❌ |
+| Kamper UI| ✅ | ❌ | ❌ | ❌ | ❌ |
 
 > ¹ Heap metrics via `performance.memory` (Chromium-based browsers only).  
 > ² Full support requires API 23+. API 16–22 reports system-level traffic only.  
@@ -24,15 +85,7 @@
 
 ---
 
-## Screenshots
-
-| CPU | FPS | Memory | Network |
-|-----|-----|--------|---------|
-| <img src="https://user-images.githubusercontent.com/13059906/147838954-6888f2e0-8552-47e3-9fc0-c4e035b2f117.png" width="180"/> | <img src="https://user-images.githubusercontent.com/13059906/147838957-04b57afc-f9e0-4cdf-b3d9-e465853043c4.png" width="180"/> | <img src="https://user-images.githubusercontent.com/13059906/147838962-991b3dba-b743-434f-ba1e-1357ccc59e12.png" width="180"/> | <img src="https://user-images.githubusercontent.com/13059906/147838968-051ff7ab-6419-417e-b5d7-b9f22c403fc0.png" width="180"/> |
-
----
-
-## Download
+## Installation
 
 Add the GitHub Packages repository, then pull the engine and whichever modules you need:
 
@@ -46,11 +99,20 @@ dependencies {
 
     implementation("com.smellouk.kamper:engine:$kamperVersion")
 
-    // Add only what you need
+    // Core metrics
     implementation("com.smellouk.kamper:cpu-module:$kamperVersion")
     implementation("com.smellouk.kamper:fps-module:$kamperVersion")
     implementation("com.smellouk.kamper:memory-module:$kamperVersion")
     implementation("com.smellouk.kamper:network-module:$kamperVersion")
+
+    // Advanced metrics
+    implementation("com.smellouk.kamper:jank-module:$kamperVersion")
+    implementation("com.smellouk.kamper:gc-module:$kamperVersion")
+    implementation("com.smellouk.kamper:thermal-module:$kamperVersion")
+    implementation("com.smellouk.kamper:issues-module:$kamperVersion")
+
+    // Android debug overlay (auto-init, no code required)
+    debugImplementation("com.smellouk.kamper:ui-android:$kamperVersion")
 }
 ```
 
@@ -66,17 +128,25 @@ Kamper.setup {
     install(FpsModule)
     install(MemoryModule())
     install(NetworkModule)
+    install(JankModule)
+    install(GcModule)
+    install(ThermalModule)
+    install(IssuesModule())
 
     addInfoListener<CpuInfo>     { info -> /* update UI / analytics */ }
     addInfoListener<FpsInfo>     { info -> /* update UI / analytics */ }
     addInfoListener<MemoryInfo>  { info -> /* update UI / analytics */ }
     addInfoListener<NetworkInfo> { info -> /* update UI / analytics */ }
+    addInfoListener<JankInfo>    { info -> /* dropped frame alerts   */ }
+    addInfoListener<GcInfo>      { info -> /* GC pressure tracking   */ }
+    addInfoListener<ThermalInfo> { info -> /* thermal throttling     */ }
+    addInfoListener<IssueInfo>   { info -> /* ANR / crash / slow UI  */ }
 
     start()
 }
 ```
 
-On **Android**, attach Kamper to the lifecycle and it handles `start`, `stop`, and `clear` automatically:
+On **Android**, attach Kamper to the lifecycle for automatic `start` / `stop` / `clear`:
 
 ```kotlin
 class MainActivity : AppCompatActivity() {
@@ -99,7 +169,6 @@ install(
     CpuModule {
         isEnabled    = true
         intervalInMs = 1_000
-        logger       = Logger.EMPTY
     }
 )
 
@@ -115,12 +184,7 @@ addInfoListener<CpuInfo> { info ->
 <summary><strong>FPS</strong> — frames per second via platform frame-timing APIs</summary>
 
 ```kotlin
-install(
-    FpsModule {
-        isEnabled = true
-        logger    = Logger.EMPTY
-    }
-)
+install(FpsModule)
 
 addInfoListener<FpsInfo> { info ->
     if (info != FpsInfo.INVALID) println("FPS: ${info.fps}")
@@ -143,16 +207,12 @@ addInfoListener<MemoryInfo> { info ->
 </details>
 
 <details>
-<summary><strong>Network</strong> — bytes received/transmitted per interval</summary>
+<summary><strong>Network</strong> — bytes received / transmitted per interval</summary>
 
 ```kotlin
-install(
-    NetworkModule {
-        isEnabled    = true
-        intervalInMs = 1_000
-        logger       = Logger.EMPTY
-    }
-)
+install(NetworkModule {
+    intervalInMs = 1_000
+})
 
 addInfoListener<NetworkInfo> { info ->
     if (info == NetworkInfo.INVALID || info == NetworkInfo.NOT_SUPPORTED) return@addInfoListener
@@ -160,6 +220,114 @@ addInfoListener<NetworkInfo> { info ->
 }
 ```
 </details>
+
+<details>
+<summary><strong>Jank</strong> — dropped frames and slow renders (Android + JVM)</summary>
+
+```kotlin
+install(JankModule {
+    frameThresholdMs          = 32   // flag frames slower than this
+    consecutiveFrameThreshold = 3    // after N consecutive slow frames
+})
+
+addInfoListener<JankInfo> { info ->
+    if (info == JankInfo.INVALID) return@addInfoListener
+    println("Dropped frames: ${info.droppedFrames}")
+}
+```
+</details>
+
+<details>
+<summary><strong>GC</strong> — garbage collection runs and pause time (Android + JVM)</summary>
+
+```kotlin
+install(GcModule)
+
+addInfoListener<GcInfo> { info ->
+    if (info == GcInfo.INVALID) return@addInfoListener
+    println("GC runs: +${info.countDelta}  Pause: +${info.pauseMsDelta} ms")
+}
+```
+</details>
+
+<details>
+<summary><strong>Thermal</strong> — device thermal state and throttling (Android)</summary>
+
+```kotlin
+install(ThermalModule)
+
+addInfoListener<ThermalInfo> { info ->
+    if (info == ThermalInfo.INVALID) return@addInfoListener
+    println("Thermal: ${info.state}  Throttling: ${info.isThrottling}")
+}
+```
+</details>
+
+<details>
+<summary><strong>Issues</strong> — ANR, crash, dropped frames, memory pressure, slow start (Android + JVM)</summary>
+
+```kotlin
+install(
+    IssuesModule {
+        slowSpanEnabled    = true
+        slowSpanThresholdMs = 1_000
+
+        droppedFramesEnabled           = true
+        droppedFrameThresholdMs        = 32
+        droppedFrameConsecutiveThreshold = 3
+
+        crashEnabled          = true
+        memoryPressureEnabled = true
+        anrEnabled            = true
+        slowStartEnabled      = true
+    }
+)
+
+addInfoListener<IssueInfo> { info ->
+    println("[${info.severity}] ${info.type}: ${info.message}")
+}
+```
+</details>
+
+---
+
+## Kamper UI — Android debug overlay
+
+Add the dependency (use `debugImplementation` so it never ships to production):
+
+```kotlin
+debugImplementation("com.smellouk.kamper:ui-android:$kamperVersion")
+```
+
+That's it. The overlay appears automatically in every debug build via a `ContentProvider`. No `Application` or `Activity` code needed. It is completely stripped from release builds.
+
+### Optional configuration
+
+```kotlin
+// In Application.onCreate() or anywhere before first activity launch
+KamperUi.configure {
+    isEnabled  = true
+    position   = ChipPosition.TOP_END  // TOP_START | TOP_END | CENTER_START | CENTER_END | BOTTOM_START | BOTTOM_END
+}
+```
+
+### Perfetto tracing
+
+The **Perfetto** tab lets you record a session in-app and export a `.perfetto-trace` file directly from the share sheet — no ADB or Android Studio required. Open the file at [ui.perfetto.dev](https://ui.perfetto.dev) to analyse counter tracks for CPU, FPS, Memory, Network, Jank, GC, and Thermal.
+
+---
+
+## Demos
+
+| Demo | Stack | Platform | Screenshot |
+|------|-------|----------|------------|
+| [`demos/android`](demos/android) | Android Views | Android | <img src="screenshots/5.png" width="120"/> |
+| [`demos/compose`](demos/compose) | Compose Multiplatform | Android · Desktop · Web | — |
+| [`demos/jvm`](demos/jvm) | Swing | JVM / Desktop | <img src="screenshots/11.png" width="200"/> |
+| [`demos/macos`](demos/macos) | AppKit (Kotlin/Native) | macOS | — |
+| [`demos/ios`](demos/ios) | UIKit (Kotlin/Native) | iOS | — |
+| [`demos/web`](demos/web) | Kotlin/JS + DOM | Browser | <img src="screenshots/12.png" width="200"/> |
+| [`demos/react-native`](demos/react-native) | React Native | Android · iOS | — |
 
 ---
 
@@ -170,18 +338,6 @@ Kamper.start()   // begin polling all installed modules
 Kamper.stop()    // pause polling (modules stay installed)
 Kamper.clear()   // uninstall all modules and remove all listeners
 ```
-
----
-
-## Samples
-
-| Sample | Stack | Description |
-|--------|-------|-------------|
-| [`samples/android`](samples/android) | Android Views | Full demo with animated metric screens |
-| [`samples/compose`](samples/compose) | Compose Multiplatform | Shared UI on Android, Desktop, and WasmJS |
-| [`samples/jvm`](samples/jvm) | Swing | Desktop monitor with live charts |
-| [`samples/macos`](samples/macos) | AppKit (Kotlin/Native) | Native macOS performance monitor |
-| [`samples/web`](samples/web) | Kotlin/JS + DOM | Browser demo with Catppuccin-themed UI |
 
 ---
 
