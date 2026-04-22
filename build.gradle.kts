@@ -48,7 +48,7 @@ buildscript {
 }
 
 allprojects {
-    if (project.path != Modules.Samples.WEB && project.path != Modules.Samples.COMPOSE) {
+    if (project.path != Modules.Demos.WEB && project.path != Modules.Demos.COMPOSE) {
         apply(plugin = "com.adarshr.test-logger")
     }
 
@@ -61,7 +61,7 @@ allprojects {
         compilerOptions.jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.fromTarget(Config.jvmTarget))
     }
 
-    if (project.path != Modules.Samples.WEB && project.path != Modules.Samples.COMPOSE) {
+    if (project.path != Modules.Demos.WEB && project.path != Modules.Demos.COMPOSE) {
         testLoggerConfig {
             theme = ThemeType.MOCHA
         }
@@ -128,7 +128,7 @@ tasks.named<Detekt>("detekt") {
     exclude("**/buildSrc/")
     exclude("**/console/")
     exclude("**/android/")
-    exclude("**/samples/")
+    exclude("**/demos/")
 
     dependencies {
         detektPlugins(Libs.Plugins.Detekt.formatting)

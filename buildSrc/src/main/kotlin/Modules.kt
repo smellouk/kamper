@@ -19,11 +19,11 @@ object Modules {
 
     const val XCFRAMEWORK = ":kamper:xcframework"
 
-    object Samples {
-        const val JVM = ":samples:jvm"
-        const val MACOS = ":samples:macos"
-        const val IOS = ":samples:ios"
-        const val WEB = ":samples:web"
-        const val COMPOSE = ":samples:compose"
+    object Demos {
+        const val JVM = ":demos:jvm"
+        const val MACOS = ":demos:macos"
+        const val IOS = ":demos:ios"
+        const val WEB = ":demos:web"
+        const val COMPOSE = ":demos:compose"
     }
 }
