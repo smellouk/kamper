@@ -31,7 +31,8 @@ import com.smellouk.kamper.ui.ChipState
 import com.smellouk.kamper.ui.KamperUiSettings
 import com.smellouk.kamper.ui.KamperUiState
 
-private val CHIP_SHAPE = RoundedCornerShape(10.dp)
+private val CHIP_SHAPE_LEFT  = RoundedCornerShape(topStart = 0.dp, bottomStart = 0.dp, topEnd = 10.dp, bottomEnd = 10.dp)
+private val CHIP_SHAPE_RIGHT = RoundedCornerShape(topStart = 10.dp, bottomStart = 10.dp, topEnd = 0.dp, bottomEnd = 0.dp)
 
 // Row = icon(14dp) + label(natural, max 44dp) + spacer + value
 // Total min width ~120dp so PEEK (56dp) always shows icon + label fully
@@ -68,12 +69,13 @@ internal fun KamperChip(
         }
     } else Modifier
 
+    val chipShape = if (mirrorLayout) CHIP_SHAPE_RIGHT else CHIP_SHAPE_LEFT
     Box(
         modifier = dragModifier
-            .shadow(8.dp, CHIP_SHAPE)
-            .clip(CHIP_SHAPE)
+            .shadow(8.dp, chipShape)
+            .clip(chipShape)
             .background(KamperTheme.SURFACE1)
-            .border(0.5.dp, KamperTheme.BORDER, CHIP_SHAPE)
+            .border(0.5.dp, KamperTheme.BORDER, chipShape)
             .clickable(onClick = onClick)
             .padding(
                 start = if (mirrorLayout && chipState == ChipState.PEEK) 6.dp else 6.dp,
