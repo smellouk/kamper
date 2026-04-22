@@ -89,12 +89,12 @@ internal actual class KamperUiRepository {
         slowStartEnabled                  = bool("slow_start_enabled"),
         slowStartColdThresholdMs          = long("slow_start_cold_ms", 2_000L),
         slowStartWarmThresholdMs          = long("slow_start_warm_ms", 800L),
-        showJank                          = bool("show_jank"),
-        showGc                            = bool("show_gc"),
-        showThermal                       = bool("show_thermal"),
-        jankEnabled                       = bool("jank_enabled"),
-        gcEnabled                         = bool("gc_enabled"),
-        thermalEnabled                    = bool("thermal_enabled")
+        showJank                          = bool("show_jank", default = false),
+        showGc                            = bool("show_gc", default = false),
+        showThermal                       = bool("show_thermal", default = false),
+        jankEnabled                       = bool("jank_enabled", default = false),
+        gcEnabled                         = bool("gc_enabled", default = false),
+        thermalEnabled                    = bool("thermal_enabled", default = false)
     )
 
     private fun saveSettings(s: KamperUiSettings) {

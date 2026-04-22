@@ -7,9 +7,9 @@ data class KamperUiSettings(
     val showMemory: Boolean = true,
     val showNetwork: Boolean = true,
     val showIssues: Boolean = true,
-    val showJank: Boolean = true,
-    val showGc: Boolean = true,
-    val showThermal: Boolean = true,
+    val showJank: Boolean = false,
+    val showGc: Boolean = false,
+    val showThermal: Boolean = false,
 
     // Module enabled (actual start/stop of module)
     val cpuEnabled: Boolean = true,
@@ -17,9 +17,9 @@ data class KamperUiSettings(
     val memoryEnabled: Boolean = true,
     val networkEnabled: Boolean = true,
     val issuesEnabled: Boolean = true,
-    val jankEnabled: Boolean = true,
-    val gcEnabled: Boolean = true,
-    val thermalEnabled: Boolean = true,
+    val jankEnabled: Boolean = false,
+    val gcEnabled: Boolean = false,
+    val thermalEnabled: Boolean = false,
 
     // Polling intervals
     val cpuIntervalMs: Long = 1_000L,
