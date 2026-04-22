@@ -52,8 +52,13 @@ import kotlinx.coroutines.flow.StateFlow
 internal fun KamperPanel(
     state: StateFlow<KamperUiState>,
     settings: StateFlow<KamperUiSettings>,
+    isRecording: StateFlow<Boolean>,
+    recordingSampleCount: StateFlow<Int>,
     onSettingsChange: (KamperUiSettings) -> Unit,
     onClearIssues: () -> Unit,
+    onStartRecording: () -> Unit,
+    onStopRecording: () -> Unit,
+    onExportTrace: () -> Unit,
     onStartEngine: () -> Unit,
     onStopEngine: () -> Unit,
     onRestartEngine: () -> Unit,
@@ -61,6 +66,8 @@ internal fun KamperPanel(
 ) {
     val s by state.collectAsState()
     val cfg by settings.collectAsState()
+    val recording by isRecording.collectAsState()
+    val sampleCount by recordingSampleCount.collectAsState()
     var visible by remember { mutableStateOf(false) }
     var selectedTab by remember { mutableStateOf(0) }
 
@@ -132,7 +139,13 @@ internal fun KamperPanel(
                     when (selectedTab) {
                         0    -> ActivityContent(s = s, cfg = cfg)
                         1    -> IssuesTab(issues = s.issues, onClear = onClearIssues)
-                        2    -> PerfettoTab()
+                        2    -> PerfettoTab(
+                            isRecording = recording,
+                            sampleCount = sampleCount,
+                            onStartRecording = onStartRecording,
+                            onStopRecording = onStopRecording,
+                            onExportTrace = onExportTrace
+                        )
                         else -> SettingsContent(
                             s = s,
                             cfg = cfg,

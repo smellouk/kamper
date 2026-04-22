@@ -125,14 +125,19 @@ actual object KamperUi {
     internal fun openPanel(parent: UIViewController, repo: KamperUiRepository) {
         val panelVC = ComposeUIViewController {
             KamperPanel(
-                state = repo.state,
-                settings = repo.settings,
-                onSettingsChange = { repo.updateSettings(it) },
-                onClearIssues = { repo.clearIssues() },
-                onStartEngine = { repo.startEngine() },
-                onStopEngine = { repo.stopEngine() },
-                onRestartEngine = { repo.restartEngine() },
-                onDismiss = { parent.dismissViewControllerAnimated(true, null) }
+                state                = repo.state,
+                settings             = repo.settings,
+                isRecording          = repo.isRecording,
+                recordingSampleCount = repo.recordingSampleCount,
+                onSettingsChange     = { repo.updateSettings(it) },
+                onClearIssues        = { repo.clearIssues() },
+                onStartRecording     = { repo.startRecording() },
+                onStopRecording      = { repo.stopRecording() },
+                onExportTrace        = {},
+                onStartEngine        = { repo.startEngine() },
+                onStopEngine         = { repo.stopEngine() },
+                onRestartEngine      = { repo.restartEngine() },
+                onDismiss            = { parent.dismissViewControllerAnimated(true, null) }
             )
         }
         panelVC.modalPresentationStyle = UIModalPresentationOverCurrentContext

@@ -139,6 +139,17 @@ internal actual class KamperUiRepository {
     private val _settings = MutableStateFlow(loadSettings())
     actual val settings: StateFlow<KamperUiSettings> = _settings.asStateFlow()
 
+    // ── Recording (stub — export not supported on Apple yet) ──────────────────
+
+    private val _isRecording = MutableStateFlow(false)
+    actual val isRecording: StateFlow<Boolean> = _isRecording.asStateFlow()
+    private val _recordingSampleCount = MutableStateFlow(0)
+    actual val recordingSampleCount: StateFlow<Int> = _recordingSampleCount.asStateFlow()
+    actual fun startRecording() = Unit
+    actual fun stopRecording() = Unit
+    actual fun exportTrace(): ByteArray = ByteArray(0)
+    actual fun clearRecording() = Unit
+
     // ── Engine and state ──────────────────────────────────────────────────────
 
     private val engine = Engine()

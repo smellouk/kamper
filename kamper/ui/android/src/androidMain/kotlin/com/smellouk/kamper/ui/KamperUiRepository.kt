@@ -43,6 +43,7 @@ import kotlinx.coroutines.flow.update
 private const val HISTORY_SIZE = 60
 private const val MAX_ISSUES = 100
 private const val PREF_ISSUES = "issues_list"
+private const val MAX_RECORDING_SAMPLES = 4_200 // ~10 min at 7 metrics/s
 
 internal actual class KamperUiRepository(context: Context) {
     private val appContext = context.applicationContext as Application
@@ -129,6 +130,41 @@ internal actual class KamperUiRepository(context: Context) {
     private val _settings = MutableStateFlow(loadSettings())
     actual val settings: StateFlow<KamperUiSettings> = _settings.asStateFlow()
 
+    // ── Recording ─────────────────────────────────────────────────────────────
+
+    private val recordingBuffer = ArrayDeque<RecordedSample>()
+    private val _isRecording = MutableStateFlow(false)
+    actual val isRecording: StateFlow<Boolean> = _isRecording.asStateFlow()
+    private val _recordingSampleCount = MutableStateFlow(0)
+    actual val recordingSampleCount: StateFlow<Int> = _recordingSampleCount.asStateFlow()
+
+    private fun nowNs(): Long = System.currentTimeMillis() * 1_000_000L
+
+    private fun record(trackId: Int, value: Double) {
+        if (!_isRecording.value) return
+        if (recordingBuffer.size >= MAX_RECORDING_SAMPLES) recordingBuffer.removeFirst()
+        recordingBuffer.addLast(RecordedSample(nowNs(), trackId, value))
+        _recordingSampleCount.value = recordingBuffer.size
+    }
+
+    actual fun startRecording() {
+        recordingBuffer.clear()
+        _recordingSampleCount.value = 0
+        _isRecording.value = true
+    }
+
+    actual fun stopRecording() {
+        _isRecording.value = false
+    }
+
+    actual fun exportTrace(): ByteArray = PerfettoExporter.export(recordingBuffer.toList())
+
+    actual fun clearRecording() {
+        recordingBuffer.clear()
+        _recordingSampleCount.value = 0
+        _isRecording.value = false
+    }
+
     // ── Engine and state ──────────────────────────────────────────────────────
 
     private val engine = Engine()
@@ -161,6 +197,7 @@ internal actual class KamperUiRepository(context: Context) {
         if (info == CpuInfo.INVALID) return@listener
         val v = (info.totalUseRatio * 100).toFloat()
         cpuHist.push(v)
+        record(Tracks.CPU, v.toDouble())
         _state.update { s -> s.copy(cpuPercent = v, cpuHistory = cpuHist.toList()) }
     }
 
@@ -168,6 +205,7 @@ internal actual class KamperUiRepository(context: Context) {
         if (info == MemoryInfo.INVALID) return@listener
         val v = info.heapMemoryInfo.allocatedInMb
         memHist.push(v)
+        record(Tracks.MEMORY, v.toDouble())
         _state.update { s -> s.copy(memoryUsedMb = v, memoryHistory = memHist.toList()) }
     }
 
@@ -175,6 +213,7 @@ internal actual class KamperUiRepository(context: Context) {
         if (info == NetworkInfo.INVALID || info == NetworkInfo.NOT_SUPPORTED) return@listener
         val v = info.rxSystemTotalInMb
         netHist.push(v)
+        record(Tracks.NETWORK, v.toDouble())
         _state.update { s -> s.copy(downloadMbps = v, downloadHistory = netHist.toList()) }
     }
 
@@ -190,6 +229,7 @@ internal actual class KamperUiRepository(context: Context) {
 
     private val jankListener: InfoListener<JankInfo> = listener@{ info ->
         if (info == JankInfo.INVALID) return@listener
+        record(Tracks.JANK, info.droppedFrames.toDouble())
         _state.update { s ->
             s.copy(jankDroppedFrames = info.droppedFrames, jankRatio = info.jankyFrameRatio)
         }
@@ -197,6 +237,7 @@ internal actual class KamperUiRepository(context: Context) {
 
     private val gcListener: InfoListener<GcInfo> = listener@{ info ->
         if (info == GcInfo.INVALID) return@listener
+        record(Tracks.GC, info.gcCountDelta.toDouble())
         _state.update { s ->
             s.copy(gcCountDelta = info.gcCountDelta, gcPauseMsDelta = info.gcPauseMsDelta)
         }
@@ -204,6 +245,7 @@ internal actual class KamperUiRepository(context: Context) {
 
     private val thermalListener: InfoListener<ThermalInfo> = listener@{ info ->
         if (info == ThermalInfo.INVALID) return@listener
+        record(Tracks.THERMAL, info.state.ordinal.toDouble())
         _state.update { s ->
             s.copy(thermalState = info.state, isThrottling = info.isThrottling)
         }
@@ -244,6 +286,7 @@ internal actual class KamperUiRepository(context: Context) {
                 fpsWindowStartNanos = frameTimeNanos
                 fpsFrameCount = 0
                 fpsHist.push(fps.toFloat())
+                record(Tracks.FPS, fps.toDouble())
                 _state.update { s ->
                     s.copy(
                         fps        = fps,
@@ -490,6 +533,7 @@ internal actual class KamperUiRepository(context: Context) {
 
     actual fun clear() {
         stopFps()
+        clearRecording()
         engine.clear()
         cpuModule = null
         memModule = null
