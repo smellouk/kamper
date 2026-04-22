@@ -51,5 +51,8 @@ data class KamperUiSettings(
     // Issues: Slow Start detector
     val slowStartEnabled: Boolean = true,
     val slowStartColdThresholdMs: Long = 2_000L,
-    val slowStartWarmThresholdMs: Long = 800L
+    val slowStartWarmThresholdMs: Long = 800L,
+
+    // UI appearance
+    val isDarkTheme: Boolean = true
 )

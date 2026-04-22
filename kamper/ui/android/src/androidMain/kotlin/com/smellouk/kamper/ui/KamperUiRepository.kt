@@ -85,7 +85,8 @@ internal actual class KamperUiRepository(context: Context) {
         showThermal                    = prefs.getBoolean("show_thermal", false),
         jankEnabled                    = prefs.getBoolean("jank_enabled", false),
         gcEnabled                      = prefs.getBoolean("gc_enabled", false),
-        thermalEnabled                 = prefs.getBoolean("thermal_enabled", false)
+        thermalEnabled                 = prefs.getBoolean("thermal_enabled", false),
+        isDarkTheme                    = prefs.getBoolean("is_dark_theme", true)
     )
 
     private fun saveSettings(s: KamperUiSettings) {
@@ -124,6 +125,7 @@ internal actual class KamperUiRepository(context: Context) {
             .putBoolean("jank_enabled", s.jankEnabled)
             .putBoolean("gc_enabled", s.gcEnabled)
             .putBoolean("thermal_enabled", s.thermalEnabled)
+            .putBoolean("is_dark_theme", s.isDarkTheme)
             .apply()
     }
 

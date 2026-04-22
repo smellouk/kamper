@@ -69,6 +69,7 @@ internal fun KamperChip(
         }
     } else Modifier
 
+    KamperThemeProvider(isDark = settings.isDarkTheme) {
     val chipShape = if (mirrorLayout) CHIP_SHAPE_LEFT else CHIP_SHAPE_RIGHT
     Box(
         modifier = dragModifier
@@ -122,6 +123,7 @@ internal fun KamperChip(
             }
         }
     }
+    } // KamperThemeProvider
 }
 
 @Composable

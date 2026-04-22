@@ -73,6 +73,7 @@ internal fun KamperPanel(
 
     LaunchedEffect(Unit) { visible = true }
 
+    KamperThemeProvider(isDark = cfg.isDarkTheme) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -105,6 +106,14 @@ internal fun KamperPanel(
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.weight(1f)
+                    )
+                    Text(
+                        if (cfg.isDarkTheme) "☀" else "🌙",
+                        color = KamperTheme.SUBTEXT,
+                        fontSize = 16.sp,
+                        modifier = Modifier
+                            .clickable { onSettingsChange(cfg.copy(isDarkTheme = !cfg.isDarkTheme)) }
+                            .padding(horizontal = 8.dp, vertical = 4.dp)
                     )
                     Text(
                         "✕",
@@ -160,6 +169,7 @@ internal fun KamperPanel(
             }
         }
     }
+    } // KamperThemeProvider
 }
 
 @Composable

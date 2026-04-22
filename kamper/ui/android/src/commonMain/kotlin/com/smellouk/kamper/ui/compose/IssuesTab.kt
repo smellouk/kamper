@@ -253,6 +253,7 @@ private fun DetailField(label: String, value: String) {
     }
 }
 
+@Composable
 private fun severityColor(s: Severity): Color = when (s) {
     Severity.CRITICAL -> KamperTheme.RED
     Severity.ERROR    -> KamperTheme.PEACH
@@ -260,6 +261,7 @@ private fun severityColor(s: Severity): Color = when (s) {
     Severity.INFO     -> KamperTheme.GREEN
 }
 
+@Composable
 private fun typeColor(t: IssueType): Color = when (t) {
     IssueType.ANR, IssueType.CRASH                                        -> KamperTheme.RED
     IssueType.SLOW_COLD_START, IssueType.SLOW_WARM_START,
