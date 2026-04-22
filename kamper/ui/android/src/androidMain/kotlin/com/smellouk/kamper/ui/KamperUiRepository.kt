@@ -448,49 +448,55 @@ internal actual class KamperUiRepository(context: Context) {
 
     actual fun updateSettings(s: KamperUiSettings) {
         val old = _settings.value
-        _settings.value = s
-        saveSettings(s)
+        // Auto-enable chip visibility when a module is first turned on
+        val normalized = s.copy(
+            showJank    = if (!old.jankEnabled    && s.jankEnabled)    true else s.showJank,
+            showGc      = if (!old.gcEnabled      && s.gcEnabled)      true else s.showGc,
+            showThermal = if (!old.thermalEnabled && s.thermalEnabled) true else s.showThermal
+        )
+        _settings.value = normalized
+        saveSettings(normalized)
 
-        val cpuConfigChanged    = old.cpuIntervalMs != s.cpuIntervalMs
-        val memConfigChanged    = old.memoryIntervalMs != s.memoryIntervalMs
-        val netConfigChanged    = old.networkIntervalMs != s.networkIntervalMs
-        val issuesConfigChanged = old.issuesConfigKey() != s.issuesConfigKey()
+        val cpuConfigChanged    = old.cpuIntervalMs != normalized.cpuIntervalMs
+        val memConfigChanged    = old.memoryIntervalMs != normalized.memoryIntervalMs
+        val netConfigChanged    = old.networkIntervalMs != normalized.networkIntervalMs
+        val issuesConfigChanged = old.issuesConfigKey() != normalized.issuesConfigKey()
 
         when {
-            !old.cpuEnabled && s.cpuEnabled     -> installCpu(s)
-            old.cpuEnabled && !s.cpuEnabled     -> uninstallCpu()
-            s.cpuEnabled && cpuConfigChanged    -> { uninstallCpu(); installCpu(s) }
+            !old.cpuEnabled && normalized.cpuEnabled     -> installCpu(normalized)
+            old.cpuEnabled && !normalized.cpuEnabled     -> uninstallCpu()
+            normalized.cpuEnabled && cpuConfigChanged    -> { uninstallCpu(); installCpu(normalized) }
         }
         when {
-            !old.fpsEnabled && s.fpsEnabled     -> startFps()
-            old.fpsEnabled && !s.fpsEnabled     -> stopFps()
+            !old.fpsEnabled && normalized.fpsEnabled     -> startFps()
+            old.fpsEnabled && !normalized.fpsEnabled     -> stopFps()
         }
         when {
-            !old.memoryEnabled && s.memoryEnabled   -> installMemory(s)
-            old.memoryEnabled && !s.memoryEnabled   -> uninstallMemory()
-            s.memoryEnabled && memConfigChanged     -> { uninstallMemory(); installMemory(s) }
+            !old.memoryEnabled && normalized.memoryEnabled   -> installMemory(normalized)
+            old.memoryEnabled && !normalized.memoryEnabled   -> uninstallMemory()
+            normalized.memoryEnabled && memConfigChanged     -> { uninstallMemory(); installMemory(normalized) }
         }
         when {
-            !old.networkEnabled && s.networkEnabled -> installNetwork(s)
-            old.networkEnabled && !s.networkEnabled -> uninstallNetwork()
-            s.networkEnabled && netConfigChanged    -> { uninstallNetwork(); installNetwork(s) }
+            !old.networkEnabled && normalized.networkEnabled -> installNetwork(normalized)
+            old.networkEnabled && !normalized.networkEnabled -> uninstallNetwork()
+            normalized.networkEnabled && netConfigChanged    -> { uninstallNetwork(); installNetwork(normalized) }
         }
         when {
-            !old.issuesEnabled && s.issuesEnabled   -> installIssues(s)
-            old.issuesEnabled && !s.issuesEnabled   -> uninstallIssues()
-            s.issuesEnabled && issuesConfigChanged  -> { uninstallIssues(); installIssues(s) }
+            !old.issuesEnabled && normalized.issuesEnabled   -> installIssues(normalized)
+            old.issuesEnabled && !normalized.issuesEnabled   -> uninstallIssues()
+            normalized.issuesEnabled && issuesConfigChanged  -> { uninstallIssues(); installIssues(normalized) }
         }
         when {
-            !old.jankEnabled && s.jankEnabled       -> installJank()
-            old.jankEnabled && !s.jankEnabled       -> uninstallJank()
+            !old.jankEnabled && normalized.jankEnabled       -> installJank()
+            old.jankEnabled && !normalized.jankEnabled       -> uninstallJank()
         }
         when {
-            !old.gcEnabled && s.gcEnabled           -> installGc()
-            old.gcEnabled && !s.gcEnabled           -> uninstallGc()
+            !old.gcEnabled && normalized.gcEnabled           -> installGc()
+            old.gcEnabled && !normalized.gcEnabled           -> uninstallGc()
         }
         when {
-            !old.thermalEnabled && s.thermalEnabled -> installThermal()
-            old.thermalEnabled && !s.thermalEnabled -> uninstallThermal()
+            !old.thermalEnabled && normalized.thermalEnabled -> installThermal()
+            old.thermalEnabled && !normalized.thermalEnabled -> uninstallThermal()
         }
 
         if (_state.value.engineRunning) engine.start()

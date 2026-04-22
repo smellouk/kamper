@@ -35,7 +35,7 @@ class CpuViewController : UIViewController(nibName = null, bundle = null) {
 
         val pad = 20.0; val gap = 6.0; val rh = METRIC_ROW_HEIGHT
         val c = mutableListOf<NSLayoutConstraint>()
-        var prevBottom = view.topAnchor
+        var prevBottom: NSLayoutYAxisAnchor = view.safeAreaLayoutGuide.topAnchor
 
         rows.forEachIndexed { i, row ->
             c += row.topAnchor.constraintEqualToAnchor(prevBottom, constant = if (i == 0) pad else gap)

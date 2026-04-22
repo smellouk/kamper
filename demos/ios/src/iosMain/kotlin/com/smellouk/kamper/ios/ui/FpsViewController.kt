@@ -49,7 +49,7 @@ class FpsViewController : UIViewController(nibName = null, bundle = null) {
 
         val pad = 20.0
         val c = mutableListOf<NSLayoutConstraint>()
-        c += fpsLabel.topAnchor.constraintEqualToAnchor(view.topAnchor, constant = 24.0)
+        c += fpsLabel.topAnchor.constraintEqualToAnchor(view.safeAreaLayoutGuide.topAnchor, constant = 24.0)
         c += fpsLabel.leadingAnchor.constraintEqualToAnchor(view.leadingAnchor, constant = pad)
         c += fpsLabel.trailingAnchor.constraintEqualToAnchor(view.trailingAnchor, constant = -pad)
 

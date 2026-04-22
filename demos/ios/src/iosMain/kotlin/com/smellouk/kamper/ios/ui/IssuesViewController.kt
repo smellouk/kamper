@@ -98,7 +98,7 @@ class IssuesViewController : UIViewController(nibName = null, bundle = null) {
         c += sep.heightAnchor.constraintEqualToConstant(1.0)
         c += sep.bottomAnchor.constraintEqualToAnchor(footerScroll.topAnchor)
 
-        c += scrollView.topAnchor.constraintEqualToAnchor(view.topAnchor, constant = pad)
+        c += scrollView.topAnchor.constraintEqualToAnchor(view.safeAreaLayoutGuide.topAnchor, constant = pad)
         c += scrollView.leadingAnchor.constraintEqualToAnchor(view.leadingAnchor)
         c += scrollView.trailingAnchor.constraintEqualToAnchor(view.trailingAnchor)
         c += scrollView.bottomAnchor.constraintEqualToAnchor(sep.topAnchor)

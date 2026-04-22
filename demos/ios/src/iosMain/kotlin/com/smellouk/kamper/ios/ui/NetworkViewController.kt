@@ -39,7 +39,7 @@ class NetworkViewController : UIViewController(nibName = null, bundle = null) {
         val pad = 20.0; val rh = METRIC_ROW_HEIGHT
         val c = mutableListOf<NSLayoutConstraint>()
 
-        c += title.topAnchor.constraintEqualToAnchor(view.topAnchor, constant = pad)
+        c += title.topAnchor.constraintEqualToAnchor(view.safeAreaLayoutGuide.topAnchor, constant = pad)
         c += title.leadingAnchor.constraintEqualToAnchor(view.leadingAnchor, constant = pad)
 
         c += rxRow.topAnchor.constraintEqualToAnchor(title.bottomAnchor, constant = 8.0)

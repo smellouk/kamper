@@ -49,7 +49,7 @@ class MemoryViewController : UIViewController(nibName = null, bundle = null) {
         val pad = 20.0; val rh = METRIC_ROW_HEIGHT
         val c = mutableListOf<NSLayoutConstraint>()
 
-        c += heapLabel.topAnchor.constraintEqualToAnchor(view.topAnchor, constant = pad)
+        c += heapLabel.topAnchor.constraintEqualToAnchor(view.safeAreaLayoutGuide.topAnchor, constant = pad)
         c += heapLabel.leadingAnchor.constraintEqualToAnchor(view.leadingAnchor, constant = pad)
 
         c += heapRow.topAnchor.constraintEqualToAnchor(heapLabel.bottomAnchor, constant = 6.0)

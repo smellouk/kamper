@@ -27,6 +27,8 @@ A floating chip overlay that sits over any screen and shows live performance met
 
 **Android: zero app code required.** A `ContentProvider` auto-initialises the overlay in debug builds and disables it automatically in release.
 
+**iOS: one line in `AppDelegate`.** The chip uses `ComposeUIViewController` as a UIKit child view, drag-and-snap works via touch, and shake detection uses `CMMotionManager`.
+
 <p align="center">
   <img src="screenshots/2.gif" width="300"/>
 </p>
@@ -77,11 +79,12 @@ A floating chip overlay that sits over any screen and shows live performance met
 | GC       | ✅ | ❌ | ✅ | ❌ | ❌ |
 | Thermal  | ✅ | ❌ | ❌ | ❌ | ❌ |
 | Issues   | ✅ | ❌ | ✅ | ❌ | ❌ |
-| Kamper UI| ✅ | ❌ | ❌ | ❌ | ❌ |
+| Kamper UI| ✅ | ✅⁴ | ❌ | ❌ | ❌ |
 
 > ¹ Heap metrics via `performance.memory` (Chromium-based browsers only).  
 > ² Full support requires API 23+. API 16–22 reports system-level traffic only.  
-> ³ Bandwidth estimate via the [Network Information API](https://developer.mozilla.org/en-US/docs/Web/API/NetworkInformation) (Chrome / Edge).
+> ³ Bandwidth estimate via the [Network Information API](https://developer.mozilla.org/en-US/docs/Web/API/NetworkInformation) (Chrome / Edge).  
+> ⁴ Requires `KamperUi.attach()` in `AppDelegate` — no auto-init on iOS.
 
 ---
 
@@ -293,13 +296,26 @@ addInfoListener<IssueInfo> { info ->
 
 ## Kamper UI — Android debug overlay
 
-Add the dependency (use `debugImplementation` so it never ships to production):
+**Android** — use `debugImplementation` so it never ships to production:
 
 ```kotlin
 debugImplementation("com.smellouk.kamper:ui-android:$kamperVersion")
 ```
 
-That's it. The overlay appears automatically in every debug build via a `ContentProvider`. No `Application` or `Activity` code needed. It is completely stripped from release builds.
+The overlay appears automatically in every debug build via a `ContentProvider`. No `Application` or `Activity` code needed. Completely stripped from release builds.
+
+**iOS** — add the framework and call `attach()` once:
+
+```swift
+// AppDelegate.swift
+import KamperUi
+
+func application(_ application: UIApplication,
+                 didFinishLaunchingWithOptions ...) -> Bool {
+    KamperUi.shared.attach()
+    return true
+}
+```
 
 ### Optional configuration
 
@@ -324,8 +340,8 @@ The **Perfetto** tab lets you record a session in-app and export a `.perfetto-tr
 | [`demos/android`](demos/android) | Android Views | Android | <img src="screenshots/5.png" width="120"/> |
 | [`demos/compose`](demos/compose) | Compose Multiplatform | Android · Desktop · Web | — |
 | [`demos/jvm`](demos/jvm) | Swing | JVM / Desktop | <img src="screenshots/11.png" width="200"/> |
-| [`demos/macos`](demos/macos) | AppKit (Kotlin/Native) | macOS | — |
-| [`demos/ios`](demos/ios) | UIKit (Kotlin/Native) | iOS | — |
+| [`demos/macos`](demos/macos) | AppKit (Kotlin/Native) | macOS | <img src="screenshots/13.png" width="200"/> |
+| [`demos/ios`](demos/ios) | UIKit (Kotlin/Native) | iOS | <img src="screenshots/14.png" width="120"/> |
 | [`demos/web`](demos/web) | Kotlin/JS + DOM | Browser | <img src="screenshots/12.png" width="200"/> |
 | [`demos/react-native`](demos/react-native) | React Native | Android · iOS | — |
 

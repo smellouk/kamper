@@ -56,7 +56,7 @@ class ThermalViewController : UIViewController(nibName = null, bundle = null) {
         val pad = 20.0
         val c = mutableListOf<NSLayoutConstraint>()
 
-        c += bigLabel.topAnchor.constraintEqualToAnchor(view.topAnchor, constant = 24.0)
+        c += bigLabel.topAnchor.constraintEqualToAnchor(view.safeAreaLayoutGuide.topAnchor, constant = 24.0)
         c += bigLabel.leadingAnchor.constraintEqualToAnchor(view.leadingAnchor, constant = pad)
         c += bigLabel.trailingAnchor.constraintEqualToAnchor(view.trailingAnchor, constant = -pad)
 

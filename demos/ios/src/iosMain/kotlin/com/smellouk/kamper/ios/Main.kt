@@ -70,18 +70,22 @@ class RootViewController : UITabBarController(nibName = null, bundle = null) {
         gcVC      = GcViewController()
         thermalVC = ThermalViewController()
 
-        cpuVC.tabBarItem     = UITabBarItem(title = "CPU",     image = null, tag = 0)
-        fpsVC.tabBarItem     = UITabBarItem(title = "FPS",     image = null, tag = 1)
-        memoryVC.tabBarItem  = UITabBarItem(title = "Memory",  image = null, tag = 2)
-        networkVC.tabBarItem = UITabBarItem(title = "Network", image = null, tag = 3)
-        issuesVC.tabBarItem  = UITabBarItem(title = "Issues",  image = null, tag = 4)
-        jankVC.tabBarItem    = UITabBarItem(title = "Jank",    image = null, tag = 5)
-        gcVC.tabBarItem      = UITabBarItem(title = "GC",      image = null, tag = 6)
-        thermalVC.tabBarItem = UITabBarItem(title = "Thermal", image = null, tag = 7)
+        cpuVC.tabBarItem     = UITabBarItem(title = "CPU",     image = UIImage.systemImageNamed("cpu"),                            tag = 0)
+        fpsVC.tabBarItem     = UITabBarItem(title = "FPS",     image = UIImage.systemImageNamed("play.circle"),                    tag = 1)
+        memoryVC.tabBarItem  = UITabBarItem(title = "Memory",  image = UIImage.systemImageNamed("memorychip"),                     tag = 2)
+        networkVC.tabBarItem = UITabBarItem(title = "Network", image = UIImage.systemImageNamed("network"),                        tag = 3)
+        issuesVC.tabBarItem  = UITabBarItem(title = "Issues",  image = UIImage.systemImageNamed("exclamationmark.triangle"),       tag = 4)
+        jankVC.tabBarItem    = UITabBarItem(title = "Jank",    image = UIImage.systemImageNamed("chart.line.uptrend.xyaxis"),      tag = 5)
+        gcVC.tabBarItem      = UITabBarItem(title = "GC",      image = UIImage.systemImageNamed("arrow.triangle.2.circlepath"),    tag = 6)
+        thermalVC.tabBarItem = UITabBarItem(title = "Thermal", image = UIImage.systemImageNamed("thermometer.medium"),             tag = 7)
 
         setViewControllers(listOf(cpuVC, fpsVC, memoryVC, networkVC, issuesVC, jankVC, gcVC, thermalVC), animated = false)
 
-        tabBar.barTintColor           = Theme.MANTLE
+        val appearance = UITabBarAppearance()
+        appearance.configureWithOpaqueBackground()
+        appearance.backgroundColor = Theme.MANTLE
+        tabBar.standardAppearance   = appearance
+        tabBar.scrollEdgeAppearance = appearance
         tabBar.tintColor              = Theme.BLUE
         tabBar.unselectedItemTintColor = Theme.MUTED
 
