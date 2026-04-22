@@ -6,14 +6,14 @@ kotlin {
     iosArm64 {
         binaries {
             executable {
-                entryPoint = "com.smellouk.kamper.samples.ios.main"
+                entryPoint = "com.smellouk.kamper.ios.main"
             }
         }
     }
     iosSimulatorArm64 {
         binaries {
             executable {
-                entryPoint = "com.smellouk.kamper.samples.ios.main"
+                entryPoint = "com.smellouk.kamper.ios.main"
             }
         }
     }

@@ -77,7 +77,7 @@
                 android:textSize="12sp"
                 android:textStyle="bold"/>
 
-            <com.smellouk.kamper.samples.views.MetricRowView
+            <com.smellouk.kamper.android.views.MetricRowView
                 android:id="@+id/heapRow"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
@@ -104,7 +104,7 @@
                 android:textSize="12sp"
                 android:textStyle="bold"/>
 
-            <com.smellouk.kamper.samples.views.MetricRowView
+            <com.smellouk.kamper.android.views.MetricRowView
                 android:id="@+id/ramRow"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"

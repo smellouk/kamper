@@ -8,10 +8,10 @@ plugins {
 }
 
 android {
-    namespace = "com.smellouk.kamper.samples.compose"
+    namespace = "com.smellouk.kamper.compose"
     compileSdk = Config.compileSdk
     defaultConfig {
-        applicationId = "com.smellouk.kamper.samples.compose"
+        applicationId = "com.smellouk.kamper.compose"
         minSdk = Config.minSdk
         targetSdk = Config.targetSdk
         versionCode = Config.versionCode
@@ -94,7 +94,7 @@ kotlin {
 compose {
     desktop {
         application {
-            mainClass = "com.smellouk.kamper.samples.compose.MainKt"
+            mainClass = "com.smellouk.kamper.compose.MainKt"
             nativeDistributions {
                 targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
                 packageName = "Kamper"

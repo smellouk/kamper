@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.smellouk.kamper.samples"
+    namespace = "com.smellouk.kamper.android"
     compileSdk = Config.compileSdk
 
     defaultConfig {
-        applicationId = "com.smellouk.kamper.samples"
+        applicationId = "com.smellouk.kamper.android"
         minSdk = Config.minSdk
         targetSdk = Config.targetSdk
         versionCode = 1

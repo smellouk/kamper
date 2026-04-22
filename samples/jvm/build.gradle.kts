@@ -4,14 +4,14 @@ plugins {
 }
 
 application {
-    mainClass.set("com.smellouk.kamper.samples.jvm.MainKt")
+    mainClass.set("com.smellouk.kamper.jvm.MainKt")
 }
 
 tasks.register<JavaExec>("runConsole") {
     group = "application"
     description = "Run the JVM console monitor (CPU + Memory + Network, no GUI)"
     classpath = sourceSets["main"].runtimeClasspath
-    mainClass.set("com.smellouk.kamper.samples.jvm.ConsoleMainKt")
+    mainClass.set("com.smellouk.kamper.jvm.ConsoleMainKt")
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {

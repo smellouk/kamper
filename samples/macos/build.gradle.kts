@@ -6,14 +6,14 @@ kotlin {
     macosX64 {
         binaries {
             executable {
-                entryPoint = "com.smellouk.kamper.samples.macos.main"
+                entryPoint = "com.smellouk.kamper.macos.main"
             }
         }
     }
     macosArm64 {
         binaries {
             executable {
-                entryPoint = "com.smellouk.kamper.samples.macos.main"
+                entryPoint = "com.smellouk.kamper.macos.main"
             }
         }
     }

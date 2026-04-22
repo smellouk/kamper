@@ -65,7 +65,7 @@
                 android:textSize="12sp"
                 android:textStyle="bold"/>
 
-            <com.smellouk.kamper.samples.views.MetricRowView
+            <com.smellouk.kamper.android.views.MetricRowView
                 android:id="@+id/rxRow"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
@@ -84,7 +84,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="8dp"/>
 
-            <com.smellouk.kamper.samples.views.MetricRowView
+            <com.smellouk.kamper.android.views.MetricRowView
                 android:id="@+id/txRow"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"/>
@@ -110,7 +110,7 @@
                 android:textSize="12sp"
                 android:textStyle="bold"/>
 
-            <com.smellouk.kamper.samples.views.MetricRowView
+            <com.smellouk.kamper.android.views.MetricRowView
                 android:id="@+id/appRxRow"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
@@ -129,7 +129,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="8dp"/>
 
-            <com.smellouk.kamper.samples.views.MetricRowView
+            <com.smellouk.kamper.android.views.MetricRowView
                 android:id="@+id/appTxRow"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"/>
