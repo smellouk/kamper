@@ -30,6 +30,7 @@ kotlin {
                 implementation(project(Modules.Performances.JANK))
                 implementation(project(Modules.Performances.GC))
                 implementation(project(Modules.Performances.THERMAL))
+                implementation(project(Modules.Ui.ANDROID))
             }
         }
     }

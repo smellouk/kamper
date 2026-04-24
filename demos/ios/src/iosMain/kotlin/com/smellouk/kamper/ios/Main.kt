@@ -20,6 +20,7 @@ import com.smellouk.kamper.network.NetworkModule
 import com.smellouk.kamper.thermal.ThermalInfo
 import com.smellouk.kamper.thermal.ThermalModule
 import com.smellouk.kamper.ios.ui.*
+import com.smellouk.kamper.ui.KamperUi
 import kotlinx.cinterop.*
 import platform.CoreGraphics.*
 import platform.Foundation.*
@@ -45,6 +46,7 @@ class AppDelegate : NSObject, UIApplicationDelegateProtocol {
         appWindow = UIWindow(frame = UIScreen.mainScreen.bounds)
         appWindow!!.rootViewController = RootViewController()
         appWindow!!.makeKeyAndVisible()
+        KamperUi.attach()
     }
 }
 

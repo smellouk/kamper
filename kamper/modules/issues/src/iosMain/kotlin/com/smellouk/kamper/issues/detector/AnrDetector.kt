@@ -4,9 +4,11 @@ import com.smellouk.kamper.issues.AnrConfig
 import com.smellouk.kamper.issues.Issue
 import com.smellouk.kamper.issues.IssueType
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
@@ -16,7 +18,8 @@ internal class AnrDetector(private val config: AnrConfig) : IssueDetector {
     private var job: Job? = null
 
     override fun start(pingIntervalMs: Long, onIssue: (Issue) -> Unit) {
-        job = CoroutineScope(Dispatchers.Default).launch {
+        val handler = CoroutineExceptionHandler { _, _ -> }
+        job = CoroutineScope(Dispatchers.Default + SupervisorJob() + handler).launch {
             while (isActive) {
                 val deferred = CompletableDeferred<Unit>()
                 CoroutineScope(Dispatchers.Main).launch { deferred.complete(Unit) }
