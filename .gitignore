@@ -10,3 +10,4 @@ credentials.properties
 /captures
 .externalNativeBuild
 .cxx
+.planning/
