@@ -9,6 +9,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import platform.CoreMotion.CMMotionManager
 import kotlin.math.sqrt
@@ -26,7 +27,7 @@ actual fun startShakeDetection() {
         return
     }
     shakeJob = CoroutineScope(Dispatchers.Default + SupervisorJob() + shakeExceptionHandler).launch {
-        while (true) {
+        while (isActive) {
             val data = try { motionManager.accelerometerData } catch (_: Throwable) { null }
             if (data != null) {
                 val mag = data.acceleration.useContents { sqrt(x * x + y * y + z * z) }

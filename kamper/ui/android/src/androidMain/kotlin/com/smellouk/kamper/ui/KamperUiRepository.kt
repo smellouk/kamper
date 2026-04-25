@@ -51,6 +51,7 @@ internal actual class KamperUiRepository(context: Context) {
 
     // ── Settings persistence ──────────────────────────────────────────────────
 
+    @Synchronized
     private fun loadSettings() = KamperUiSettings(
         showCpu                        = prefs.getBoolean("show_cpu", true),
         showFps                        = prefs.getBoolean("show_fps", true),
@@ -89,6 +90,7 @@ internal actual class KamperUiRepository(context: Context) {
         isDarkTheme                    = prefs.getBoolean("is_dark_theme", true)
     )
 
+    @Synchronized
     private fun saveSettings(s: KamperUiSettings) {
         prefs.edit()
             .putBoolean("show_cpu", s.showCpu)

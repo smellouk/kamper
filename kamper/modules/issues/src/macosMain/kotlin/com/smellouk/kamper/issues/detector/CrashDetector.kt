@@ -3,9 +3,12 @@ package com.smellouk.kamper.issues.detector
 import com.smellouk.kamper.issues.CrashConfig
 import com.smellouk.kamper.issues.Issue
 import com.smellouk.kamper.issues.IssueType
+import kotlinx.cinterop.CFunction
+import kotlinx.cinterop.CPointer
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.staticCFunction
 import platform.Foundation.NSException
+import platform.Foundation.NSGetUncaughtExceptionHandler
 import platform.Foundation.NSSetUncaughtExceptionHandler
 import kotlin.random.Random
 
@@ -14,6 +17,7 @@ internal class CrashDetector(private val config: CrashConfig) : IssueDetector {
     override fun start(pingIntervalMs: Long, onIssue: (Issue) -> Unit) {
         pendingOnIssue = onIssue
         pendingConfig = config
+        previousHandler = NSGetUncaughtExceptionHandler()
         NSSetUncaughtExceptionHandler(
             staticCFunction { exception: NSException? ->
                 val ex = exception ?: return@staticCFunction
@@ -34,7 +38,8 @@ internal class CrashDetector(private val config: CrashConfig) : IssueDetector {
     }
 
     override fun stop() {
-        NSSetUncaughtExceptionHandler(null)
+        NSSetUncaughtExceptionHandler(previousHandler)
+        previousHandler = null
         pendingOnIssue = null
         pendingConfig = null
     }
@@ -42,5 +47,6 @@ internal class CrashDetector(private val config: CrashConfig) : IssueDetector {
     companion object {
         private var pendingOnIssue: ((Issue) -> Unit)? = null
         private var pendingConfig: CrashConfig? = null
+        private var previousHandler: CPointer<CFunction<(NSException?) -> Unit>>? = null
     }
 }

@@ -37,6 +37,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import platform.Foundation.NSLock
 import platform.Foundation.NSUserDefaults
 
 private const val HISTORY_SIZE = 60
@@ -60,81 +61,93 @@ internal actual class KamperUiRepository {
     private fun int(key: String, default: Int) =
         if (defaults.objectForKey(key) != null) defaults.integerForKey(key).toInt() else default
 
-    private fun loadSettings() = KamperUiSettings(
-        showCpu                           = bool("show_cpu"),
-        showFps                           = bool("show_fps"),
-        showMemory                        = bool("show_memory"),
-        showNetwork                       = bool("show_network"),
-        showIssues                        = bool("show_issues"),
-        cpuEnabled                        = bool("cpu_enabled"),
-        fpsEnabled                        = bool("fps_enabled"),
-        memoryEnabled                     = bool("memory_enabled"),
-        networkEnabled                    = bool("network_enabled"),
-        issuesEnabled                     = bool("issues_enabled"),
-        cpuIntervalMs                     = long("cpu_interval_ms", 1_000L),
-        memoryIntervalMs                  = long("memory_interval_ms", 1_000L),
-        networkIntervalMs                 = long("network_interval_ms", 1_000L),
-        issuesIntervalMs                  = long("issues_interval_ms", 1_000L),
-        slowSpanEnabled                   = bool("slow_span_enabled"),
-        slowSpanThresholdMs               = long("slow_span_threshold_ms", 1_000L),
-        droppedFramesEnabled              = bool("dropped_frames_enabled"),
-        droppedFrameThresholdMs           = long("dropped_frame_threshold_ms", 32L),
-        droppedFrameConsecutiveThreshold  = int("dropped_frame_consecutive", 3),
-        crashEnabled                      = bool("crash_enabled"),
-        memoryPressureEnabled             = bool("mem_pressure_enabled"),
-        memPressureWarningPct             = float("mem_pressure_warning_pct", 0.80f),
-        memPressureCriticalPct            = float("mem_pressure_critical_pct", 0.95f),
-        anrEnabled                        = bool("anr_enabled"),
-        anrThresholdMs                    = long("anr_threshold_ms", 5_000L),
-        slowStartEnabled                  = bool("slow_start_enabled"),
-        slowStartColdThresholdMs          = long("slow_start_cold_ms", 2_000L),
-        slowStartWarmThresholdMs          = long("slow_start_warm_ms", 800L),
-        showJank                          = bool("show_jank", default = false),
-        showGc                            = bool("show_gc", default = false),
-        showThermal                       = bool("show_thermal", default = false),
-        jankEnabled                       = bool("jank_enabled", default = false),
-        gcEnabled                         = bool("gc_enabled", default = false),
-        thermalEnabled                    = bool("thermal_enabled", default = false),
-        isDarkTheme                       = bool("is_dark_theme", default = true)
-    )
+    private fun loadSettings(): KamperUiSettings {
+        lock.lock()
+        try {
+            return KamperUiSettings(
+                showCpu                           = bool("show_cpu"),
+                showFps                           = bool("show_fps"),
+                showMemory                        = bool("show_memory"),
+                showNetwork                       = bool("show_network"),
+                showIssues                        = bool("show_issues"),
+                cpuEnabled                        = bool("cpu_enabled"),
+                fpsEnabled                        = bool("fps_enabled"),
+                memoryEnabled                     = bool("memory_enabled"),
+                networkEnabled                    = bool("network_enabled"),
+                issuesEnabled                     = bool("issues_enabled"),
+                cpuIntervalMs                     = long("cpu_interval_ms", 1_000L),
+                memoryIntervalMs                  = long("memory_interval_ms", 1_000L),
+                networkIntervalMs                 = long("network_interval_ms", 1_000L),
+                issuesIntervalMs                  = long("issues_interval_ms", 1_000L),
+                slowSpanEnabled                   = bool("slow_span_enabled"),
+                slowSpanThresholdMs               = long("slow_span_threshold_ms", 1_000L),
+                droppedFramesEnabled              = bool("dropped_frames_enabled"),
+                droppedFrameThresholdMs           = long("dropped_frame_threshold_ms", 32L),
+                droppedFrameConsecutiveThreshold  = int("dropped_frame_consecutive", 3),
+                crashEnabled                      = bool("crash_enabled"),
+                memoryPressureEnabled             = bool("mem_pressure_enabled"),
+                memPressureWarningPct             = float("mem_pressure_warning_pct", 0.80f),
+                memPressureCriticalPct            = float("mem_pressure_critical_pct", 0.95f),
+                anrEnabled                        = bool("anr_enabled"),
+                anrThresholdMs                    = long("anr_threshold_ms", 5_000L),
+                slowStartEnabled                  = bool("slow_start_enabled"),
+                slowStartColdThresholdMs          = long("slow_start_cold_ms", 2_000L),
+                slowStartWarmThresholdMs          = long("slow_start_warm_ms", 800L),
+                showJank                          = bool("show_jank", default = false),
+                showGc                            = bool("show_gc", default = false),
+                showThermal                       = bool("show_thermal", default = false),
+                jankEnabled                       = bool("jank_enabled", default = false),
+                gcEnabled                         = bool("gc_enabled", default = false),
+                thermalEnabled                    = bool("thermal_enabled", default = false),
+                isDarkTheme                       = bool("is_dark_theme", default = true)
+            )
+        } finally {
+            lock.unlock()
+        }
+    }
 
     private fun saveSettings(s: KamperUiSettings) {
-        defaults.apply {
-            setBool(s.showCpu, "show_cpu")
-            setBool(s.showFps, "show_fps")
-            setBool(s.showMemory, "show_memory")
-            setBool(s.showNetwork, "show_network")
-            setBool(s.showIssues, "show_issues")
-            setBool(s.cpuEnabled, "cpu_enabled")
-            setBool(s.fpsEnabled, "fps_enabled")
-            setBool(s.memoryEnabled, "memory_enabled")
-            setBool(s.networkEnabled, "network_enabled")
-            setBool(s.issuesEnabled, "issues_enabled")
-            setInteger(s.cpuIntervalMs, "cpu_interval_ms")
-            setInteger(s.memoryIntervalMs, "memory_interval_ms")
-            setInteger(s.networkIntervalMs, "network_interval_ms")
-            setInteger(s.issuesIntervalMs, "issues_interval_ms")
-            setBool(s.slowSpanEnabled, "slow_span_enabled")
-            setInteger(s.slowSpanThresholdMs, "slow_span_threshold_ms")
-            setBool(s.droppedFramesEnabled, "dropped_frames_enabled")
-            setInteger(s.droppedFrameThresholdMs, "dropped_frame_threshold_ms")
-            setInteger(s.droppedFrameConsecutiveThreshold.toLong(), "dropped_frame_consecutive")
-            setBool(s.crashEnabled, "crash_enabled")
-            setBool(s.memoryPressureEnabled, "mem_pressure_enabled")
-            setFloat(s.memPressureWarningPct, "mem_pressure_warning_pct")
-            setFloat(s.memPressureCriticalPct, "mem_pressure_critical_pct")
-            setBool(s.anrEnabled, "anr_enabled")
-            setInteger(s.anrThresholdMs, "anr_threshold_ms")
-            setBool(s.slowStartEnabled, "slow_start_enabled")
-            setInteger(s.slowStartColdThresholdMs, "slow_start_cold_ms")
-            setInteger(s.slowStartWarmThresholdMs, "slow_start_warm_ms")
-            setBool(s.showJank, "show_jank")
-            setBool(s.showGc, "show_gc")
-            setBool(s.showThermal, "show_thermal")
-            setBool(s.jankEnabled, "jank_enabled")
-            setBool(s.gcEnabled, "gc_enabled")
-            setBool(s.thermalEnabled, "thermal_enabled")
-            setBool(s.isDarkTheme, "is_dark_theme")
+        lock.lock()
+        try {
+            defaults.apply {
+                setBool(s.showCpu, "show_cpu")
+                setBool(s.showFps, "show_fps")
+                setBool(s.showMemory, "show_memory")
+                setBool(s.showNetwork, "show_network")
+                setBool(s.showIssues, "show_issues")
+                setBool(s.cpuEnabled, "cpu_enabled")
+                setBool(s.fpsEnabled, "fps_enabled")
+                setBool(s.memoryEnabled, "memory_enabled")
+                setBool(s.networkEnabled, "network_enabled")
+                setBool(s.issuesEnabled, "issues_enabled")
+                setInteger(s.cpuIntervalMs, "cpu_interval_ms")
+                setInteger(s.memoryIntervalMs, "memory_interval_ms")
+                setInteger(s.networkIntervalMs, "network_interval_ms")
+                setInteger(s.issuesIntervalMs, "issues_interval_ms")
+                setBool(s.slowSpanEnabled, "slow_span_enabled")
+                setInteger(s.slowSpanThresholdMs, "slow_span_threshold_ms")
+                setBool(s.droppedFramesEnabled, "dropped_frames_enabled")
+                setInteger(s.droppedFrameThresholdMs, "dropped_frame_threshold_ms")
+                setInteger(s.droppedFrameConsecutiveThreshold.toLong(), "dropped_frame_consecutive")
+                setBool(s.crashEnabled, "crash_enabled")
+                setBool(s.memoryPressureEnabled, "mem_pressure_enabled")
+                setFloat(s.memPressureWarningPct, "mem_pressure_warning_pct")
+                setFloat(s.memPressureCriticalPct, "mem_pressure_critical_pct")
+                setBool(s.anrEnabled, "anr_enabled")
+                setInteger(s.anrThresholdMs, "anr_threshold_ms")
+                setBool(s.slowStartEnabled, "slow_start_enabled")
+                setInteger(s.slowStartColdThresholdMs, "slow_start_cold_ms")
+                setInteger(s.slowStartWarmThresholdMs, "slow_start_warm_ms")
+                setBool(s.showJank, "show_jank")
+                setBool(s.showGc, "show_gc")
+                setBool(s.showThermal, "show_thermal")
+                setBool(s.jankEnabled, "jank_enabled")
+                setBool(s.gcEnabled, "gc_enabled")
+                setBool(s.thermalEnabled, "thermal_enabled")
+                setBool(s.isDarkTheme, "is_dark_theme")
+            }
+        } finally {
+            lock.unlock()
         }
     }
 
@@ -505,5 +518,9 @@ internal actual class KamperUiRepository {
         jankModule = null
         gcModule = null
         thermalModule = null
+    }
+
+    companion object {
+        private val lock = NSLock()
     }
 }

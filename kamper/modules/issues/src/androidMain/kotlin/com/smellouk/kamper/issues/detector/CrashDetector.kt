@@ -53,9 +53,7 @@ internal class CrashDetector(
     }
 
     override fun stop() {
-        if (config.chainToPreviousHandler) {
-            Thread.setDefaultUncaughtExceptionHandler(previousHandler)
-        }
+        Thread.setDefaultUncaughtExceptionHandler(previousHandler)
         previousHandler = null
     }
 }

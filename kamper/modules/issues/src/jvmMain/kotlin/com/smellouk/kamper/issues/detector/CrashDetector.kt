@@ -50,9 +50,7 @@ internal class CrashDetector(private val config: CrashConfig) : IssueDetector {
     }
 
     override fun stop() {
-        if (config.chainToPreviousHandler) {
-            Thread.setDefaultUncaughtExceptionHandler(previousHandler)
-        }
+        Thread.setDefaultUncaughtExceptionHandler(previousHandler)
         previousHandler = null
     }
 }
