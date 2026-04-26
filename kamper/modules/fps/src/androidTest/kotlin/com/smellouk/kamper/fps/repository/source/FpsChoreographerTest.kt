@@ -21,7 +21,7 @@ class FpsChoreographerTest {
     }
 
     @Test
-    fun `start should get instance of choreographer and postFrameCallback`() {
+    fun start_should_get_instance_of_choreographer_and_postFrameCallback() {
         classToTest.start()
 
         verify { Choreographer.getInstance() }
@@ -29,7 +29,7 @@ class FpsChoreographerTest {
     }
 
     @Test
-    fun `stop should remove callback from choreographer`() {
+    fun stop_should_remove_callback_from_choreographer() {
         classToTest.start() // To initialize choreographer
 
         classToTest.stop()
@@ -38,14 +38,14 @@ class FpsChoreographerTest {
     }
 
     @Test
-    fun `stop should not call remove callback from choreographer when no choreographer is present`() {
+    fun stop_should_not_call_remove_callback_from_choreographer_when_no_choreographer_is_present() {
         classToTest.stop()
 
         verify(exactly = 0) { choreographer.removeFrameCallback(any()) }
     }
 
     @Test
-    fun `frameCallback should call frameListener`() {
+    fun frameCallback_should_call_frameListener() {
         classToTest.start()
         val frameListener = mockk<FpsChoreographerFrameListener>(relaxed = true)
         classToTest.setFrameListener(frameListener)
@@ -58,7 +58,7 @@ class FpsChoreographerTest {
     }
 
     @Test
-    fun `doFrame should not re-register when fpsActive is false`() {
+    fun doFrame_should_not_re_register_when_fpsActive_is_false() {
         classToTest.start() // fpsActive = true, posts callback once
         classToTest.stop() // fpsActive = false, removes callback
 
@@ -69,7 +69,7 @@ class FpsChoreographerTest {
     }
 
     @Test
-    fun `doFrame should survive listener exception and re-register`() {
+    fun doFrame_should_survive_listener_exception_and_re_register() {
         classToTest.start()
         val throwingListener = mockk<FpsChoreographerFrameListener>()
         every { throwingListener.invoke(any()) } throws RuntimeException("boom")

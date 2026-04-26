@@ -7,6 +7,14 @@ apply(from = projectDir.resolve("../../publish.gradle.kts"))
 
 android {
     namespace = "io.mellouk.kamper.thermal"
+    packaging {
+        resources {
+            excludes += setOf(
+                "META-INF/LICENSE.md",
+                "META-INF/LICENSE-notice.md"
+            )
+        }
+    }
 }
 
 kotlin {
@@ -43,3 +51,4 @@ kotlin {
         }
     }
 }
+

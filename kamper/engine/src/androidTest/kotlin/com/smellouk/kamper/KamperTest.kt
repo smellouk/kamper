@@ -1,54 +1,40 @@
 package com.smellouk.kamper
 
 import com.smellouk.kamper.api.Logger
-import dev.mokkery.answering.returns
-import dev.mokkery.every
 import dev.mokkery.mock
-import dev.mokkery.spy
-import dev.mokkery.verify
-import dev.mokkery.verifyNoMoreCalls
+import org.junit.After
 import org.junit.Test
 import kotlin.test.assertEquals
 
 class KamperTest {
-    private val classToTest = spy(Kamper).also {
-        every { it.start() } returns Unit
-        every { it.stop() } returns Unit
-        every { it.clear() } returns Unit
+
+    @After
+    fun teardown() {
+        Kamper.clear()
+        Kamper.setup { }
     }
 
     @Test
-    fun `setup should override default config`() {
+    fun setup_shouldOverrideDefaultConfig() {
         val logger = mock<Logger>()
 
-        classToTest.setup {
-            this.logger = logger
-        }
+        Kamper.setup { this.logger = logger }
 
-        assertEquals(logger, classToTest.config.logger)
+        assertEquals(logger, Kamper.config.logger)
     }
 
     @Test
-    fun `start should call engine start`() {
-        classToTest.start()
-
-        verify { classToTest.start() }
-        verifyNoMoreCalls(classToTest)
+    fun start_shouldNotThrow() {
+        Kamper.start()
     }
 
     @Test
-    fun `stop should call engine stop`() {
-        classToTest.stop()
-
-        verify { classToTest.stop() }
-        verifyNoMoreCalls(classToTest)
+    fun stop_shouldNotThrow() {
+        Kamper.stop()
     }
 
     @Test
-    fun `clear should call engine clear`() {
-        classToTest.clear()
-
-        verify { classToTest.clear() }
-        verifyNoMoreCalls(classToTest)
+    fun clear_shouldNotThrow() {
+        Kamper.clear()
     }
 }

@@ -84,6 +84,12 @@ object Libs {
                 "test-junit"
             const val mockk =
                 "io.mockk:mockk:${Versions.mockk}"
+            const val mockk_android =
+                "io.mockk:mockk-android:${Versions.mockk}"
+            const val runner =
+                "androidx.test:runner:1.6.2"
+            const val junit_ext =
+                "androidx.test.ext:junit:1.2.1"
         }
     }
 }

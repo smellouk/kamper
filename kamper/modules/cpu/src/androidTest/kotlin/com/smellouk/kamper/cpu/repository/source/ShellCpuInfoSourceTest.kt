@@ -16,7 +16,6 @@ import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 
-@Suppress("IllegalIdentifier")
 class ShellCpuInfoSourceTest {
     private val logger = mockk<Logger>(relaxed = true)
     private val classToTest: ShellCpuInfoSource = ShellCpuInfoSource(logger)
@@ -41,7 +40,7 @@ class ShellCpuInfoSourceTest {
     }
 
     @Test
-    fun `getCpuInfoDto returns INVALID on first call (no delta yet)`() {
+    fun getCpuInfoDto_returns_INVALID_on_first_call_no_delta_yet() {
         every { ProcFileReader.getCpuProcPidStatTime(PID) } returns PID_STAT_SAMPLE_1
         every { SystemClock.elapsedRealtime() } returns 0L
 
@@ -51,7 +50,7 @@ class ShellCpuInfoSourceTest {
     }
 
     @Test
-    fun `getCpuInfoDto returns valid dto with correct appTime on second call`() {
+    fun getCpuInfoDto_returns_valid_dto_with_correct_appTime_on_second_call() {
         every { ProcFileReader.getCpuProcPidStatTime(PID) } returnsMany listOf(
             PID_STAT_SAMPLE_1,
             PID_STAT_SAMPLE_2
@@ -66,7 +65,7 @@ class ShellCpuInfoSourceTest {
     }
 
     @Test
-    fun `getCpuInfoDto returns correct totalTime based on cores and elapsed time`() {
+    fun getCpuInfoDto_returns_correct_totalTime_based_on_cores_and_elapsed_time() {
         every { ProcFileReader.getCpuProcPidStatTime(PID) } returnsMany listOf(
             PID_STAT_SAMPLE_1,
             PID_STAT_SAMPLE_2
@@ -81,7 +80,7 @@ class ShellCpuInfoSourceTest {
     }
 
     @Test
-    fun `getCpuInfoDto returns idleTime as totalTime minus appDelta`() {
+    fun getCpuInfoDto_returns_idleTime_as_totalTime_minus_appDelta() {
         every { ProcFileReader.getCpuProcPidStatTime(PID) } returnsMany listOf(
             PID_STAT_SAMPLE_1,
             PID_STAT_SAMPLE_2
@@ -95,7 +94,7 @@ class ShellCpuInfoSourceTest {
     }
 
     @Test
-    fun `getCpuInfoDto returns correct user and system deltas from pid stat`() {
+    fun getCpuInfoDto_returns_correct_user_and_system_deltas_from_pid_stat() {
         every { ProcFileReader.getCpuProcPidStatTime(PID) } returnsMany listOf(
             PID_STAT_SAMPLE_1,
             PID_STAT_SAMPLE_2
@@ -113,7 +112,7 @@ class ShellCpuInfoSourceTest {
     }
 
     @Test
-    fun `getCpuInfoDto returns INVALID when pid stat read fails`() {
+    fun getCpuInfoDto_returns_INVALID_when_pid_stat_read_fails() {
         every { ProcFileReader.getCpuProcPidStatTime(PID) } throws RuntimeException("read failed")
 
         val dto = classToTest.getCpuInfoDto()
@@ -122,7 +121,7 @@ class ShellCpuInfoSourceTest {
     }
 
     @Test
-    fun `getCpuInfoDto returns INVALID when pid stat line has too few fields`() {
+    fun getCpuInfoDto_returns_INVALID_when_pid_stat_line_has_too_few_fields() {
         every { ProcFileReader.getCpuProcPidStatTime(PID) } returns "123 (myapp) S 1 2"
         every { SystemClock.elapsedRealtime() } returns 0L
 

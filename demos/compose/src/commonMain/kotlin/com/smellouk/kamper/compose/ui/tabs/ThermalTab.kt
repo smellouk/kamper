@@ -48,7 +48,8 @@ fun ThermalTab(info: ThermalInfo, modifier: Modifier = Modifier) {
         ThermalState.CRITICAL,
         ThermalState.EMERGENCY,
         ThermalState.SHUTDOWN                 -> KamperColors.peach
-        ThermalState.UNKNOWN                  -> KamperColors.overlay1
+        ThermalState.UNKNOWN,
+        ThermalState.UNSUPPORTED              -> KamperColors.overlay1
     }
 
     Column(modifier = modifier.fillMaxSize()) {

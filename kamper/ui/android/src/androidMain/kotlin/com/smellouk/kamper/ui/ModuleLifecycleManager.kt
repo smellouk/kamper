@@ -50,6 +50,10 @@ internal class ModuleLifecycleManager(
 ) {
     private val engine = Engine()
 
+    // Tracks actual engine running state separately from UI StateFlow to avoid
+    // TOCTOU races in applySettings() (WR-03).
+    @Volatile private var engineRunning = false
+
     private val cpuHist = ArrayDeque<Float>()
     private val fpsHist = ArrayDeque<Float>()
     private val memHist = ArrayDeque<Float>()
@@ -74,10 +78,20 @@ internal class ModuleLifecycleManager(
 
     private val cpuListener: InfoListener<CpuInfo> = listener@{ info ->
         if (info == CpuInfo.INVALID) return@listener
+        if (info == CpuInfo.UNSUPPORTED) {
+            state.update { s -> s.copy(cpuUnsupported = true) }
+            return@listener
+        }
         val v = (info.totalUseRatio * 100).toFloat()
         cpuHist.push(v)
         recordingManager.record(Tracks.CPU, v.toDouble())
-        state.update { s -> s.copy(cpuPercent = v, cpuHistory = cpuHist.toList()) }
+        state.update { s ->
+            s.copy(
+                cpuPercent = v,
+                cpuHistory = cpuHist.toList(),
+                cpuUnsupported = false
+            )
+        }
     }
 
     private val memListener: InfoListener<MemoryInfo> = listener@{ info ->
@@ -126,9 +140,17 @@ internal class ModuleLifecycleManager(
 
     private val thermalListener: InfoListener<ThermalInfo> = listener@{ info ->
         if (info == ThermalInfo.INVALID) return@listener
+        if (info == ThermalInfo.UNSUPPORTED) {
+            state.update { s -> s.copy(thermalUnsupported = true) }
+            return@listener
+        }
         recordingManager.record(Tracks.THERMAL, info.state.ordinal.toDouble())
         state.update { s ->
-            s.copy(thermalState = info.state, isThrottling = info.isThrottling)
+            s.copy(
+                thermalState = info.state,
+                isThrottling = info.isThrottling,
+                thermalUnsupported = false
+            )
         }
     }
 
@@ -139,11 +161,15 @@ internal class ModuleLifecycleManager(
     private fun loadPersistedIssues(): MutableList<com.smellouk.kamper.issues.Issue> {
         val raw = preferencesStore.getString(PREF_ISSUES, "")
         if (raw.isEmpty()) return mutableListOf()
-        return raw.lines().mapNotNull { it.deserializeIssue() }.toMutableList()
+        // Records are separated by Group Separator (0x1D), which pctEncode() will escape
+        // if it ever appears inside a field value — making the format self-consistent.
+        return raw.split('').mapNotNull { it.deserializeIssue() }.toMutableList()
     }
 
     private fun saveIssues() {
-        preferencesStore.putString(PREF_ISSUES, issuesList.joinToString("\n") { it.serialize() })
+        // Use Group Separator (0x1D) instead of newline so that any newline inside
+        // field values (e.g. stack traces) cannot corrupt the record boundaries.
+        preferencesStore.putString(PREF_ISSUES, issuesList.joinToString("") { it.serialize() })
     }
 
     fun clearIssues() {
@@ -156,9 +182,9 @@ internal class ModuleLifecycleManager(
 
     // ── FPS (Choreographer-based on Android) ──────────────────────────────────
 
-    private var fpsFrameCount = 0
-    private var fpsWindowStartNanos = 0L
-    private var fpsActive = false
+    @Volatile private var fpsFrameCount = 0
+    @Volatile private var fpsWindowStartNanos = 0L
+    @Volatile private var fpsActive = false
 
     private val fpsCallback: Choreographer.FrameCallback = object : Choreographer.FrameCallback {
         override fun doFrame(frameTimeNanos: Long) {
@@ -196,9 +222,10 @@ internal class ModuleLifecycleManager(
         fpsActive = false
         Handler(Looper.getMainLooper()).post {
             Choreographer.getInstance().removeFrameCallback(fpsCallback)
+            // Reset counters on the Choreographer thread to avoid races with doFrame
+            fpsFrameCount = 0
+            fpsWindowStartNanos = 0L
         }
-        fpsFrameCount = 0
-        fpsWindowStartNanos = 0L
         // Reset derived state so stale peak/low don't bleed into the next measurement window
         state.update { it.copy(fpsPeak = 0, fpsLow = Int.MAX_VALUE, fpsHistory = emptyList()) }
     }
@@ -375,7 +402,7 @@ internal class ModuleLifecycleManager(
             old.thermalEnabled && !normalized.thermalEnabled -> uninstallThermal()
         }
 
-        if (state.value.engineRunning) {
+        if (engineRunning) {
             engine.stop()   // stop currently running instances cleanly
             engine.start()  // restart with the updated module set
         }
@@ -385,11 +412,13 @@ internal class ModuleLifecycleManager(
 
     fun startEngine() {
         engine.start()
+        engineRunning = true
         state.update { it.copy(engineRunning = true) }
     }
 
     fun stopEngine() {
         engine.stop()
+        engineRunning = false
         state.update { it.copy(engineRunning = false) }
     }
 
@@ -412,6 +441,7 @@ internal class ModuleLifecycleManager(
         if (s.gcEnabled) installGc()
         if (s.thermalEnabled) installThermal()
         engine.start()
+        engineRunning = true
         if (s.fpsEnabled) startFps()
         state.update { it.copy(engineRunning = true) }
     }

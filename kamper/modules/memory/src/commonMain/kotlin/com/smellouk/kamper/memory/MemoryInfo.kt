@@ -11,6 +11,7 @@ data class MemoryInfo(
         val INVALID = MemoryInfo(
             HeapMemoryInfo.INVALID, PssInfo.INVALID, RamInfo.INVALID
         )
+        val UNSUPPORTED = MemoryInfo(HeapMemoryInfo.UNSUPPORTED, PssInfo.UNSUPPORTED, RamInfo.UNSUPPORTED)
     }
 
     data class HeapMemoryInfo(
@@ -21,6 +22,7 @@ data class MemoryInfo(
             val INVALID = HeapMemoryInfo(
                 -1F, -1F
             )
+            val UNSUPPORTED = HeapMemoryInfo(-2F, -2F)
         }
     }
 
@@ -34,6 +36,7 @@ data class MemoryInfo(
             val INVALID = PssInfo(
                 -1F, -1F, -1F, -1F
             )
+            val UNSUPPORTED = PssInfo(-2F, -2F, -2F, -2F)
         }
     }
 
@@ -47,6 +50,7 @@ data class MemoryInfo(
             val INVALID = RamInfo(
                 -1F, -1F, -1F, false
             )
+            val UNSUPPORTED = RamInfo(-2F, -2F, -2F, false)
         }
     }
 }

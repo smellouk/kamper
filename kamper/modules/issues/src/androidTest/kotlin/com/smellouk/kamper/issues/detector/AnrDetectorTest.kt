@@ -8,7 +8,6 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
-@Suppress("IllegalIdentifier")
 class AnrDetectorTest {
     private val config = AnrConfig(thresholdMs = THRESHOLD_MS)
     private val onIssue = mockk<(Issue) -> Unit>(relaxed = true)
@@ -20,14 +19,14 @@ class AnrDetectorTest {
     }
 
     @Test
-    fun `stop should be safe to call without start`() {
+    fun stop_should_be_safe_to_call_without_start() {
         val detector = AnrDetector(config)
         // Must not throw or deadlock. Even though no thread was started, stop() should be a no-op.
         detector.stop()
     }
 
     @Test
-    fun `stop should return before onIssue can fire after stop`() {
+    fun stop_should_return_before_onIssue_can_fire_after_stop() {
         val detector = AnrDetector(config)
         detector.start(pingIntervalMs = PING_INTERVAL_MS, onIssue = onIssue)
 
@@ -53,7 +52,7 @@ class AnrDetectorTest {
     }
 
     @Test
-    fun `stop should set stopped flag so post-stop guard works`() {
+    fun stop_should_set_stopped_flag_so_post_stop_guard_works() {
         val detector = AnrDetector(config)
         detector.start(pingIntervalMs = PING_INTERVAL_MS, onIssue = onIssue)
         detector.stop()
@@ -62,7 +61,7 @@ class AnrDetectorTest {
     }
 
     @Test
-    fun `start after stop should reset stopped flag for restart`() {
+    fun start_after_stop_should_reset_stopped_flag_for_restart() {
         val detector = AnrDetector(config)
         detector.start(pingIntervalMs = PING_INTERVAL_MS, onIssue = onIssue)
         detector.stop()

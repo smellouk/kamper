@@ -16,18 +16,27 @@ import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
+import kotlin.test.BeforeTest
 import kotlin.test.Test
+import kotlin.test.assertEquals
 
 @Suppress("IllegalIdentifier")
 class WatcherTest {
     private val info = mock<Info>(MockMode.autofill)
     private val listener = mock<MockableListener<Info>>()
+    private var callbackInvocations = 0
+    private val callback: () -> Unit = { callbackInvocations++ }
 
     private val testScope = TestScope()
     private val defaultDispatcher = StandardTestDispatcher(testScope.testScheduler)
     private val mainDispatcher = defaultDispatcher
     private val infoRepository = mock<InfoRepository<Info>>()
     private val logger = mock<Logger>(MockMode.autofill)
+
+    @BeforeTest
+    fun resetCounter() {
+        callbackInvocations = 0
+    }
 
     private val classToTest: Watcher<Info> by lazy {
         Watcher(
@@ -77,6 +86,35 @@ class WatcherTest {
 
         verify { job.cancel() }
         verifyNoMoreCalls(job)
+    }
+
+    @Test
+    fun `startWatching should invoke onSampleDelivered once per non-null info delivery`() = runTest {
+        every { listener.invoke(info) } returns Unit
+        every { infoRepository.getInfo() } returns info
+
+        classToTest.startWatching(
+            intervalInMs = INTERVAL_IN_MS,
+            listeners = listOf(listener),
+            onSampleDelivered = callback
+        ).also { loopTwiceAndCancel() }
+
+        verify(exactly(2)) { listener.invoke(info) }
+        assertEquals(2, callbackInvocations)
+    }
+
+    @Test
+    fun `startWatching should NOT invoke onSampleDelivered when infoRepository throws`() = runTest {
+        every { infoRepository.getInfo() } throws Exception("test")
+
+        classToTest.startWatching(
+            intervalInMs = INTERVAL_IN_MS,
+            listeners = listOf(listener),
+            onSampleDelivered = callback
+        ).also { loopTwiceAndCancel() }
+
+        verify(exactly(0)) { listener.invoke(any()) }
+        assertEquals(0, callbackInvocations)
     }
 
     private fun loopTwiceAndCancel() {

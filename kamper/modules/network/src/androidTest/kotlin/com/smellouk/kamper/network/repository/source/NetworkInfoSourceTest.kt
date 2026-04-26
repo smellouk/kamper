@@ -30,7 +30,7 @@ class NetworkInfoSourceTest {
     }
 
     @Test
-    fun `getNetworkInfoDto should return invalid dto when cache is not initialized`() {
+    fun getNetworkInfoDto_should_return_invalid_dto_when_cache_is_not_initialized() {
         mockTraffic(ONE_MEGABYTE_TRAFFIC_IN_BYTES)
 
         val dto = classToTest.getNetworkInfoDto()
@@ -39,7 +39,7 @@ class NetworkInfoSourceTest {
     }
 
     @Test
-    fun `getNetworkInfoDto should return not supported dto when system totals are unsupported`() {
+    fun getNetworkInfoDto_should_return_not_supported_dto_when_system_totals_are_unsupported() {
         mockSystemTraffic(NOT_SUPPORTED)
         mockUidTraffic(NOT_SUPPORTED)
 
@@ -49,7 +49,7 @@ class NetworkInfoSourceTest {
     }
 
     @Test
-    fun `getNetworkInfoDto should return valid dto when cache is available`() {
+    fun getNetworkInfoDto_should_return_valid_dto_when_cache_is_available() {
         classToTest.cachedDto = CACHED_DTO
         mockTraffic(ONE_MEGABYTE_TRAFFIC_IN_BYTES * 3)
 
@@ -59,7 +59,7 @@ class NetworkInfoSourceTest {
     }
 
     @Test
-    fun `getNetworkInfoDto should report system traffic and zero app traffic when uid tracking is unsupported`() {
+    fun getNetworkInfoDto_should_report_system_traffic_and_zero_app_traffic_when_uid_tracking_is_unsupported() {
         classToTest.cachedDto = CACHED_DTO_UID_ZERO
         mockSystemTraffic(ONE_MEGABYTE_TRAFFIC_IN_BYTES * 3)
         mockUidTraffic(NOT_SUPPORTED)

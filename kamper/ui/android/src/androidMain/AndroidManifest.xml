@@ -21,6 +21,14 @@
             android:name=".KamperPanelActivity"
             android:exported="false"
             android:theme="@style/Theme.Kamper.Transparent" />
+
+        <receiver
+            android:name="com.smellouk.kamper.ui.KamperConfigReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.smellouk.kamper.CONFIGURE" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

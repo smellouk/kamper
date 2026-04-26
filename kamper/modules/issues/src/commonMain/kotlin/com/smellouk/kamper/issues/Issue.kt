@@ -19,6 +19,13 @@ data class Issue(
             message = "",
             timestampMs = -1L
         )
+        val UNSUPPORTED = Issue(
+            id = "unsupported",
+            type = IssueType.SLOW_SPAN,
+            severity = Severity.INFO,
+            message = "unsupported",
+            timestampMs = -2L
+        )
     }
 }
 

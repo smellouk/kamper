@@ -44,7 +44,7 @@ class MemoryInfoSourceTest {
     }
 
     @Test
-    fun `getMemoryInfoDto should return invalid memory info when activityManager is null`() {
+    fun getMemoryInfoDto_should_return_invalid_memory_info_when_activityManager_is_null() {
         every { context.getSystemService(Context.ACTIVITY_SERVICE) } returns null
 
         val dto = classToTest.getMemoryInfoDto()
@@ -53,7 +53,7 @@ class MemoryInfoSourceTest {
     }
 
     @Test
-    fun `getMemoryInfoDto should return invalid memory info when and exception is thrown`() {
+    fun getMemoryInfoDto_should_return_invalid_memory_info_when_and_exception_is_thrown() {
         val activityManager = mockk<ActivityManager>(relaxed = true).apply {
             every { getProcessMemoryInfo(any()) } throws Exception("ANY_EXCEPTION")
         }
@@ -65,7 +65,7 @@ class MemoryInfoSourceTest {
     }
 
     @Test
-    fun `getMemoryInfoDto should return memory info`() {
+    fun getMemoryInfoDto_should_return_memory_info() {
         every {
             context.getSystemService(Context.ACTIVITY_SERVICE)
         } returns mockk<ActivityManager>()
@@ -79,7 +79,7 @@ class MemoryInfoSourceTest {
     }
 
     @Test
-    fun `getMemoryInfoDto should return memory info with null pss info`() {
+    fun getMemoryInfoDto_should_return_memory_info_with_null_pss_info() {
         every {
             context.getSystemService(Context.ACTIVITY_SERVICE)
         } returns mockk<ActivityManager>()

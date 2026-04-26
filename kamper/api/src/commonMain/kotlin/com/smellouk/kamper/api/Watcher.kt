@@ -17,7 +17,11 @@ open class Watcher<I : Info>(
     // Visible only for testing
     internal var job: Job? = null
 
-    override fun startWatching(intervalInMs: Long, listeners: List<InfoListener<I>>) {
+    override fun startWatching(
+        intervalInMs: Long,
+        listeners: List<InfoListener<I>>,
+        onSampleDelivered: (() -> Unit)?
+    ) {
         if (job?.isActive == true) {
             return
         }
@@ -36,6 +40,7 @@ open class Watcher<I : Info>(
                         listeners.forEach { listener ->
                             listener.invoke(info)
                         }
+                        onSampleDelivered?.invoke()
                     }
                 }
                 delay(intervalInMs)

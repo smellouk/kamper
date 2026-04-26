@@ -9,7 +9,10 @@ plugins {
 android {
     namespace = "com.smellouk.kamper.ui"
     compileSdk = Config.compileSdk
-    defaultConfig { minSdk = Config.minSdk }
+    defaultConfig {
+        minSdk = Config.minSdk
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
     compileOptions {
         sourceCompatibility = Config.sourceCompatibility
         targetCompatibility = Config.targetCompatibility
@@ -17,6 +20,14 @@ android {
     testOptions {
         unitTests {
             isReturnDefaultValues = true
+        }
+    }
+    packaging {
+        resources {
+            excludes += setOf(
+                "META-INF/LICENSE.md",
+                "META-INF/LICENSE-notice.md"
+            )
         }
     }
 }
@@ -58,6 +69,13 @@ kotlin {
         val androidUnitTest by getting {
             dependencies {
                 implementation(kotlin("test"))
+            }
+        }
+        val androidInstrumentedTest by getting {
+            dependencies {
+                implementation(Libs.Android.Tests.runner)
+                implementation(Libs.Android.Tests.junit_ext)
+                implementation(Libs.Android.Tests.mockk_android)
             }
         }
     }

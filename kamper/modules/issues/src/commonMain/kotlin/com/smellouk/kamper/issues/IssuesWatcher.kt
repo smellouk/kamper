@@ -17,7 +17,11 @@ internal class IssuesWatcher(
     private val accumulator = ArrayDeque<Issue>()
     private var totalDropped = 0
 
-    override fun startWatching(intervalInMs: Long, listeners: List<InfoListener<IssueInfo>>) {
+    override fun startWatching(
+        intervalInMs: Long,
+        listeners: List<InfoListener<IssueInfo>>,
+        onSampleDelivered: (() -> Unit)?
+    ) {
         this.listeners = listeners
         lock.withLock {
             accumulator.clear()

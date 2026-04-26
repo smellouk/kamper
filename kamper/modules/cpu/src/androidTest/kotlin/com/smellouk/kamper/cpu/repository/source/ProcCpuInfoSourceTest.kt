@@ -33,7 +33,7 @@ class ProcCpuInfoSourceTest {
     }
 
     @Test
-    fun `getCpuInfoDto should return valid cpu info dto`() {
+    fun getCpuInfoDto_should_return_valid_cpu_info_dto() {
         every { ProcFileReader.getCpuProcStatTime() } returnsMany listOf(
             CPU_DEVICE_RATE,
             CPU_DEVICE_RATE2
@@ -50,7 +50,7 @@ class ProcCpuInfoSourceTest {
     }
 
     @Test
-    fun `parse should parse cpu info strings to the expected cpu info object`() {
+    fun parse_should_parse_cpu_info_strings_to_the_expected_cpu_info_object() {
         val info = classToTest.parse(
             CPU_DEVICE_RATE,
             CPU_APP_RATE
@@ -60,7 +60,7 @@ class ProcCpuInfoSourceTest {
     }
 
     @Test
-    fun `parse should return invalid cpu info when cpu device string is invalid`() {
+    fun parse_should_return_invalid_cpu_info_when_cpu_device_string_is_invalid() {
         val info = classToTest.parse(
             ANY_CPU_DEVICE_RATE,
             CPU_APP_RATE
@@ -70,7 +70,7 @@ class ProcCpuInfoSourceTest {
     }
 
     @Test
-    fun `parse should return invalid cpu info when cpu app string is invalid`() {
+    fun parse_should_return_invalid_cpu_info_when_cpu_app_string_is_invalid() {
         val info = classToTest.parse(
             CPU_DEVICE_RATE,
             ANY_CPU_APP_RATE

@@ -22,7 +22,9 @@ data class KamperUiState(
     val gcCountDelta: Long = 0L,
     val gcPauseMsDelta: Long = 0L,
     val thermalState: ThermalState = ThermalState.NONE,
-    val isThrottling: Boolean = false
+    val isThrottling: Boolean = false,
+    val cpuUnsupported: Boolean = false,
+    val thermalUnsupported: Boolean = false
 ) {
     companion object {
         val EMPTY = KamperUiState(
@@ -36,7 +38,7 @@ data class KamperUiState(
             memoryHistory = emptyList(),
             downloadMbps = 0f,
             downloadHistory = emptyList(),
-            engineRunning = true
+            engineRunning = false
         )
     }
 }

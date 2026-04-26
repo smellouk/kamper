@@ -15,7 +15,6 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
-@Suppress("IllegalIdentifier")
 class AndroidOverlayManagerTest {
     private val app = mockk<Application>(relaxed = true)
     private val state = MutableStateFlow(KamperUiState.EMPTY)
@@ -76,7 +75,7 @@ class AndroidOverlayManagerTest {
     }
 
     @Test
-    fun `detachFromActivity should remove view from overlayViews even when removeView throws`() {
+    fun detachFromActivity_shouldRemoveView_evenWhenRemoveViewThrows() {
         val v = mockk<View>(relaxed = true)
         every { v.parent } returns root
         overlayViews().add(v)
@@ -88,7 +87,7 @@ class AndroidOverlayManagerTest {
     }
 
     @Test
-    fun `detachFromActivity should null chipView when chipView is the removed view`() {
+    fun detachFromActivity_shouldNullChipView_whenChipViewIsTheRemovedView() {
         val v = mockk<View>(relaxed = true)
         every { v.parent } returns root
         overlayViews().add(v)
@@ -100,7 +99,7 @@ class AndroidOverlayManagerTest {
     }
 
     @Test
-    fun `detachFromActivity should leave overlayViews empty after successful removal`() {
+    fun detachFromActivity_shouldLeaveOverlayViewsEmpty_afterSuccessfulRemoval() {
         val v = mockk<View>(relaxed = true)
         every { v.parent } returns root
         overlayViews().add(v)
@@ -112,7 +111,7 @@ class AndroidOverlayManagerTest {
     }
 
     @Test
-    fun `detachFromActivity should not remove views whose parent is a different root`() {
+    fun detachFromActivity_shouldNotRemoveViews_whenParentIsDifferentRoot() {
         val otherRoot = mockk<ViewGroup>(relaxed = true)
         val v = mockk<View>(relaxed = true)
         every { v.parent } returns otherRoot
@@ -125,8 +124,7 @@ class AndroidOverlayManagerTest {
     }
 
     @Test
-    fun `detachFromActivity on empty overlayViews should be a no-op`() {
-        // Pre-condition: overlayViews is empty
+    fun detachFromActivity_onEmptyOverlayViews_shouldBeNoOp() {
         assertTrue(overlayViews().isEmpty())
 
         callDetach()

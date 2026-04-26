@@ -763,10 +763,19 @@ internal fun MetricCard(
     color: Color,
     history: List<Float>,
     extra: String?,
-    dimmed: Boolean = false
+    dimmed: Boolean = false,
+    unsupported: Boolean = false
 ) {
-    val tint = if (dimmed) color.copy(alpha = 0.4f) else color
-    val textColor = if (dimmed) KamperTheme.SUBTEXT else KamperTheme.TEXT
+    val tint = when {
+        unsupported -> KamperTheme.SUBTEXT
+        dimmed      -> color.copy(alpha = 0.4f)
+        else        -> color
+    }
+    val textColor = when {
+        unsupported -> KamperTheme.SUBTEXT
+        dimmed      -> KamperTheme.SUBTEXT
+        else        -> KamperTheme.TEXT
+    }
     Column(
         modifier = Modifier
             .fillMaxWidth()

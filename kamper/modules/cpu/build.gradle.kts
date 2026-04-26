@@ -7,6 +7,18 @@ apply(from = projectDir.resolve("../../publish.gradle.kts"))
 
 android {
     namespace = "io.mellouk.kamper.cpu"
+    buildFeatures { buildConfig = true }
+    defaultConfig {
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+    packaging {
+        resources {
+            excludes += setOf(
+                "META-INF/LICENSE.md",
+                "META-INF/LICENSE-notice.md"
+            )
+        }
+    }
 }
 
 kotlin {
@@ -39,6 +51,13 @@ kotlin {
             dependencies {
                 implementation(Libs.Android.Coroutines.android)
                 implementation(Libs.Android.Androidx.annotationx)
+            }
+        }
+
+        val androidInstrumentedTest by getting {
+            dependencies {
+                implementation(Libs.Android.Tests.runner)
+                implementation(Libs.Android.Tests.mockk_android)
             }
         }
     }

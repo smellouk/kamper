@@ -1,18 +1,35 @@
 package com.smellouk.kamper.cpu
 
 import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertNotEquals
 
-/**
- * Wave 0 stub for FEAT-01 CpuInfo.UNSUPPORTED sentinel tests.
- *
- * Plan 07-01 Task 3 will replace this placeholder with the full set of
- * 3 sentinel-correctness tests (UNSUPPORTED != INVALID, all -2.0 fields,
- * INVALID still uses -1.0).
- */
 @Suppress("IllegalIdentifier")
 class CpuInfoUnsupportedTest {
     @Test
-    fun `UNSUPPORTED sentinel tests will be implemented in Plan 07-01`() {
-        TODO("implement in Plan 07-01 Task 3")
+    fun `UNSUPPORTED should be structurally distinct from INVALID`() {
+        assertNotEquals(CpuInfo.INVALID, CpuInfo.UNSUPPORTED)
+    }
+
+    @Test
+    fun `UNSUPPORTED should use -2_0 sentinel for every numeric field`() {
+        with(CpuInfo.UNSUPPORTED) {
+            assertEquals(-2.0, totalUseRatio)
+            assertEquals(-2.0, appRatio)
+            assertEquals(-2.0, userRatio)
+            assertEquals(-2.0, systemRatio)
+            assertEquals(-2.0, ioWaitRatio)
+        }
+    }
+
+    @Test
+    fun `INVALID should still use -1_0 sentinel after the change`() {
+        with(CpuInfo.INVALID) {
+            assertEquals(-1.0, totalUseRatio)
+            assertEquals(-1.0, appRatio)
+            assertEquals(-1.0, userRatio)
+            assertEquals(-1.0, systemRatio)
+            assertEquals(-1.0, ioWaitRatio)
+        }
     }
 }

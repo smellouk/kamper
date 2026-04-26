@@ -17,7 +17,7 @@ class NetworkInfoRepositoryImplTest {
     }
 
     @Test
-    fun `getInfo should call MemoryInfoSource and MemoryInfoMapper`() {
+    fun getInfo_should_call_MemoryInfoSource_and_MemoryInfoMapper() {
         classToTest.getInfo()
 
         verify { networkInfoSource.getNetworkInfoDto() }

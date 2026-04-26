@@ -22,12 +22,12 @@ class FpsInfoSourceTest {
     }
 
     @Test
-    fun `instance creation should set frame listener`() {
+    fun instance_creation_should_set_frame_listener() {
         verify { choreographer.setFrameListener(any()) }
     }
 
     @Test
-    fun `getFpsInfoDto should return valid fps info`() {
+    fun getFpsInfoDto_should_return_valid_fps_info() {
         frameListener.invoke(FRAME_NANO_TIME)
         frameListener.invoke(FRAME_NANO_TIME_2)
 
@@ -37,7 +37,7 @@ class FpsInfoSourceTest {
     }
 
     @Test
-    fun `getFpsInfoDto should return invalid fps info when currentFrameCount equals 0`() {
+    fun getFpsInfoDto_should_return_invalid_fps_info_when_currentFrameCount_equals_0() {
         val dto = classToTest.getFpsInfoDto()
 
         assertEquals(FpsInfoDto.INVALID, dto)

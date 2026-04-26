@@ -18,7 +18,7 @@ Kamper v1.0 takes an existing KMP performance monitoring library from a rough br
 - [x] **Phase 6: KamperUiRepository Refactor** — Background dispatcher, split classes, settings tests
 - [x] **Phase 7: KamperPanel Refactor** — Eliminate unnecessary Compose recompositions
 - [x] **Phase 8: Security, Docs & Scaling** — Security policy, API docs, capacity limits
-- [ ] **Phase 9: Missing Features** — Implement platform features deferred from earlier phases
+- [x] **Phase 9: Missing Features** — Implement platform features deferred from earlier phases
 - [ ] **Phase 10: Test Coverage** — Close unit and instrumented test coverage gaps
 - [ ] **Phase 11: Migrate buildSrc to Composite Build** — Replace buildSrc with convention plugins
 - [ ] **Phase 12: Kotlin-Gradle Monorepo Consolidation** — Kotlin-first Gradle structure consolidation
@@ -168,12 +168,12 @@ Plans:
 **Plans**: 6 plans
 
 Plans:
-- [ ] 09-01: Audit deferred features list
-- [ ] 09-02: JVM network feature completion
-- [ ] 09-03: iOS/macOS feature gaps
-- [ ] 09-04: Thermal monitoring stubs
-- [ ] 09-05: GC monitoring gaps
-- [ ] 09-06: Jank detection completeness
+- [x] 09-01: UNSUPPORTED sentinel constants for all Info subclasses + Performance.lastValidSampleAt (FEAT-01)
+- [x] 09-02: KamperConfigReceiver BroadcastReceiver with android:exported=false (FEAT-02)
+- [x] 09-03: CpuInfoRepositoryImpl one-time UNSUPPORTED capability probe (FEAT-01)
+- [x] 09-04: UI UNSUPPORTED tile rendering — KamperUiState + MetricCard gray styling (FEAT-01 UI)
+- [x] 09-05: FEAT-03 plumbing — currentApiTimeMs + onSampleDelivered + Performance.installedAt
+- [x] 09-06: Engine.validate() health-check API with per-module staleness detection (FEAT-03)
 
 ### Phase 10: Test Coverage
 **Goal**: Systematically close unit and instrumented test coverage gaps across all modules

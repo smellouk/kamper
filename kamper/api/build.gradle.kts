@@ -6,6 +6,14 @@ plugins {
 
 android {
     namespace = "io.mellouk.kamper.api"
+    packaging {
+        resources {
+            excludes += setOf(
+                "META-INF/LICENSE.md",
+                "META-INF/LICENSE-notice.md"
+            )
+        }
+    }
 }
 
 kotlin {

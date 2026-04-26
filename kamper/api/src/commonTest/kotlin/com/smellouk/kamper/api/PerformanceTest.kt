@@ -57,7 +57,7 @@ class PerformanceTest {
     fun `start should not start watcher when performance is not initialized`() {
         classToTest.start()
 
-        verify(exactly(0)) { watcher.startWatching(any(), any()) }
+        verify(exactly(0)) { watcher.startWatching(any(), any(), any()) }
         verify { logger.log(any()) }
         verifyNoMoreCalls(watcher, logger)
     }
@@ -68,7 +68,7 @@ class PerformanceTest {
 
         classToTest.start()
 
-        verify(exactly(1)) { watcher.startWatching(INTERVAL_IN_MS, any()) }
+        verify(exactly(1)) { watcher.startWatching(INTERVAL_IN_MS, any(), any()) }
         verify(exactly(0)) { logger.log(any()) }
         verifyNoMoreCalls(watcher, logger)
     }
@@ -78,7 +78,7 @@ class PerformanceTest {
         classToTest.stop()
 
         verify(exactly(1)) { watcher.stopWatching() }
-        verify(exactly(0)) { watcher.startWatching(any(), any()) }
+        verify(exactly(0)) { watcher.startWatching(any(), any(), any()) }
         verify(exactly(0)) { logger.log(any()) }
         verifyNoMoreCalls(watcher, logger)
     }

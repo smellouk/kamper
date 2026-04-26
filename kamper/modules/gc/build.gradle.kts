@@ -7,6 +7,14 @@ apply(from = projectDir.resolve("../../publish.gradle.kts"))
 
 android {
     namespace = "io.mellouk.kamper.gc"
+    packaging {
+        resources {
+            excludes += setOf(
+                "META-INF/LICENSE.md",
+                "META-INF/LICENSE-notice.md"
+            )
+        }
+    }
 }
 
 kotlin {

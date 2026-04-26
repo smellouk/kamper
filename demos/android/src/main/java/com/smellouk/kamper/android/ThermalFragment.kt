@@ -74,6 +74,7 @@ class ThermalFragment : Fragment() {
         ThermalState.CRITICAL,
         ThermalState.EMERGENCY,
         ThermalState.SHUTDOWN            -> 0xFFFAB387.toInt()
-        ThermalState.UNKNOWN             -> 0xFFA6ADC8.toInt()
+        ThermalState.UNKNOWN,
+        ThermalState.UNSUPPORTED         -> 0xFFA6ADC8.toInt()
     }
 }

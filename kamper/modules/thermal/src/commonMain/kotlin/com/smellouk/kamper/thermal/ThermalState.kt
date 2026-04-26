@@ -8,5 +8,6 @@ enum class ThermalState {
     CRITICAL,
     EMERGENCY,
     SHUTDOWN,
-    UNKNOWN
+    UNKNOWN,
+    UNSUPPORTED
 }

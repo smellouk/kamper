@@ -10,5 +10,6 @@ data class GcInfo(
 ) : Info {
     companion object {
         val INVALID = GcInfo(-1L, -1L, -1L, -1L)
+        val UNSUPPORTED = GcInfo(-2L, -2L, -2L, -2L)
     }
 }

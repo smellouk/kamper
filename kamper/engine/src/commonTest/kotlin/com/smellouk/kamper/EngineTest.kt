@@ -27,6 +27,8 @@ class EngineTest {
     fun setup() {
         classToTest.performanceList.clear()
         classToTest.mapListeners.clear()
+        // Mirror Engine.init {} re-seeding so each test starts in the same state Engine guarantees.
+        classToTest.mapListeners[ValidationInfo::class] = mutableListOf()
     }
 
     @Test
@@ -60,7 +62,9 @@ class EngineTest {
     fun `addInfoListener should not add listener when target performance module is not installed`() {
         classToTest.addInfoListener<Info> { }
 
-        assertEquals(0, classToTest.mapListeners.size)
+        // Engine.init {} seeds the ValidationInfo slot; adding an Info listener for a
+        // non-installed module does not add a new slot — size stays at 1 (ValidationInfo only).
+        assertEquals(1, classToTest.mapListeners.size)
     }
 
     @Test
@@ -69,7 +73,8 @@ class EngineTest {
 
         classToTest.addInfoListener<Info> { }
 
-        assertEquals(1, classToTest.mapListeners.size)
+        // ValidationInfo slot (1) + Info slot from install (1) = 2 total.
+        assertEquals(2, classToTest.mapListeners.size)
     }
 
     @Test
@@ -80,7 +85,8 @@ class EngineTest {
 
         classToTest.removeInfoListener(listener)
 
-        assertEquals(1, classToTest.mapListeners.size)
+        // ValidationInfo slot (1) + Info slot from install (1) = 2 total.
+        assertEquals(2, classToTest.mapListeners.size)
         assertEquals(0, classToTest.mapListeners[Info::class]?.size)
     }
 
@@ -91,7 +97,8 @@ class EngineTest {
 
         classToTest.removeInfoListener(listener)
 
-        assertEquals(1, classToTest.mapListeners.size)
+        // ValidationInfo slot (1) + Info slot from install (1) = 2 total.
+        assertEquals(2, classToTest.mapListeners.size)
         assertEquals(0, classToTest.mapListeners[Info::class]?.size)
     }
 
@@ -101,12 +108,14 @@ class EngineTest {
         val module = createPerformanceModule(true, performanceMock)
         classToTest.install(module)
         assertEquals(1, classToTest.performanceList.size)
-        assertEquals(1, classToTest.mapListeners.size)
+        // ValidationInfo slot (1) + Info slot from install (1) = 2 total.
+        assertEquals(2, classToTest.mapListeners.size)
 
         classToTest.uninstall(module)
 
         assertEquals(0, classToTest.performanceList.size)
-        assertEquals(0, classToTest.mapListeners.size)
+        // After uninstall, Info slot is removed but ValidationInfo slot remains = 1.
+        assertEquals(1, classToTest.mapListeners.size)
     }
 
     @Test
@@ -116,7 +125,8 @@ class EngineTest {
         classToTest.uninstall(module)
 
         assertEquals(0, classToTest.performanceList.size)
-        assertEquals(0, classToTest.mapListeners.size)
+        // Only ValidationInfo slot seeded by Engine.init {} = 1.
+        assertEquals(1, classToTest.mapListeners.size)
     }
 
     @Test
@@ -129,7 +139,8 @@ class EngineTest {
         classToTest.install(module)
 
         assertEquals(1, classToTest.performanceList.size)
-        assertEquals(1, classToTest.mapListeners.size)
+        // ValidationInfo slot (1) + Info slot from reinstall (1) = 2 total.
+        assertEquals(2, classToTest.mapListeners.size)
     }
 
     @Test
@@ -139,7 +150,8 @@ class EngineTest {
 
         classToTest.install(performanceModule)
 
-        assertEquals(1, classToTest.mapListeners.size)
+        // ValidationInfo slot (1) + Info slot from install (1) = 2 total.
+        assertEquals(2, classToTest.mapListeners.size)
         assertEquals(1, classToTest.performanceList.size)
         verify { performanceMock.initialize(any(), any()) }
     }
@@ -151,7 +163,8 @@ class EngineTest {
 
         classToTest.install(performanceModule)
 
-        assertEquals(1, classToTest.mapListeners.size)
+        // ValidationInfo slot (1) + Info slot from install attempt (1) = 2 total.
+        assertEquals(2, classToTest.mapListeners.size)
         assertEquals(0, classToTest.performanceList.size)
         verify { performanceMock.initialize(any(), any()) }
     }
@@ -163,7 +176,8 @@ class EngineTest {
 
         classToTest.install(performanceModule)
 
-        assertEquals(1, classToTest.mapListeners.size)
+        // ValidationInfo slot (1) + Info slot from install attempt (1) = 2 total.
+        assertEquals(2, classToTest.mapListeners.size)
         assertEquals(0, classToTest.performanceList.size)
         verify(exactly(0)) { performanceMock.initialize(any(), any()) }
     }

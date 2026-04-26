@@ -26,7 +26,7 @@ class FpsInfoRepositoryImplTest {
     }
 
     @Test
-    fun `getInfo should get fps info`() {
+    fun getInfo_should_get_fps_info() {
         val fpsInfo = classToTest.getInfo()
 
         assertEquals(this.fpsInfo, fpsInfo)

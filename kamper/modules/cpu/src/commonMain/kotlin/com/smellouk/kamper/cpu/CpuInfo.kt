@@ -11,5 +11,6 @@ data class CpuInfo(
 ) : Info {
     companion object {
         val INVALID = CpuInfo(-1.0, -1.0, -1.0, -1.0, -1.0)
+        val UNSUPPORTED = CpuInfo(-2.0, -2.0, -2.0, -2.0, -2.0)
     }
 }

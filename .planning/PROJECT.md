@@ -21,12 +21,14 @@ The monitoring must never crash or destabilize the host app — every metric col
 - ✓ Lifecycle hardening — overlay set-tracking, FPS AtomicBoolean, ANR volatile stop — v1.0/Phase 04
 - ✓ CPU /proc/stat direct reads (PERF-01) + configurable buffer ceiling + amber 90%-full badge (PERF-02) — v1.0/Phase 05
 - ✓ KamperUiRepository refactor — PreferencesStore/SettingsRepository/RecordingManager/ModuleLifecycleManager split, 22 unit tests (ARCH-01 DEBT-03 DEBT-04 TEST-01) — v1.0/Phase 06
+- ✓ KamperPanel refactor — eliminate unnecessary Compose recompositions — v1.0/Phase 07
+- ✓ Security & docs — security policy, API docs, capacity limits — v1.0/Phase 08
+- ✓ UNSUPPORTED sentinels for all Info subclasses + CPU capability probe + UI gray tile (FEAT-01) — v1.0/Phase 09
+- ✓ KamperConfigReceiver ADB toggle with android:exported=false (FEAT-02) — v1.0/Phase 09
+- ✓ Engine.validate() health-check API with per-module staleness detection (FEAT-03) — v1.0/Phase 09
 
 ### Active
 
-- [ ] KamperPanel refactor — eliminate unnecessary Compose recompositions (Phase 07)
-- [ ] Security & docs — security policy, API docs, capacity limits (Phase 08)
-- [ ] Missing platform features — deferred from earlier phases (Phase 09)
 - [ ] Test coverage — systematic unit + instrumented coverage gaps closed (Phase 10)
 - [ ] Build modernization — composite build convention plugins, version catalog (Phases 11-13)
 - [ ] React Native package — published RN wrapper for Kamper engine + UI (Phases 14-15)
@@ -59,6 +61,10 @@ Kamper is a brownfield KMP library with 89 commits of history now aligned to Con
 | Listener pattern over reactive streams | Zero dependency on reactive libraries; simpler host-app integration | ✓ Good |
 | No breaking API changes in v1.0 | Library users pin versions; breakage forces migration | ✓ Good |
 | git filter-repo for history rewrite | Single-pass Python callback; all 89 commits in one run | ✓ Good |
+| CpuInfoSource non-nullable contract | `getCpuInfoDto()` returns `CpuInfoDto.INVALID` (not null) — null checks against a non-nullable return are always-false | ✓ Good |
+| One-time capability probe with Boolean? cache | `null=not-probed, true=supported, false=UNSUPPORTED` — O(1) after first poll | ✓ Good |
+| firstCallComplete guard for warm-up | First delta source poll always returns INVALID (no prior sample); guard prevents false-positive UNSUPPORTED on warm-up | ✓ Good |
+| Engine.validate() single-call semantics | Per D-13 validate() is called from app code (not on a hot loop) — no need to synchronize performanceList iteration | ✓ Good |
 
 ---
-*Last updated: 2026-04-26 after Phase 03 completion*
+*Last updated: 2026-04-26 after Phase 09 completion*

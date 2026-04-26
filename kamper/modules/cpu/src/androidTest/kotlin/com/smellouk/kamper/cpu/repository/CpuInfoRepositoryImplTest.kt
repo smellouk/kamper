@@ -36,7 +36,7 @@ class CpuInfoRepositoryImplTest {
     }
 
     @Test
-    fun `getInfo should get it from procCpuInfoRawSource when api level below 26`() {
+    fun getInfo_should_get_it_from_procCpuInfoRawSource_when_api_level_below_26() {
         val dto = mockk<CpuInfoDto>()
         every { ApiLevelProvider.getApiLevel() } returns 20
         every { procCpuInfoRawSource.getCpuInfoDto() } returns dto
@@ -49,7 +49,7 @@ class CpuInfoRepositoryImplTest {
     }
 
     @Test
-    fun `getInfo should get it from procCpuInfoRawSource when api level 26+ and proc stat is accessible`() {
+    fun getInfo_should_get_it_from_procCpuInfoRawSource_when_api_level_26_and_proc_stat_is_accessible() {
         val dto = mockk<CpuInfoDto>()
         every { ApiLevelProvider.getApiLevel() } returns 26
         every { ProcStatAccessibilityProvider.isAccessible() } returns true
@@ -63,7 +63,7 @@ class CpuInfoRepositoryImplTest {
     }
 
     @Test
-    fun `getInfo should get it from shellCpuInfoRawSource when api level 26+ and proc stat is not accessible`() {
+    fun getInfo_should_get_it_from_shellCpuInfoRawSource_when_api_level_26_and_proc_stat_is_not_accessible() {
         val dto = mockk<CpuInfoDto>()
         every { ApiLevelProvider.getApiLevel() } returns 26
         every { ProcStatAccessibilityProvider.isAccessible() } returns false

@@ -8,5 +8,6 @@ data class ThermalInfo(
 ) : Info {
     companion object {
         val INVALID = ThermalInfo(ThermalState.UNKNOWN, false)
+        val UNSUPPORTED = ThermalInfo(ThermalState.UNSUPPORTED, false)
     }
 }

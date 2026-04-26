@@ -21,6 +21,14 @@ android {
         sourceCompatibility = Config.sourceCompatibility
         targetCompatibility = Config.targetCompatibility
     }
+    packaging {
+        resources {
+            excludes += setOf(
+                "META-INF/LICENSE.md",
+                "META-INF/LICENSE-notice.md"
+            )
+        }
+    }
 }
 
 kotlin {

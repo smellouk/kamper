@@ -3,6 +3,7 @@ package com.smellouk.kamper.api
 interface Info {
     companion object {
         val INVALID = object : Info {}
+        val UNSUPPORTED = object : Info {}
     }
 }
 

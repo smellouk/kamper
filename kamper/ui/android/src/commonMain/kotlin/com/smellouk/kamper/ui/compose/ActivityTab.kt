@@ -38,19 +38,23 @@ internal fun ActivityTab(
     val jankRatio       by remember { derivedStateOf { s.jankRatio } }
     val gcCountDelta    by remember { derivedStateOf { s.gcCountDelta } }
     val gcPauseDelta    by remember { derivedStateOf { s.gcPauseMsDelta } }
-    val thermalState    by remember { derivedStateOf { s.thermalState } }
-    val isThrottling    by remember { derivedStateOf { s.isThrottling } }
+    val thermalState        by remember { derivedStateOf { s.thermalState } }
+    val isThrottling        by remember { derivedStateOf { s.isThrottling } }
+    val cpuUnsupported      by remember { derivedStateOf { s.cpuUnsupported } }
+    val thermalUnsupported  by remember { derivedStateOf { s.thermalUnsupported } }
 
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         if (cfg.cpuEnabled) {
+            val isCpuUnsupported = cpuUnsupported
             MetricCard(
-                title    = "CPU",
-                current  = "${cpuPercent.formatDp(1)}%",
-                fraction = (cpuPercent / 100f).coerceIn(0f, 1f),
-                color    = KamperTheme.BLUE,
-                history  = cpuHistory,
-                extra    = null,
-                dimmed   = !cfg.showCpu
+                title       = "CPU",
+                current     = if (isCpuUnsupported) "Unsupported" else "${cpuPercent.formatDp(1)}%",
+                fraction    = if (isCpuUnsupported) 0f else (cpuPercent / 100f).coerceIn(0f, 1f),
+                color       = KamperTheme.BLUE,
+                history     = if (isCpuUnsupported) emptyList() else cpuHistory,
+                extra       = null,
+                dimmed      = !cfg.showCpu,
+                unsupported = isCpuUnsupported
             )
         }
         if (cfg.fpsEnabled) {
@@ -116,25 +120,28 @@ internal fun ActivityTab(
             )
         }
         if (cfg.thermalEnabled) {
+            val isThermalUnsupported = thermalUnsupported
             val thermalFraction = when (thermalState) {
-                com.smellouk.kamper.thermal.ThermalState.NONE      -> 0f
-                com.smellouk.kamper.thermal.ThermalState.LIGHT     -> 0.2f
-                com.smellouk.kamper.thermal.ThermalState.MODERATE  -> 0.4f
-                com.smellouk.kamper.thermal.ThermalState.SEVERE    -> 0.6f
-                com.smellouk.kamper.thermal.ThermalState.CRITICAL  -> 0.8f
+                com.smellouk.kamper.thermal.ThermalState.NONE        -> 0f
+                com.smellouk.kamper.thermal.ThermalState.LIGHT       -> 0.2f
+                com.smellouk.kamper.thermal.ThermalState.MODERATE    -> 0.4f
+                com.smellouk.kamper.thermal.ThermalState.SEVERE      -> 0.6f
+                com.smellouk.kamper.thermal.ThermalState.CRITICAL    -> 0.8f
                 com.smellouk.kamper.thermal.ThermalState.EMERGENCY,
-                com.smellouk.kamper.thermal.ThermalState.SHUTDOWN  -> 1.0f
-                com.smellouk.kamper.thermal.ThermalState.UNKNOWN   -> 0f
+                com.smellouk.kamper.thermal.ThermalState.SHUTDOWN    -> 1.0f
+                com.smellouk.kamper.thermal.ThermalState.UNKNOWN     -> 0f
+                com.smellouk.kamper.thermal.ThermalState.UNSUPPORTED -> 0f
             }
             val thermalColor = if (isThrottling) KamperTheme.PEACH else KamperTheme.GREEN
             MetricCard(
-                title    = "Thermal",
-                current  = thermalState.name,
-                fraction = thermalFraction,
-                color    = thermalColor,
-                history  = emptyList(),
-                extra    = if (isThrottling) "THROTTLING" else null,
-                dimmed   = !cfg.showThermal
+                title       = "Thermal",
+                current     = if (isThermalUnsupported) "Unsupported" else thermalState.name,
+                fraction    = if (isThermalUnsupported) 0f else thermalFraction,
+                color       = thermalColor,
+                history     = emptyList(),
+                extra       = if (isThermalUnsupported || !isThrottling) null else "THROTTLING",
+                dimmed      = !cfg.showThermal,
+                unsupported = isThermalUnsupported
             )
         }
     }

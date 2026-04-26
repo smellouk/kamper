@@ -13,7 +13,6 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 
-@Suppress("IllegalIdentifier")
 class FpsPerformanceTest {
     private val classToTest = spyk(
         FpsPerformance(
@@ -36,7 +35,7 @@ class FpsPerformanceTest {
     }
 
     @Test
-    fun `start should call parent start and FpsChoreographer start`() {
+    fun start_should_call_parent_start_and_FpsChoreographer_start() {
         classToTest.start()
 
         verify { parentClassToTest.start() }
@@ -44,7 +43,7 @@ class FpsPerformanceTest {
     }
 
     @Test
-    fun `stop should call parent start and FpsChoreographer stop`() {
+    fun stop_should_call_parent_start_and_FpsChoreographer_stop() {
         classToTest.stop()
 
         verify { parentClassToTest.stop() }
@@ -52,7 +51,7 @@ class FpsPerformanceTest {
     }
 
     @Test
-    fun `clean should clean FpsChoreographer`() {
+    fun clean_should_clean_FpsChoreographer() {
         classToTest.clean()
 
         verify { FpsChoreographer.clean() }
