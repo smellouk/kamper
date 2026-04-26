@@ -1,35 +1,14 @@
 plugins {
-    kotlin("multiplatform")
+    id("org.jetbrains.kotlin.multiplatform")
     id("com.android.library")
-    id("dev.mokkery")
-    id(Libs.Plugins.Compose.id)
-    id(Libs.Plugins.Compose.kotlinPluginId) version Versions.kotlin
+    id("org.jetbrains.compose")
+    alias(libs.plugins.kotlin.compose)
+    id("kamper.android.config")
 }
 
 android {
     namespace = "com.smellouk.kamper.ui"
-    compileSdk = Config.compileSdk
-    defaultConfig {
-        minSdk = Config.minSdk
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-    }
-    compileOptions {
-        sourceCompatibility = Config.sourceCompatibility
-        targetCompatibility = Config.targetCompatibility
-    }
-    testOptions {
-        unitTests {
-            isReturnDefaultValues = true
-        }
-    }
-    packaging {
-        resources {
-            excludes += setOf(
-                "META-INF/LICENSE.md",
-                "META-INF/LICENSE-notice.md"
-            )
-        }
-    }
+    // compileSdk, minSdk, compileOptions provided by kamper.android.config
 }
 
 kotlin {
@@ -39,16 +18,16 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            api(project(Modules.ENGINE))
-            implementation(project(Modules.Performances.CPU))
-            implementation(project(Modules.Performances.FPS))
-            implementation(project(Modules.Performances.MEMORY))
-            implementation(project(Modules.Performances.NETWORK))
-            implementation(project(Modules.Performances.ISSUES))
-            implementation(project(Modules.Performances.JANK))
-            implementation(project(Modules.Performances.GC))
-            implementation(project(Modules.Performances.THERMAL))
-            implementation(Libs.Kmm.Coroutines.core)
+            api(project(":kamper:engine"))
+            implementation(project(":kamper:modules:cpu"))
+            implementation(project(":kamper:modules:fps"))
+            implementation(project(":kamper:modules:memory"))
+            implementation(project(":kamper:modules:network"))
+            implementation(project(":kamper:modules:issues"))
+            implementation(project(":kamper:modules:jank"))
+            implementation(project(":kamper:modules:gc"))
+            implementation(project(":kamper:modules:thermal"))
+            implementation(libs.kotlinx.coroutines.core)
             implementation(compose.runtime)
             implementation(compose.foundation)
             implementation(compose.animation)
@@ -56,27 +35,17 @@ kotlin {
             implementation(compose.ui)
         }
         androidMain.dependencies {
-            implementation(Libs.Android.Coroutines.android)
-            implementation(Libs.Android.Androidx.core_ktx)
-            implementation(Libs.Android.Androidx.appCompat)
+            implementation(libs.kotlinx.coroutines.android)
+            implementation(libs.androidx.core.ktx)
+            implementation(libs.androidx.appcompat)
         }
-        val commonTest by getting {
-            dependencies {
-                implementation(kotlin("test"))
-                implementation(Libs.Kmm.Tests.coroutines)
-            }
+        commonTest.dependencies {
+            implementation(kotlin("test-common"))
+            implementation(kotlin("test-annotations-common"))
+            implementation(libs.kotlinx.coroutines.test)
         }
-        val androidUnitTest by getting {
-            dependencies {
-                implementation(kotlin("test"))
-            }
-        }
-        val androidInstrumentedTest by getting {
-            dependencies {
-                implementation(Libs.Android.Tests.runner)
-                implementation(Libs.Android.Tests.junit_ext)
-                implementation(Libs.Android.Tests.mockk_android)
-            }
+        getByName("androidUnitTest").dependencies {
+            implementation(kotlin("test-junit"))
         }
     }
 }

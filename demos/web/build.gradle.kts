@@ -1,5 +1,5 @@
 plugins {
-    kotlin("multiplatform")
+    alias(libs.plugins.kotlin.multiplatform)
 }
 
 kotlin {
@@ -15,15 +15,15 @@ kotlin {
     sourceSets {
         val jsMain by getting {
             dependencies {
-                implementation(project(Modules.ENGINE))
-                implementation(project(Modules.Performances.CPU))
-                implementation(project(Modules.Performances.FPS))
-                implementation(project(Modules.Performances.MEMORY))
-                implementation(project(Modules.Performances.NETWORK))
-                implementation(project(Modules.Performances.ISSUES))
-                implementation(project(Modules.Performances.JANK))
-                implementation(project(Modules.Performances.GC))
-                implementation(project(Modules.Performances.THERMAL))
+                implementation(project(":kamper:engine"))
+                implementation(project(":kamper:modules:cpu"))
+                implementation(project(":kamper:modules:fps"))
+                implementation(project(":kamper:modules:memory"))
+                implementation(project(":kamper:modules:network"))
+                implementation(project(":kamper:modules:issues"))
+                implementation(project(":kamper:modules:jank"))
+                implementation(project(":kamper:modules:gc"))
+                implementation(project(":kamper:modules:thermal"))
             }
         }
     }

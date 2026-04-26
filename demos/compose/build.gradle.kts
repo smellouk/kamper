@@ -1,33 +1,25 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
 plugins {
-    kotlin("multiplatform")
-    id(Libs.Plugins.Compose.id)
-    id(Libs.Plugins.Compose.kotlinPluginId) version Versions.kotlin
-    id("com.android.application")
+    alias(libs.plugins.kotlin.multiplatform)
+    alias(libs.plugins.compose.multiplatform)
+    alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.android.application)
 }
 
 android {
     namespace = "com.smellouk.kamper.compose"
-    compileSdk = Config.compileSdk
+    compileSdk = 35
     defaultConfig {
         applicationId = "com.smellouk.kamper.compose"
-        minSdk = Config.minSdk
-        targetSdk = Config.targetSdk
-        versionCode = Config.versionCode
-        versionName = Config.versionName
+        minSdk = 21
+        targetSdk = 35
+        versionCode = 1
+        versionName = "1.0"
     }
     compileOptions {
-        sourceCompatibility = Config.sourceCompatibility
-        targetCompatibility = Config.targetCompatibility
-    }
-    packaging {
-        resources {
-            excludes += setOf(
-                "META-INF/LICENSE.md",
-                "META-INF/LICENSE-notice.md"
-            )
-        }
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 }
 
@@ -43,16 +35,6 @@ kotlin {
             isStatic = true
         }
     }
-    wasmJs {
-        outputModuleName = "compose"
-        browser {
-            commonWebpackConfig {
-                outputFileName = "compose.js"
-            }
-            binaries.executable()
-        }
-    }
-
     sourceSets {
         val commonMain by getting {
             dependencies {
@@ -62,15 +44,15 @@ kotlin {
                 implementation(compose.ui)
                 implementation(compose.components.resources)
 
-                implementation(project(Modules.ENGINE))
-                implementation(project(Modules.Performances.CPU))
-                implementation(project(Modules.Performances.FPS))
-                implementation(project(Modules.Performances.MEMORY))
-                implementation(project(Modules.Performances.NETWORK))
-                implementation(project(Modules.Performances.ISSUES))
-                implementation(project(Modules.Performances.JANK))
-                implementation(project(Modules.Performances.GC))
-                implementation(project(Modules.Performances.THERMAL))
+                implementation(project(":kamper:engine"))
+                implementation(project(":kamper:modules:cpu"))
+                implementation(project(":kamper:modules:fps"))
+                implementation(project(":kamper:modules:memory"))
+                implementation(project(":kamper:modules:network"))
+                implementation(project(":kamper:modules:issues"))
+                implementation(project(":kamper:modules:jank"))
+                implementation(project(":kamper:modules:gc"))
+                implementation(project(":kamper:modules:thermal"))
             }
         }
 
@@ -78,14 +60,14 @@ kotlin {
             dependencies {
                 implementation(compose.preview)
                 implementation("androidx.activity:activity-compose:1.10.1")
-                implementation(project(Modules.Ui.ANDROID))
+                implementation(project(":kamper:ui:android"))
             }
         }
 
         val iosMain by creating {
             dependsOn(commonMain)
             dependencies {
-                implementation(project(Modules.Ui.ANDROID))
+                implementation(project(":kamper:ui:android"))
             }
         }
         val iosArm64Main by getting { dependsOn(iosMain) }

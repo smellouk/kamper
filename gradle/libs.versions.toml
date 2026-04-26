@@ -1,0 +1,61 @@
+[versions]
+kotlin = "2.3.20"
+coroutines = "1.10.1"
+compose = "1.8.0"
+agp = "8.12.0"
+mokkery = "3.3.0"
+mockk = "1.14.3"
+detekt = "1.23.7"
+gradle-test-logger = "4.0.0"
+androidx-app-compat = "1.7.0"
+androidx-annotations = "1.9.1"
+androidx-lifecycle = "2.8.7"
+androidx-material = "1.12.0"
+androidx-constraintlayout = "2.2.1"
+androidx-core-ktx = "1.16.0"
+compile-sdk = "35"
+min-sdk = "21"
+target-sdk = "35"
+
+[libraries]
+# Coroutines
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
+kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
+kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
+
+# AndroidX
+androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "androidx-app-compat" }
+androidx-annotation = { module = "androidx.annotation:annotation", version.ref = "androidx-annotations" }
+androidx-lifecycle-common = { module = "androidx.lifecycle:lifecycle-common", version.ref = "androidx-lifecycle" }
+androidx-material = { module = "com.google.android.material:material", version.ref = "androidx-material" }
+androidx-constraintlayout = { module = "androidx.constraintlayout:constraintlayout", version.ref = "androidx-constraintlayout" }
+androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "androidx-core-ktx" }
+
+# Testing
+mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
+
+# Detekt formatting (referenced by root build.gradle.kts detekt task)
+detekt-formatting = { module = "io.gitlab.arturbosch.detekt:detekt-formatting", version.ref = "detekt" }
+
+# Build-logic compileOnly classpath (referenced ONLY by build-logic/build.gradle.kts)
+kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
+android-gradle-plugin = { module = "com.android.tools.build:gradle", version.ref = "agp" }
+mokkery-gradle-plugin = { module = "dev.mokkery:dev.mokkery.gradle.plugin", version.ref = "mokkery" }
+
+[plugins]
+# External plugins
+kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+android-library = { id = "com.android.library", version.ref = "agp" }
+android-application = { id = "com.android.application", version.ref = "agp" }
+mokkery = { id = "dev.mokkery", version.ref = "mokkery" }
+compose-multiplatform = { id = "org.jetbrains.compose", version.ref = "compose" }
+detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
+test-logger = { id = "com.adarshr.test-logger", version.ref = "gradle-test-logger" }
+
+# Convention plugins (resolved via includeBuild("build-logic"); no version)
+kamper-kmp-library = { id = "kamper.kmp.library" }
+kamper-android-config = { id = "kamper.android.config" }
+kamper-publish = { id = "kamper.publish" }

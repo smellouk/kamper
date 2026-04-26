@@ -1,51 +1,28 @@
 plugins {
-    kotlin("multiplatform")
-    id("dev.mokkery")
-    id("com.android.library")
+    id("kamper.kmp.library")
+    id("kamper.publish")
 }
-apply(from = projectDir.resolve("../publish.gradle.kts"))
 
 android {
     namespace = "io.mellouk.kamper"
-    packaging {
-        resources {
-            excludes += setOf(
-                "META-INF/LICENSE.md",
-                "META-INF/LICENSE-notice.md"
-            )
-        }
-    }
 }
 
 kotlin {
     androidTarget {
         publishLibraryVariants("release")
     }
-    jvm()
-    macosX64()
-    macosArm64()
-    iosArm64()
-    iosSimulatorArm64()
-    tvosArm64()
-    tvosSimulatorArm64()
-    js(IR) {
-        browser()
-    }
-    wasmJs {
-        browser()
-    }
 
     sourceSets {
         val commonMain by getting {
             dependencies {
-                api(project(Modules.API))
+                api(project(":kamper:api"))
             }
         }
 
         val androidMain by getting {
             dependencies {
-                implementation(Libs.Android.Androidx.annotationx)
-                implementation(Libs.Android.Androidx.lifecycleCommon)
+                implementation(libs.androidx.annotation)
+                implementation(libs.androidx.lifecycle.common)
             }
         }
     }

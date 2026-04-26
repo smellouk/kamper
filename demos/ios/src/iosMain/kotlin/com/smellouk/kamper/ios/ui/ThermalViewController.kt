@@ -92,7 +92,8 @@ class ThermalViewController : UIViewController(nibName = null, bundle = null) {
         ThermalState.CRITICAL,
         ThermalState.EMERGENCY,
         ThermalState.SHUTDOWN                 -> Theme.PEACH
-        ThermalState.UNKNOWN                  -> Theme.MUTED
+        ThermalState.UNKNOWN,
+        ThermalState.UNSUPPORTED              -> Theme.MUTED
     }
 
     private fun toggleStress() {

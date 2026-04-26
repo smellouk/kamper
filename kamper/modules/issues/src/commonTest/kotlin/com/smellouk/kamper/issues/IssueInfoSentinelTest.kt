@@ -13,7 +13,7 @@ class IssueInfoSentinelTest {
     }
 
     @Test
-    fun `Issue INVALID should have empty id, SLOW_SPAN type, INFO severity, empty message, -1L timestamp`() {
+    fun `Issue INVALID should have empty id and SLOW_SPAN type and INFO severity and empty message and -1L timestamp`() {
         with(Issue.INVALID) {
             assertEquals("", id)
             assertEquals(IssueType.SLOW_SPAN, type)

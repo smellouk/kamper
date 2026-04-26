@@ -1,52 +1,22 @@
 plugins {
-    kotlin("multiplatform")
-    id("dev.mokkery")
-    id("com.android.library")
+    id("kamper.kmp.library")
 }
 
 android {
     namespace = "io.mellouk.kamper.api"
-    packaging {
-        resources {
-            excludes += setOf(
-                "META-INF/LICENSE.md",
-                "META-INF/LICENSE-notice.md"
-            )
-        }
-    }
 }
 
 kotlin {
-    androidTarget()
-    jvm()
-    macosX64()
-    macosArm64()
-    iosArm64()
-    iosSimulatorArm64()
-    tvosArm64()
-    tvosSimulatorArm64()
-    js(IR) {
-        browser()
-    }
-    wasmJs {
-        browser()
-    }
-
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation(Libs.Kmm.Coroutines.core)
-            }
-        }
-        val commonTest by getting {
-            dependencies {
-                implementation(Libs.Kmm.Tests.coroutines)
+                implementation(libs.kotlinx.coroutines.core)
             }
         }
 
         val androidMain by getting {
             dependencies {
-                implementation(Libs.Android.Coroutines.android)
+                implementation(libs.kotlinx.coroutines.android)
             }
         }
     }

@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework
 
 plugins {
-    kotlin("multiplatform")
+    id("org.jetbrains.kotlin.multiplatform")
 }
 
 kotlin {
@@ -14,22 +14,22 @@ kotlin {
             baseName = "Kamper"
             isStatic = true
             xcf.add(this)
-            export(project(Modules.ENGINE))
-            export(project(Modules.Performances.CPU))
-            export(project(Modules.Performances.FPS))
-            export(project(Modules.Performances.MEMORY))
-            export(project(Modules.Performances.NETWORK))
+            export(project(":kamper:engine"))
+            export(project(":kamper:modules:cpu"))
+            export(project(":kamper:modules:fps"))
+            export(project(":kamper:modules:memory"))
+            export(project(":kamper:modules:network"))
         }
     }
 
     sourceSets {
         val commonMain by getting {
             dependencies {
-                api(project(Modules.ENGINE))
-                api(project(Modules.Performances.CPU))
-                api(project(Modules.Performances.FPS))
-                api(project(Modules.Performances.MEMORY))
-                api(project(Modules.Performances.NETWORK))
+                api(project(":kamper:engine"))
+                api(project(":kamper:modules:cpu"))
+                api(project(":kamper:modules:fps"))
+                api(project(":kamper:modules:memory"))
+                api(project(":kamper:modules:network"))
             }
         }
     }

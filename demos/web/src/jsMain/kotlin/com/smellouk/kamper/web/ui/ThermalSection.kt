@@ -56,7 +56,8 @@ internal object ThermalSection {
         ThermalState.CRITICAL,
         ThermalState.EMERGENCY,
         ThermalState.SHUTDOWN                 -> "#fab387"
-        ThermalState.UNKNOWN                  -> "#7f849c"
+        ThermalState.UNKNOWN,
+        ThermalState.UNSUPPORTED              -> "#7f849c"
     }
 
     private fun toggleStress() {

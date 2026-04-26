@@ -88,7 +88,8 @@ class ThermalView : NSView {
         ThermalState.CRITICAL,
         ThermalState.EMERGENCY,
         ThermalState.SHUTDOWN                 -> Theme.PEACH
-        ThermalState.UNKNOWN                  -> Theme.MUTED
+        ThermalState.UNKNOWN,
+        ThermalState.UNSUPPORTED              -> Theme.MUTED
     }
 
     private fun toggleStress() {

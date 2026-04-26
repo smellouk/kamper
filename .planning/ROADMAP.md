@@ -20,7 +20,7 @@ Kamper v1.0 takes an existing KMP performance monitoring library from a rough br
 - [x] **Phase 8: Security, Docs & Scaling** — Security policy, API docs, capacity limits
 - [x] **Phase 9: Missing Features** — Implement platform features deferred from earlier phases
 - [x] **Phase 10: Test Coverage** — Close unit and instrumented test coverage gaps (completed 2026-04-26)
-- [ ] **Phase 11: Migrate buildSrc to Composite Build** — Replace buildSrc with convention plugins
+- [x] **Phase 11: Migrate buildSrc to Composite Build** — Replace buildSrc with convention plugins (completed 2026-04-26)
 - [ ] **Phase 12: Kotlin-Gradle Monorepo Consolidation** — Kotlin-first Gradle structure consolidation
 - [ ] **Phase 13: Stack Alignment & Dependency Unification** — Single version catalog for all dependencies
 - [ ] **Phase 14: React Native Package** — Create and publish RN wrapper for Kamper engine and UI
@@ -201,10 +201,10 @@ Plans:
 **Plans**: 4 plans
 
 Plans:
-- [ ] 11-01: Create build-logic module structure
-- [ ] 11-02: Migrate Config.kt and Libs.kt
-- [ ] 11-03: Migrate module-level build scripts to plugins
-- [ ] 11-04: Remove buildSrc and verify build
+- [x] 11-01: Create build-logic module structure
+- [x] 11-02: Migrate Config.kt and Libs.kt
+- [x] 11-03: Migrate module-level build scripts to plugins
+- [x] 11-04: Remove buildSrc and verify build
 
 ### Phase 12: Kotlin-Gradle Monorepo Consolidation
 **Goal**: Kotlin-first Gradle consolidation for monorepo structure
@@ -359,7 +359,7 @@ Plans:
 | 8. Security, Docs & Scaling | 5/5 | Complete | 2026-04-26 |
 | 9. Missing Features | 0/6 | Not started | - |
 | 10. Test Coverage | 3/3 | Complete   | 2026-04-26 |
-| 11. Migrate buildSrc | 0/4 | Not started | - |
+| 11. Migrate buildSrc | 4/4 | Complete    | 2026-04-26 |
 | 12. Monorepo Consolidation | 0/3 | Not started | - |
 | 13. Dependency Unification | 0/5 | Not started | - |
 | 14. React Native Package | 0/7 | Not started | - |

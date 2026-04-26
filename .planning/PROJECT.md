@@ -67,4 +67,4 @@ Kamper is a brownfield KMP library with 89 commits of history now aligned to Con
 | Engine.validate() single-call semantics | Per D-13 validate() is called from app code (not on a hot loop) — no need to synchronize performanceList iteration | ✓ Good |
 
 ---
-*Last updated: 2026-04-26 after Phase 09 completion*
+*Last updated: 2026-04-26 after Phase 11 completion — buildSrc → composite build migration done; build-logic convention plugins live*

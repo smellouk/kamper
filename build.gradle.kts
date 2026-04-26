@@ -1,13 +1,19 @@
 import com.adarshr.gradle.testlogger.TestLoggerExtension
 import com.adarshr.gradle.testlogger.theme.ThemeType
-import com.android.build.gradle.LibraryExtension
 import io.gitlab.arturbosch.detekt.Detekt
-import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.lang.System.getenv as Env
 
 plugins {
-    id(Libs.Plugins.Detekt.id) version Versions.detekt
+    alias(libs.plugins.detekt)
+    alias(libs.plugins.test.logger) apply false
+    alias(libs.plugins.kotlin.multiplatform) apply false
+    alias(libs.plugins.kotlin.android) apply false
+    alias(libs.plugins.kotlin.jvm) apply false
+    alias(libs.plugins.android.application) apply false
+    alias(libs.plugins.android.library) apply false
+    alias(libs.plugins.compose.multiplatform) apply false
+    alias(libs.plugins.kotlin.compose) apply false
+    alias(libs.plugins.mokkery) apply false
 }
 
 extra.apply {
@@ -33,81 +39,11 @@ extra.apply {
     set("LIB_VERSION_NAME", generateVersionName())
 }
 
-buildscript {
-    repositories {
-        google()
-        mavenCentral()
-    }
-    dependencies {
-        classpath("com.android.tools.build:gradle:8.12.0")
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:2.3.20")
-        classpath("dev.mokkery:dev.mokkery.gradle.plugin:3.3.0")
-        classpath("com.adarshr:gradle-test-logger-plugin:4.0.0")
-        classpath("org.jetbrains.compose:compose-gradle-plugin:1.8.0")
-    }
-}
-
 allprojects {
-    if (project.path != Modules.Demos.WEB && project.path != Modules.Demos.COMPOSE) {
+    if (project.path != ":demos:web" && project.path != ":demos:compose") {
         apply(plugin = "com.adarshr.test-logger")
-    }
-
-    repositories {
-        google()
-        mavenCentral()
-    }
-
-    tasks.withType<KotlinCompile> {
-        compilerOptions.jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.fromTarget(Config.jvmTarget))
-    }
-
-    if (project.path != Modules.Demos.WEB && project.path != Modules.Demos.COMPOSE) {
         testLoggerConfig {
             theme = ThemeType.MOCHA
-        }
-    }
-}
-
-subprojects {
-    afterEvaluate {
-        if (project.plugins.findPlugin("org.jetbrains.kotlin.multiplatform") === null) return@afterEvaluate
-        kmmConfig {
-            sourceSets["commonTest"].dependencies {
-                implementation(kotlin(Libs.Kmm.Tests.kcommon))
-                implementation(kotlin(Libs.Kmm.Tests.kannotationscommon))
-                implementation(Libs.Kmm.Tests.coroutines)
-            }
-
-            sourceSets.findByName("androidUnitTest")?.dependencies {
-                implementation(kotlin(Libs.Android.Tests.kotlin_junit))
-            }
-
-            sourceSets.findByName("androidInstrumentedTest")?.dependencies {
-                implementation(kotlin(Libs.Android.Tests.kotlin_junit))
-                implementation(Libs.Android.Tests.mockk)
-            }
-
-            sourceSets.findByName("jvmTest")?.dependencies {
-                implementation(kotlin("test"))
-            }
-
-            sourceSets.findByName("jsTest")?.dependencies {
-                implementation(kotlin("test"))
-            }
-        }
-
-        if (project.plugins.findPlugin("com.android.library") != null) {
-            androidConfig {
-                compileSdk = Config.compileSdk
-                defaultConfig {
-                    minSdk = Config.minSdk
-                    targetSdk = Config.targetSdk
-                }
-                compileOptions {
-                    sourceCompatibility = Config.sourceCompatibility
-                    targetCompatibility = Config.targetCompatibility
-                }
-            }
         }
     }
 }
@@ -126,13 +62,12 @@ tasks.named<Detekt>("detekt") {
     exclude("**/*.kts")
     exclude("**/resources/")
     exclude("**/build/")
-    exclude("**/buildSrc/")
     exclude("**/console/")
     exclude("**/android/")
     exclude("**/demos/")
 
     dependencies {
-        detektPlugins(Libs.Plugins.Detekt.formatting)
+        detektPlugins(libs.detekt.formatting)
     }
 }
 
@@ -142,12 +77,6 @@ tasks.withType<Delete>().configureEach {
 
 fun Project.testLoggerConfig(configure: Action<TestLoggerExtension>) =
     (this as ExtensionAware).extensions.configure("testlogger", configure)
-
-fun Project.kmmConfig(configure: Action<KotlinMultiplatformExtension>): Unit =
-    (this as ExtensionAware).extensions.configure("kotlin", configure)
-
-fun Project.androidConfig(configure: Action<LibraryExtension>): Unit =
-    (this as ExtensionAware).extensions.configure("android", configure)
 
 fun generateVersionName(): String {
     val default = "git describe --tags --abbrev=0".execute() ?: "0.1.0"
