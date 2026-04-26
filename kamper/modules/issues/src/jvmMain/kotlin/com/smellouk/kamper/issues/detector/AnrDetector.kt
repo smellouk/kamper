@@ -23,11 +23,13 @@ internal class AnrDetector(private val config: AnrConfig) : IssueDetector {
                             ?.value
                         val stackTrace = if (config.captureThreadDump && edtFrames != null) {
                             edtFrames.joinToString("\n") { "\tat $it" }
-                        } else null
+                        } else {
+                            null
+                        }
 
                         onIssue(
                             Issue(
-                                id = "${IssueType.ANR}_${Random.nextLong().toString(16)}",
+                                id = "${IssueType.ANR}_${Random.nextLong().toString(HEX_RADIX)}",
                                 type = IssueType.ANR,
                                 severity = config.severity,
                                 message = "EDT blocked for ≥${config.thresholdMs}ms",
@@ -52,6 +54,12 @@ internal class AnrDetector(private val config: AnrConfig) : IssueDetector {
 
     override fun stop() {
         watchdogThread?.interrupt()
+        watchdogThread?.join(config.thresholdMs + JOIN_GRACE_MS)
         watchdogThread = null
+    }
+
+    private companion object {
+        const val HEX_RADIX = 16
+        const val JOIN_GRACE_MS = 500L
     }
 }

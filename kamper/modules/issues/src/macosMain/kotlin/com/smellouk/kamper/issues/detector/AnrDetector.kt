@@ -24,7 +24,7 @@ internal class AnrDetector(private val config: AnrConfig) : IssueDetector {
                 if (responded == null && isActive) {
                     onIssue(
                         Issue(
-                            id = "${IssueType.ANR}_${Random.nextLong().toString(16)}",
+                            id = "${IssueType.ANR}_${Random.nextLong().toString(HEX_RADIX)}",
                             type = IssueType.ANR,
                             severity = config.severity,
                             message = "Main run loop blocked for ≥${config.thresholdMs}ms",
@@ -42,5 +42,9 @@ internal class AnrDetector(private val config: AnrConfig) : IssueDetector {
     override fun stop() {
         job?.cancel()
         job = null
+    }
+
+    private companion object {
+        const val HEX_RADIX = 16
     }
 }

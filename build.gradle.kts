@@ -83,6 +83,7 @@ subprojects {
             }
 
             sourceSets.findByName("androidInstrumentedTest")?.dependencies {
+                implementation(kotlin(Libs.Android.Tests.kotlin_junit))
                 implementation(Libs.Android.Tests.mockk)
             }
 

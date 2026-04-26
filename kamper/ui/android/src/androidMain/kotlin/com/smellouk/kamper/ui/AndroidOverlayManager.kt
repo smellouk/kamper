@@ -62,6 +62,7 @@ internal class AndroidOverlayManager(
     private val mainHandler = Handler(Looper.getMainLooper())
     private val autoCollapseRunnable = Runnable { collapseChip() }
     private var panelOpened = false
+    private val overlayViews = mutableSetOf<View>()
 
     private val lifecycleCallbacks = object : Application.ActivityLifecycleCallbacks {
         override fun onActivityResumed(activity: Activity) = attachToActivity(activity)
@@ -89,10 +90,9 @@ internal class AndroidOverlayManager(
     private fun attachToActivity(activity: Activity) {
         if (activity is KamperPanelActivity) return
         val root = activity.window.decorView as? ViewGroup ?: return
-        if (root.findViewWithTag<View>(OVERLAY_TAG) != null) return
+        if (overlayViews.any { it.parent == root }) return
 
         val view = ComposeView(activity).apply {
-            tag = OVERLAY_TAG
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnDetachedFromWindow)
             setContent {
                 val s by state.collectAsState()
@@ -132,7 +132,10 @@ internal class AndroidOverlayManager(
             topMargin = if (initialized) chipY else 0
         }
         if (!initialized) view.alpha = 0f
+        // Re-check at the point of mutation: a rapid pause/resume can pass the early guard twice
+        if (overlayViews.any { it.parent == root }) return
         root.addView(view, lp)
+        overlayViews.add(view)
         chipView = view
 
         view.doOnLayout { v ->
@@ -161,9 +164,13 @@ internal class AndroidOverlayManager(
 
     private fun detachFromActivity(activity: Activity) {
         val root = activity.window.decorView as? ViewGroup ?: return
-        root.findViewWithTag<View>(OVERLAY_TAG)?.let { v ->
+        val toRemove = overlayViews.filter { it.parent == root }
+        toRemove.forEach { v ->
+            try {
+                root.removeView(v)
+            } catch (_: Exception) { }
+            overlayViews.remove(v)
             if (chipView == v) chipView = null
-            root.removeView(v)
         }
     }
 
@@ -256,7 +263,6 @@ internal class AndroidOverlayManager(
     }
 
     private companion object {
-        const val OVERLAY_TAG = "kamper_chip_overlay"
         const val PREF_CHIP_Y = "chip_y"
         const val PREF_ON_RIGHT = "on_right"
         const val PEEK_WIDTH_DP = 56f

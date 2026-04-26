@@ -56,6 +56,31 @@ class FpsChoreographerTest {
         verify { frameListener.invoke(FRAME_NANO_TIME) }
         verify(exactly = 2) { choreographer.postFrameCallback(any()) }
     }
+
+    @Test
+    fun `doFrame should not re-register when fpsActive is false`() {
+        classToTest.start() // fpsActive = true, posts callback once
+        classToTest.stop() // fpsActive = false, removes callback
+
+        classToTest.frameCallback.doFrame(FRAME_NANO_TIME)
+
+        // postFrameCallback was called exactly once by start(), never by doFrame after stop
+        verify(exactly = 1) { choreographer.postFrameCallback(any()) }
+    }
+
+    @Test
+    fun `doFrame should survive listener exception and re-register`() {
+        classToTest.start()
+        val throwingListener = mockk<FpsChoreographerFrameListener>()
+        every { throwingListener.invoke(any()) } throws RuntimeException("boom")
+        classToTest.setFrameListener(throwingListener)
+
+        // Must not throw out of doFrame
+        classToTest.frameCallback.doFrame(FRAME_NANO_TIME)
+
+        // Re-registration must still happen because fpsActive is still true
+        verify(exactly = 2) { choreographer.postFrameCallback(any()) }
+    }
 }
 
 private const val FRAME_NANO_TIME = 1000000000L
