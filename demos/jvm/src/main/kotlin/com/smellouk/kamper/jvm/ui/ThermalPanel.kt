@@ -95,7 +95,8 @@ class ThermalPanel : JPanel(BorderLayout(0, 0)) {
         ThermalState.CRITICAL,
         ThermalState.EMERGENCY,
         ThermalState.SHUTDOWN                 -> Theme.PEACH
-        ThermalState.UNKNOWN                  -> Theme.MUTED
+        ThermalState.UNKNOWN,
+        ThermalState.UNSUPPORTED              -> Theme.MUTED
     }
 
     private fun spinLoop() {

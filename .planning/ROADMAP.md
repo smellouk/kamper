@@ -19,7 +19,7 @@ Kamper v1.0 takes an existing KMP performance monitoring library from a rough br
 - [x] **Phase 7: KamperPanel Refactor** — Eliminate unnecessary Compose recompositions
 - [x] **Phase 8: Security, Docs & Scaling** — Security policy, API docs, capacity limits
 - [x] **Phase 9: Missing Features** — Implement platform features deferred from earlier phases
-- [ ] **Phase 10: Test Coverage** — Close unit and instrumented test coverage gaps
+- [x] **Phase 10: Test Coverage** — Close unit and instrumented test coverage gaps (completed 2026-04-26)
 - [ ] **Phase 11: Migrate buildSrc to Composite Build** — Replace buildSrc with convention plugins
 - [ ] **Phase 12: Kotlin-Gradle Monorepo Consolidation** — Kotlin-first Gradle structure consolidation
 - [ ] **Phase 13: Stack Alignment & Dependency Unification** — Single version catalog for all dependencies
@@ -186,9 +186,9 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 10-01: Audit coverage gaps and prioritize
-- [ ] 10-02: Unit test coverage for commonMain paths
-- [ ] 10-03: Instrumented test coverage for Android paths
+- [x] 10-01: Audit coverage gaps and prioritize
+- [x] 10-02: Unit test coverage for commonMain paths
+- [x] 10-03: Instrumented test coverage for Android paths
 
 ### Phase 11: Migrate buildSrc to Composite Build
 **Goal**: Replace buildSrc with composite build convention plugins
@@ -358,7 +358,7 @@ Plans:
 | 7. KamperPanel Refactor | 5/5 | Complete | 2026-04-26 |
 | 8. Security, Docs & Scaling | 5/5 | Complete | 2026-04-26 |
 | 9. Missing Features | 0/6 | Not started | - |
-| 10. Test Coverage | 0/3 | Not started | - |
+| 10. Test Coverage | 3/3 | Complete   | 2026-04-26 |
 | 11. Migrate buildSrc | 0/4 | Not started | - |
 | 12. Monorepo Consolidation | 0/3 | Not started | - |
 | 13. Dependency Unification | 0/5 | Not started | - |

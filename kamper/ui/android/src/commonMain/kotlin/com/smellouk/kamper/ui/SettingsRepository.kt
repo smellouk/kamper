@@ -20,7 +20,8 @@ internal class SettingsRepository(
     private val _settings = MutableStateFlow(loadSettingsSync())
     val settings: StateFlow<KamperUiSettings> = _settings.asStateFlow()
 
-    private fun loadSettingsSync(): KamperUiSettings = KamperUiSettings(
+    private fun loadSettingsSync(): KamperUiSettings = runCatching {
+        KamperUiSettings(
         showCpu                          = store.getBoolean("show_cpu", true),
         showFps                          = store.getBoolean("show_fps", true),
         showMemory                       = store.getBoolean("show_memory", true),
@@ -56,7 +57,8 @@ internal class SettingsRepository(
         slowStartColdThresholdMs         = store.getLong("slow_start_cold_ms", 2_000L),
         slowStartWarmThresholdMs         = store.getLong("slow_start_warm_ms", 800L),
         isDarkTheme                      = store.getBoolean("is_dark_theme", true)
-    )
+        )
+    }.getOrDefault(KamperUiSettings())
 
     suspend fun loadSettings(): KamperUiSettings = withContext(dispatcher) {
         loadSettingsSync().also { _settings.value = it }

@@ -29,12 +29,6 @@ class AndroidOverlayManagerTest {
 
     @Before
     fun setup() {
-        every { app.resources } returns mockk(relaxed = true)
-        every { app.resources.displayMetrics } returns mockk(relaxed = true) {
-            every { density } returns 1f
-            every { widthPixels } returns 1080
-            every { heightPixels } returns 1920
-        }
         every { app.getSharedPreferences(any(), any()) } returns mockk(relaxed = true)
 
         manager = AndroidOverlayManager(app, state, settings, config, onClearIssues)
