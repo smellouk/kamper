@@ -21,7 +21,7 @@ Kamper v1.0 takes an existing KMP performance monitoring library from a rough br
 - [x] **Phase 9: Missing Features** — Implement platform features deferred from earlier phases
 - [x] **Phase 10: Test Coverage** — Close unit and instrumented test coverage gaps (completed 2026-04-26)
 - [x] **Phase 11: Migrate buildSrc to Composite Build** — Replace buildSrc with convention plugins (completed 2026-04-26)
-- [ ] **Phase 12: Kotlin-Gradle Monorepo Consolidation** — Kotlin-first Gradle structure consolidation
+- [x] **Phase 12: Kotlin-Gradle Monorepo Consolidation** — Kotlin-first Gradle structure consolidation (completed 2026-04-26)
 - [ ] **Phase 13: Stack Alignment & Dependency Unification** — Single version catalog for all dependencies
 - [ ] **Phase 14: React Native Package** — Create and publish RN wrapper for Kamper engine and UI
 - [ ] **Phase 15: Adjust Kamper UI for React Native** — Align UI layer to support the RN package
@@ -211,15 +211,17 @@ Plans:
 **Depends on**: Phase 11
 **Requirements**: BUILD-02
 **Success Criteria** (what must be TRUE):
-  1. All Gradle scripts use Kotlin DSL exclusively
+  1. All Kamper-owned Gradle scripts use Kotlin DSL exclusively; demos/react-native/android/ Groovy DSL files are React Native framework-owned and intentionally preserved per D-11
   2. Shared build logic consolidated with no duplication
   3. Build structure documented in STRUCTURE.md
-**Plans**: 3 plans
+**Plans**: 5 plans
 
 Plans:
-- [ ] 12-01: Audit remaining Groovy DSL usage
-- [ ] 12-02: Migrate to Kotlin DSL
-- [ ] 12-03: Consolidate shared build logic
+- [x] 12-01: Audit remaining Groovy DSL usage
+- [x] 12-02: Migrate to Kotlin DSL
+- [x] 12-03: Consolidate shared build logic
+- [x] 12-04: Gap closure — Fix ROADMAP SC-1 carve-out for RN composite Groovy files (BUILD-02)
+- [x] 12-05: Gap closure — Update STRUCTURE.md to reflect build-logic, composite builds, CC, PREFER_SETTINGS (BUILD-02)
 
 ### Phase 13: Stack Alignment & Dependency Unification
 **Goal**: Unify all dependency versions into a single version catalog (libs.versions.toml)
@@ -360,7 +362,7 @@ Plans:
 | 9. Missing Features | 0/6 | Not started | - |
 | 10. Test Coverage | 3/3 | Complete   | 2026-04-26 |
 | 11. Migrate buildSrc | 4/4 | Complete    | 2026-04-26 |
-| 12. Monorepo Consolidation | 0/3 | Not started | - |
+| 12. Monorepo Consolidation | 5/5 | Complete   | 2026-04-26 |
 | 13. Dependency Unification | 0/5 | Not started | - |
 | 14. React Native Package | 0/7 | Not started | - |
 | 15. Kamper UI for RN | 0/3 | Not started | - |

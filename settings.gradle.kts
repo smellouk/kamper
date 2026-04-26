@@ -65,3 +65,11 @@ include(":demos:macos")
 include(":demos:web")
 include(":demos:compose")
 include(":demos:ios")
+
+// React Native demo — integrated as composite build per D-09.
+// Uses includeBuild (NOT a regular subproject include) because the RN demo has its own
+// settings.gradle with com.facebook.react.settings applied. The Gradle project root for the
+// RN demo is at demos/react-native/android/ (standard RN project layout). The RN demo's
+// settings.gradle already has includeBuild('../../..') for dependency substitution back to
+// the root — Gradle 8.x handles the mutual composite relationship correctly.
+includeBuild("demos/react-native/android")
