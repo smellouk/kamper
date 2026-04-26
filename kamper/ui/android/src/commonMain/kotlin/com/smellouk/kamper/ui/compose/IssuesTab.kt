@@ -10,15 +10,10 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -175,83 +170,7 @@ private fun TypeChip(type: IssueType) {
     )
 }
 
-@Composable
-private fun IssueDetailDialog(issue: Issue, onDismiss: () -> Unit) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        containerColor = KamperTheme.SURFACE,
-        titleContentColor = KamperTheme.TEXT,
-        textContentColor = KamperTheme.SUBTEXT,
-        title = {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                TypeChip(issue.type)
-                Spacer(Modifier.width(8.dp))
-                Text(
-                    issue.severity.name,
-                    color = severityColor(issue.severity),
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.SemiBold
-                )
-            }
-        },
-        text = {
-            Column(
-                modifier = Modifier.verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                DetailField("Time", fmtTime(issue.timestampMs))
-                DetailField("Message", issue.message)
-                issue.durationMs?.let { DetailField("Duration", "${it}ms") }
-                issue.threadName?.let { DetailField("Thread", it) }
-                if (issue.details.isNotEmpty()) {
-                    issue.details.entries.forEach { (k, v) -> DetailField(k, v) }
-                }
-                val stackTrace = issue.stackTrace
-                if (!stackTrace.isNullOrBlank()) {
-                    Text(
-                        "Stack Trace",
-                        color = KamperTheme.SUBTEXT,
-                        fontSize = 10.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        modifier = Modifier.padding(top = 4.dp)
-                    )
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .heightIn(max = 220.dp)
-                            .clip(RoundedCornerShape(6.dp))
-                            .background(KamperTheme.BASE)
-                            .border(0.5.dp, KamperTheme.BORDER, RoundedCornerShape(6.dp))
-                    ) {
-                        Text(
-                            stackTrace,
-                            color = KamperTheme.TEXT,
-                            fontSize = 9.sp,
-                            fontFamily = FontFamily.Monospace,
-                            lineHeight = 13.sp,
-                            modifier = Modifier
-                                .verticalScroll(rememberScrollState())
-                                .padding(8.dp)
-                        )
-                    }
-                }
-            }
-        },
-        confirmButton = {
-            TextButton(onClick = onDismiss) {
-                Text("Close", color = KamperTheme.BLUE)
-            }
-        }
-    )
-}
-
-@Composable
-private fun DetailField(label: String, value: String) {
-    Column {
-        Text(label, color = KamperTheme.SUBTEXT, fontSize = 10.sp, fontWeight = FontWeight.SemiBold)
-        Text(value, color = KamperTheme.TEXT, fontSize = 12.sp)
-    }
-}
+// IssueDetailDialog and DetailField moved to PanelComponents.kt as internal fun
 
 @Composable
 private fun severityColor(s: Severity): Color = when (s) {

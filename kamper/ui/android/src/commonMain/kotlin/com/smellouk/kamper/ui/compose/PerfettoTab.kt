@@ -1,9 +1,5 @@
 package com.smellouk.kamper.ui.compose
 
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -16,29 +12,19 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalClipboardManager
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import kotlinx.coroutines.delay
 
 private const val CMD_RECORD =
     "adb shell perfetto -o /data/misc/perfetto-traces/trace.perfetto-trace -t 10s sched freq am wm view app"
@@ -203,150 +189,4 @@ internal fun PerfettoTab(
 
 internal expect val showAdbGuide: Boolean
 
-// ── Recording badge with live elapsed timer ───────────────────────────────────
-
-@Composable
-private fun RecordingBadge(
-    isRecording: Boolean,
-    sampleCount: Int,
-    maxRecordingSamples: Int
-) {
-    val warningSampleCount = maxRecordingSamples * 9 / 10
-    val isWarning = isRecording && sampleCount >= warningSampleCount
-
-    var elapsed by remember { mutableStateOf(0) }
-    LaunchedEffect(isRecording) {
-        elapsed = 0
-        if (isRecording) {
-            while (true) { delay(1_000); elapsed++ }
-        }
-    }
-
-    AnimatedContent(
-        targetState = isRecording,
-        transitionSpec = { fadeIn() togetherWith fadeOut() },
-        label = "recording_badge"
-    ) { recording ->
-        val badgeColor = when {
-            recording && isWarning -> KamperTheme.WARNING
-            recording              -> KamperTheme.RED
-            else                   -> KamperTheme.SUBTEXT
-        }
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .clip(RoundedCornerShape(4.dp))
-                .background(
-                    if (recording) badgeColor.copy(alpha = 0.15f)
-                    else KamperTheme.SURFACE.copy(alpha = 0.6f)
-                )
-                .padding(horizontal = 8.dp, vertical = 3.dp)
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(6.dp)
-                    .clip(CircleShape)
-                    .background(if (recording) badgeColor else KamperTheme.SUBTEXT)
-            )
-            Spacer(Modifier.width(5.dp))
-            if (recording) {
-                val m = elapsed / 60
-                val s = elapsed % 60
-                val mm = m.toString().padStart(2, '0')
-                val ss = s.toString().padStart(2, '0')
-                Column {
-                    Text(
-                        "REC  $mm:$ss  $sampleCount pts",
-                        color = badgeColor,
-                        fontSize = 10.sp,
-                        fontWeight = FontWeight.Bold,
-                        fontFamily = FontFamily.Monospace
-                    )
-                    if (isWarning) {
-                        val pct = sampleCount * 100 / maxRecordingSamples
-                        Text(
-                            "⚠ Buffer ${pct}% full",
-                            color = KamperTheme.WARNING,
-                            fontSize = 10.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            fontFamily = FontFamily.Monospace
-                        )
-                    }
-                }
-            } else {
-                Text(
-                    if (sampleCount > 0) "STOPPED  $sampleCount pts" else "IDLE",
-                    color = KamperTheme.SUBTEXT,
-                    fontSize = 10.sp,
-                    fontWeight = FontWeight.Bold,
-                    fontFamily = FontFamily.Monospace
-                )
-            }
-        }
-    }
-}
-
-// ── Guide step with copy button ───────────────────────────────────────────────
-
-@Composable
-private fun GuideStep(number: String, label: String, cmd: String) {
-    val clipboard = LocalClipboardManager.current
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(8.dp))
-            .background(KamperTheme.BASE)
-            .border(0.5.dp, KamperTheme.BORDER, RoundedCornerShape(8.dp))
-            .padding(12.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            StepBadge(number)
-            Spacer(Modifier.width(8.dp))
-            Text(label, color = KamperTheme.TEXT, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
-        }
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(6.dp))
-                .background(KamperTheme.SURFACE)
-                .border(0.5.dp, KamperTheme.BORDER, RoundedCornerShape(6.dp))
-                .padding(horizontal = 10.dp, vertical = 8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                cmd,
-                color = KamperTheme.GREEN,
-                fontSize = 10.sp,
-                fontFamily = FontFamily.Monospace,
-                modifier = Modifier.weight(1f)
-            )
-            Spacer(Modifier.width(8.dp))
-            Text(
-                "Copy",
-                color = KamperTheme.BLUE,
-                fontSize = 10.sp,
-                fontWeight = FontWeight.SemiBold,
-                modifier = Modifier
-                    .clip(RoundedCornerShape(4.dp))
-                    .background(KamperTheme.BLUE.copy(alpha = 0.12f))
-                    .clickable { clipboard.setText(AnnotatedString(cmd)) }
-                    .padding(horizontal = 6.dp, vertical = 3.dp)
-            )
-        }
-    }
-}
-
-@Composable
-private fun StepBadge(number: String) {
-    Text(
-        number,
-        color = KamperTheme.BLUE,
-        fontSize = 11.sp,
-        fontWeight = FontWeight.Bold,
-        modifier = Modifier
-            .clip(RoundedCornerShape(4.dp))
-            .background(KamperTheme.BLUE.copy(alpha = 0.15f))
-            .padding(horizontal = 6.dp, vertical = 2.dp)
-    )
-}
+// RecordingBadge, GuideStep, StepBadge moved to PanelComponents.kt as internal fun

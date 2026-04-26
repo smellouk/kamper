@@ -11,3 +11,4 @@ credentials.properties
 .externalNativeBuild
 .cxx
 .planning/
+.claude/worktrees/
