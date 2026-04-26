@@ -20,7 +20,7 @@ actual val CpuModule: PerformanceModule<CpuConfig, CpuInfo>
 @Suppress("FunctionNaming")
 fun CpuModule(
     builder: CpuConfig.Builder.() -> Unit
-): PerformanceModule<CpuConfig, CpuInfo> = with(CpuConfig.Builder.apply(builder).build()) {
+): PerformanceModule<CpuConfig, CpuInfo> = with(CpuConfig.Builder().apply(builder).build()) {
     PerformanceModule(
         config = this,
         performance = createPerformance(logger)

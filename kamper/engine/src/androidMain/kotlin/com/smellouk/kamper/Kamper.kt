@@ -8,7 +8,7 @@ object Kamper : Engine(), LifecycleObserver {
     fun setup(
         builder: KamperConfig.Builder.() -> Unit
     ): Kamper {
-        config = KamperConfig.Builder.apply(builder).build()
+        config = KamperConfig.Builder().apply(builder).build()
         return this
     }
 

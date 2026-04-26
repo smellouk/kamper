@@ -11,7 +11,7 @@ class KamperConfigBuilderTest {
     fun `build should build correct config`() {
         val logger = mock<Logger>()
 
-        val config = KamperConfig.Builder.apply { this.logger = logger }.build()
+        val config = KamperConfig.Builder().apply { this.logger = logger }.build()
 
         assertEquals(logger, config.logger)
     }

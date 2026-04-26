@@ -11,7 +11,7 @@ class FpsConfigBuilderTest {
     @Test
     fun `build should build correct config`() {
         val loggerMock = mock<Logger>()
-        with(FpsConfig.Builder.apply {
+        with(FpsConfig.Builder().apply {
             isEnabled = false
             logger = loggerMock
         }.build()) {

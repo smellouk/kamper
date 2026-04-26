@@ -25,12 +25,15 @@ fun IssuesModule(
     strictMode: StrictModeConfig = StrictModeConfig(),
     builder: IssuesConfig.Builder.() -> Unit = {}
 ): PerformanceModule<IssuesConfig, IssueInfo> {
-    val config = IssuesConfig.Builder.apply(builder).build()
+    val config = IssuesConfig.Builder().apply(builder).build()
     val application = context.applicationContext as Application
     return PerformanceModule(
         config = config,
         performance = IssuesPerformance(
-            issuesWatcher = IssuesWatcher(detectors = buildDetectors(config, anr, slowStart, strictMode, application)),
+            issuesWatcher = IssuesWatcher(
+                detectors = buildDetectors(config, anr, slowStart, strictMode, application),
+                config = config
+            ),
             logger = config.logger
         )
     )

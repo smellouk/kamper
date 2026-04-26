@@ -16,7 +16,7 @@ actual val GcModule: PerformanceModule<GcConfig, GcInfo>
 @Suppress("FunctionNaming")
 fun GcModule(
     builder: GcConfig.Builder.() -> Unit
-): PerformanceModule<GcConfig, GcInfo> = with(GcConfig.Builder.apply(builder).build()) {
+): PerformanceModule<GcConfig, GcInfo> = with(GcConfig.Builder().apply(builder).build()) {
     PerformanceModule(config = this, performance = createPerformance(logger))
 }
 

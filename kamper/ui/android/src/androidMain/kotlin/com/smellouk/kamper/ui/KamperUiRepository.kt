@@ -2,6 +2,7 @@ package com.smellouk.kamper.ui
 
 import android.app.Application
 import android.content.Context
+import java.io.OutputStream
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -46,6 +47,17 @@ internal actual class KamperUiRepository(
     actual fun startRecording() = recordingManager.startRecording()
     actual fun stopRecording() = recordingManager.stopRecording()
     actual fun exportTrace(): ByteArray = recordingManager.exportTrace()
+
+    /**
+     * Streams the current recording buffer to [out] as a gzip-compressed Perfetto trace.
+     * The caller owns [out] (typically a [java.io.FileOutputStream]) and must close it
+     * after this method returns. Memory-efficient alternative to [exportTrace] for long
+     * recordings — does not hold the protobuf bytes in memory.
+     */
+    fun exportTraceToFile(out: OutputStream) {
+        recordingManager.exportTraceToFile(out)
+    }
+
     actual fun clearRecording() = recordingManager.clearRecording()
     actual fun startEngine() = lifecycleManager.startEngine()
     actual fun stopEngine() = lifecycleManager.stopEngine()

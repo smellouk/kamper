@@ -1,6 +1,7 @@
 package com.smellouk.kamper.issues.detector
 
 import android.content.Context
+import android.util.Log
 import com.smellouk.kamper.issues.CrashConfig
 import com.smellouk.kamper.issues.Issue
 import com.smellouk.kamper.issues.IssueType
@@ -10,10 +11,18 @@ internal class CrashDetector(
     private val config: CrashConfig,
     private val context: Context
 ) : IssueDetector {
+    private companion object {
+        private const val TAG = "CrashDetector"
+    }
+
     private var previousHandler: Thread.UncaughtExceptionHandler? = null
 
     override fun start(pingIntervalMs: Long, onIssue: (Issue) -> Unit) {
         previousHandler = Thread.getDefaultUncaughtExceptionHandler()
+        if (previousHandler != null) {
+            val handlerName = previousHandler?.javaClass?.name
+            Log.w(TAG, "CrashDetector: replacing existing UncaughtExceptionHandler: $handlerName")
+        }
         Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
             val stackTrace = buildString {
                 append(throwable.stackTraceToString())

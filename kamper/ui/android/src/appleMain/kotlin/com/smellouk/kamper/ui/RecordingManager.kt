@@ -37,7 +37,7 @@ internal class RecordingManager(
         _isRecording.value = false
     }
 
-    fun exportTrace(): ByteArray = PerfettoExporter.export(recordingBuffer.toList())
+    fun exportTrace(): ByteArray = ByteArray(0) // Perfetto export is Android-only
 
     fun clearRecording() {
         recordingBuffer.clear()

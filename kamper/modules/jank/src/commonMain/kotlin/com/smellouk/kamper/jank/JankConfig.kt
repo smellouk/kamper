@@ -4,6 +4,13 @@ import com.smellouk.kamper.api.Config
 import com.smellouk.kamper.api.EMPTY
 import com.smellouk.kamper.api.Logger
 
+/**
+ * Configuration for the jank detection module. Reports an issue when a frame's render time exceeds
+ * [jankThresholdMs] (default 16 ms ≈ one refresh interval on a 60 Hz display).
+ *
+ * @property jankThresholdMs Frame render time above which the frame is reported as janky.
+ * @property logger Logger used for module-internal diagnostic output. Defaults to [Logger.EMPTY].
+ */
 data class JankConfig(
     override val isEnabled: Boolean,
     override val intervalInMs: Long,
@@ -19,7 +26,7 @@ data class JankConfig(
         )
     }
 
-    object Builder {
+    class Builder {
         var isEnabled: Boolean = DEFAULT.isEnabled
         var intervalInMs: Long = DEFAULT.intervalInMs
         var jankThresholdMs: Long = DEFAULT.jankThresholdMs

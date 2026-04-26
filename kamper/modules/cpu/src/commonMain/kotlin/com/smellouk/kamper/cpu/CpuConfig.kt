@@ -4,6 +4,12 @@ import com.smellouk.kamper.api.Config
 import com.smellouk.kamper.api.EMPTY
 import com.smellouk.kamper.api.Logger
 
+/**
+ * Configuration for the CPU monitoring module. Samples per-process CPU utilisation at the configured
+ * interval and emits a [CpuInfo] update to listeners.
+ *
+ * @property logger Logger used for module-internal diagnostic output. Defaults to [Logger.EMPTY].
+ */
 data class CpuConfig(
     override val isEnabled: Boolean,
     override val intervalInMs: Long,
@@ -13,7 +19,7 @@ data class CpuConfig(
         val DEFAULT = CpuConfig(true, 1000, Logger.EMPTY)
     }
 
-    object Builder {
+    class Builder {
         var isEnabled: Boolean = DEFAULT.isEnabled
         var intervalInMs: Long = DEFAULT.intervalInMs
         var logger: Logger = DEFAULT.logger

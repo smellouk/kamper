@@ -4,6 +4,13 @@ import com.smellouk.kamper.api.Config
 import com.smellouk.kamper.api.EMPTY
 import com.smellouk.kamper.api.Logger
 
+/**
+ * Configuration for the thermal monitoring module. Polls the device thermal state at the configured
+ * interval and reports throttling levels (where supported by the underlying platform — Android
+ * exposes `PowerManager.getCurrentThermalStatus()` from API 29).
+ *
+ * @property logger Logger used for module-internal diagnostic output. Defaults to [Logger.EMPTY].
+ */
 data class ThermalConfig(
     override val isEnabled: Boolean,
     override val intervalInMs: Long,
@@ -13,7 +20,7 @@ data class ThermalConfig(
         val DEFAULT = ThermalConfig(isEnabled = true, intervalInMs = 2_000L, logger = Logger.EMPTY)
     }
 
-    object Builder {
+    class Builder {
         var isEnabled: Boolean = DEFAULT.isEnabled
         var intervalInMs: Long = DEFAULT.intervalInMs
         var logger: Logger = DEFAULT.logger

@@ -8,6 +8,7 @@ import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.content.FileProvider
 import com.smellouk.kamper.ui.compose.KamperPanel
 import java.io.File
+import java.io.FileOutputStream
 
 class KamperPanelActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,7 +35,7 @@ class KamperPanelActivity : AppCompatActivity() {
                     onClearIssues        = { repo.clearIssues() },
                     onStartRecording     = { repo.startRecording() },
                     onStopRecording      = { repo.stopRecording() },
-                    onExportTrace        = { sharePerfettoTrace(repo.exportTrace()) },
+                    onExportTrace        = { sharePerfettoTrace() },
                     onStartEngine        = { repo.startEngine() },
                     onStopEngine         = { repo.stopEngine() },
                     onRestartEngine      = { repo.restartEngine() },
@@ -45,14 +46,15 @@ class KamperPanelActivity : AppCompatActivity() {
         setContentView(view)
     }
 
-    private fun sharePerfettoTrace(bytes: ByteArray) {
-        if (bytes.isEmpty()) return
-        val fileName = "kamper_${System.currentTimeMillis()}.perfetto-trace"
+    private fun sharePerfettoTrace() {
+        val repo = KamperUi.repository ?: return
+        if (repo.recordingSampleCount.value == 0) return
+        val fileName = "kamper_${System.currentTimeMillis()}.perfetto-trace.gz"
         val file = File(cacheDir, fileName)
-        file.writeBytes(bytes)
+        FileOutputStream(file).use { fos -> repo.exportTraceToFile(fos) }
         val uri = FileProvider.getUriForFile(this, "$packageName.kamper.provider", file)
         val intent = Intent(Intent.ACTION_SEND).apply {
-            type = "application/octet-stream"
+            type = "application/gzip"
             putExtra(Intent.EXTRA_STREAM, uri)
             putExtra(Intent.EXTRA_SUBJECT, fileName)
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)

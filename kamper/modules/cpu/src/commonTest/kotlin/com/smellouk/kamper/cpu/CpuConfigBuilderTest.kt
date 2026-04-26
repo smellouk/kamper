@@ -11,7 +11,7 @@ class CpuConfigBuilderTest {
     @Test
     fun `build should build correct config`() {
         val loggerMock = mock<Logger>()
-        with(CpuConfig.Builder.apply {
+        with(CpuConfig.Builder().apply {
             isEnabled = false
             intervalInMs = INTERVAL_IN_MS
             logger = loggerMock

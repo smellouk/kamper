@@ -16,7 +16,7 @@ actual val JankModule: PerformanceModule<JankConfig, JankInfo>
 @Suppress("FunctionNaming")
 fun JankModule(
     builder: JankConfig.Builder.() -> Unit
-): PerformanceModule<JankConfig, JankInfo> = with(JankConfig.Builder.apply(builder).build()) {
+): PerformanceModule<JankConfig, JankInfo> = with(JankConfig.Builder().apply(builder).build()) {
     PerformanceModule(config = this, performance = createPerformance(logger))
 }
 

@@ -21,7 +21,7 @@ actual val NetworkModule: PerformanceModule<NetworkConfig, NetworkInfo>
 fun NetworkModule(
     builder: NetworkConfig.Builder.() -> Unit
 ): PerformanceModule<NetworkConfig, NetworkInfo> =
-    with(NetworkConfig.Builder.apply(builder).build()) {
+    with(NetworkConfig.Builder().apply(builder).build()) {
         PerformanceModule(
             config = this,
             performance = createPerformance(logger)

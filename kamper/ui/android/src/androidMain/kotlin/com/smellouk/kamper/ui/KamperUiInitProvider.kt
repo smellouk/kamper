@@ -6,6 +6,24 @@ import android.content.pm.ApplicationInfo
 import android.database.Cursor
 import android.net.Uri
 
+/**
+ * Auto-initializes Kamper UI only in debuggable builds.
+ *
+ * This is a development convenience — it is not a security control.
+ * [android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE] can be spoofed on rooted devices and
+ * must not be relied upon as a security boundary.
+ *
+ * For production environments that require explicit initialization control, disable this
+ * provider in your `AndroidManifest.xml`:
+ *
+ * ```xml
+ * <provider
+ *     android:name="com.smellouk.kamper.ui.KamperUiInitProvider"
+ *     android:authorities="${applicationId}.kamper_ui_init"
+ *     android:enabled="false"
+ *     tools:replace="android:enabled" />
+ * ```
+ */
 class KamperUiInitProvider : ContentProvider() {
     override fun onCreate(): Boolean {
         val ctx = context ?: return false

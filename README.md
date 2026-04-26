@@ -271,23 +271,28 @@ addInfoListener<ThermalInfo> { info ->
 
 ```kotlin
 install(
-    IssuesModule {
-        slowSpanEnabled    = true
-        slowSpanThresholdMs = 1_000
-
-        droppedFramesEnabled           = true
-        droppedFrameThresholdMs        = 32
-        droppedFrameConsecutiveThreshold = 3
-
-        crashEnabled          = true
-        memoryPressureEnabled = true
-        anrEnabled            = true
-        slowStartEnabled      = true
+    IssuesModule(
+        context   = context,
+        anr       = AnrConfig(isEnabled = true),
+        slowStart = SlowStartConfig(isEnabled = true)
+    ) {
+        slowSpan = SlowSpanConfig(
+            isEnabled          = true,
+            defaultThresholdMs = 1_000
+        )
+        droppedFrames = DroppedFramesConfig(
+            isEnabled                  = true,
+            frameThresholdMs           = 32,
+            consecutiveFramesThreshold = 3
+        )
+        crash          = CrashConfig(isEnabled = true)
+        memoryPressure = MemoryPressureConfig(isEnabled = true)
     }
 )
 
 addInfoListener<IssueInfo> { info ->
-    println("[${info.severity}] ${info.type}: ${info.message}")
+    val issue = info.issue
+    println("[${issue.severity}] ${issue.type}: ${issue.message}")
 }
 ```
 </details>
@@ -354,6 +359,48 @@ Kamper.start()   // begin polling all installed modules
 Kamper.stop()    // pause polling (modules stay installed)
 Kamper.clear()   // uninstall all modules and remove all listeners
 ```
+
+---
+
+## Security Considerations
+
+Kamper is a developer-facing performance monitoring library. The following items are intentionally
+**convenience features**, not security boundaries. Library consumers shipping to production should
+review them.
+
+### Auto-initialization
+
+`KamperUiInitProvider` auto-initializes Kamper UI in debuggable builds via the `FLAG_DEBUGGABLE`
+application flag. This is a development convenience — it is not a security control.
+`FLAG_DEBUGGABLE` can be spoofed on rooted devices and must not be relied upon as a security boundary.
+
+To opt out of auto-initialization (for production builds, paid users, or sensitive environments),
+disable the provider in your app's `AndroidManifest.xml`:
+
+```xml
+<provider
+    android:name="com.smellouk.kamper.ui.KamperUiInitProvider"
+    android:authorities="${applicationId}.kamper_ui_init"
+    android:enabled="false"
+    tools:replace="android:enabled" />
+```
+
+With auto-init disabled, call `KamperUi.attach(context)` and `KamperUi.configure { ... }` explicitly
+from your `Application.onCreate()`.
+
+### SharedPreferences plain-text storage
+
+Kamper UI persists its configuration (panel toggles, polling intervals, threshold values) in
+plain-text `SharedPreferences` under the file name `kamper_ui_prefs`. Issue history is similarly
+persisted. This data is sandboxed to your application's private storage and is not readable by
+other apps on a non-rooted device, but it is **not encrypted at rest**.
+
+Kamper does not store credentials, PII, or secrets. The only values written are numeric thresholds
+and boolean toggles configured by the developer. If your app extends Kamper to store sensitive
+threshold values (for example, a private API endpoint as part of a custom config), migrate the
+backing store to [`EncryptedSharedPreferences`](https://developer.android.com/reference/androidx/security/crypto/EncryptedSharedPreferences)
+from `androidx.security:security-crypto`. Kamper does not depend on `androidx.security:security-crypto`
+by default — adding it is the consuming app's responsibility.
 
 ---
 

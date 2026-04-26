@@ -15,7 +15,7 @@ actual val ThermalModule: PerformanceModule<ThermalConfig, ThermalInfo>
 fun ThermalModule(
     context: Context,
     builder: ThermalConfig.Builder.() -> Unit = {}
-): PerformanceModule<ThermalConfig, ThermalInfo> = with(ThermalConfig.Builder.apply(builder).build()) {
+): PerformanceModule<ThermalConfig, ThermalInfo> = with(ThermalConfig.Builder().apply(builder).build()) {
     PerformanceModule(config = this, performance = createPerformance(context, logger))
 }
 

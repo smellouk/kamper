@@ -16,8 +16,8 @@ Kamper v1.0 takes an existing KMP performance monitoring library from a rough br
 - [x] **Phase 4: Fragile Lifecycle Hardening** — Harden AndroidOverlayManager, FpsChoreographer exception safety, AnrDetector stop race
 - [x] **Phase 5: CPU Performance Recording Buffer** — Add ring buffer for CPU sample recording and replay
 - [x] **Phase 6: KamperUiRepository Refactor** — Background dispatcher, split classes, settings tests
-- [ ] **Phase 7: KamperPanel Refactor** — Eliminate unnecessary Compose recompositions
-- [ ] **Phase 8: Security, Docs & Scaling** — Security policy, API docs, capacity limits
+- [x] **Phase 7: KamperPanel Refactor** — Eliminate unnecessary Compose recompositions
+- [x] **Phase 8: Security, Docs & Scaling** — Security policy, API docs, capacity limits
 - [ ] **Phase 9: Missing Features** — Implement platform features deferred from earlier phases
 - [ ] **Phase 10: Test Coverage** — Close unit and instrumented test coverage gaps
 - [ ] **Phase 11: Migrate buildSrc to Composite Build** — Replace buildSrc with convention plugins
@@ -149,12 +149,14 @@ Plans:
   1. SECURITY.md exists with vulnerability reporting policy
   2. All public API types have KDoc documentation
   3. CAPACITY.md documents known scaling limits per module
-**Plans**: 3 plans
+**Plans**: 5 plans (3 executed; 2 gap-closure plans added after VERIFICATION found 0/3 ROADMAP must-haves and 4 unfixed code-review findings)
 
 Plans:
-- [ ] 08-01: SECURITY.md and vulnerability policy
-- [ ] 08-02: KDoc coverage for public API
-- [ ] 08-03: CAPACITY.md and scaling documentation
+- [x] 08-01: Existing — SEC-01/SEC-02/SEC-03 inline security framing (KDoc + README + CrashDetector log)
+- [x] 08-02: Existing — SCALE-01 issues capacity + DroppedIssueEvent
+- [x] 08-03: Existing — SCALE-02 Perfetto streaming gzip export
+- [x] 08-04: Gap closure — SECURITY.md, CAPACITY.md, KDoc sweep across 15 public Config types (SEC-01, DOC-02)
+- [x] 08-05: Gap closure — Code review fixes CR-01..CR-04 (README examples, Builder singletons, RecordingManager thread-safety)
 
 ### Phase 9: Missing Features
 **Goal**: Implement platform features deferred from earlier phases
@@ -352,9 +354,9 @@ Plans:
 | 4. Fragile Lifecycle Hardening | 3/3 | Complete | 2026-04-26 |
 | 5. CPU Recording Buffer | 2/2 | Complete | 2026-04-26 |
 | 6. KamperUiRepository Refactor | 6/6 | Complete | 2026-04-26 |
-| 6. KamperUiRepository Refactor | 0/6 | Not started | - |
-| 7. KamperPanel Refactor | 0/5 | Not started | - |
-| 8. Security, Docs & Scaling | 0/3 | Not started | - |
+| 6. KamperUiRepository Refactor | 6/6 | Complete | 2026-04-26 |
+| 7. KamperPanel Refactor | 5/5 | Complete | 2026-04-26 |
+| 8. Security, Docs & Scaling | 5/5 | Complete | 2026-04-26 |
 | 9. Missing Features | 0/6 | Not started | - |
 | 10. Test Coverage | 0/3 | Not started | - |
 | 11. Migrate buildSrc | 0/4 | Not started | - |

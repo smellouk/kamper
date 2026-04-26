@@ -16,7 +16,7 @@ actual val JankModule: PerformanceModule<JankConfig, JankInfo>
 fun JankModule(
     application: Application,
     builder: JankConfig.Builder.() -> Unit = {}
-): PerformanceModule<JankConfig, JankInfo> = with(JankConfig.Builder.apply(builder).build()) {
+): PerformanceModule<JankConfig, JankInfo> = with(JankConfig.Builder().apply(builder).build()) {
     val tracker = JankFrameTracker()
     PerformanceModule(
         config = this,

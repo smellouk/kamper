@@ -17,11 +17,14 @@ fun IssuesModule(
     slowStart: SlowStartConfig = SlowStartConfig(),
     builder: IssuesConfig.Builder.() -> Unit = {}
 ): PerformanceModule<IssuesConfig, IssueInfo> {
-    val config = IssuesConfig.Builder.apply(builder).build()
+    val config = IssuesConfig.Builder().apply(builder).build()
     return PerformanceModule(
         config = config,
         performance = IssuesPerformance(
-            issuesWatcher = IssuesWatcher(detectors = buildDetectors(config, anr)),
+            issuesWatcher = IssuesWatcher(
+                detectors = buildDetectors(config, anr),
+                config = config
+            ),
             logger = config.logger
         )
     )

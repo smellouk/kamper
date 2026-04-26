@@ -18,7 +18,7 @@ actual val FpsModule: PerformanceModule<FpsConfig, FpsInfo>
 @Suppress("FunctionNaming")
 fun FpsModule(
     builder: FpsConfig.Builder.() -> Unit
-): PerformanceModule<FpsConfig, FpsInfo> = with(FpsConfig.Builder.apply(builder).build()) {
+): PerformanceModule<FpsConfig, FpsInfo> = with(FpsConfig.Builder().apply(builder).build()) {
     PerformanceModule(
         config = this,
         performance = createPerformance(logger)
