@@ -45,10 +45,13 @@ internal object ApiLevelProvider {
 internal object ProcStatAccessibilityProvider {
     fun isAccessible(): Boolean = try {
         val line = FileInputStream("/proc/stat").bufferedReader().use { it.readLine() }
-            ?: return false
+            ?: run { Log.d("Kamper/CPU", "/proc/stat accessible=false (null line)"); return false }
         val parts = line.trim().split("\\s+".toRegex())
-        parts.size >= 5 && parts.drop(1).any { it.toLongOrNull() ?: 0L > 0L }
+        val result = parts.size >= 5 && parts.drop(1).any { it.toLongOrNull() ?: 0L > 0L }
+        Log.d("Kamper/CPU", "/proc/stat accessible=$result line='$line'")
+        result
     } catch (e: Exception) {
+        Log.d("Kamper/CPU", "/proc/stat accessible=false ${e.javaClass.simpleName}: ${e.message}")
         false
     }
 }

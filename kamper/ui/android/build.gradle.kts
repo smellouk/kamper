@@ -1,6 +1,7 @@
 plugins {
     kotlin("multiplatform")
     id("com.android.library")
+    id("dev.mokkery")
     id(Libs.Plugins.Compose.id)
     id(Libs.Plugins.Compose.kotlinPluginId) version Versions.kotlin
 }
@@ -12,6 +13,11 @@ android {
     compileOptions {
         sourceCompatibility = Config.sourceCompatibility
         targetCompatibility = Config.targetCompatibility
+    }
+    testOptions {
+        unitTests {
+            isReturnDefaultValues = true
+        }
     }
 }
 
@@ -42,6 +48,17 @@ kotlin {
             implementation(Libs.Android.Coroutines.android)
             implementation(Libs.Android.Androidx.core_ktx)
             implementation(Libs.Android.Androidx.appCompat)
+        }
+        val commonTest by getting {
+            dependencies {
+                implementation(kotlin("test"))
+                implementation(Libs.Kmm.Tests.coroutines)
+            }
+        }
+        val androidUnitTest by getting {
+            dependencies {
+                implementation(kotlin("test"))
+            }
         }
     }
 }

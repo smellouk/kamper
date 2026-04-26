@@ -1,5 +1,7 @@
 package com.smellouk.kamper.cpu.repository.source
 
+import android.os.Process
+import android.os.SystemClock
 import com.smellouk.kamper.api.Logger
 import com.smellouk.kamper.cpu.repository.CpuInfoDto
 import io.mockk.every
@@ -8,47 +10,40 @@ import io.mockk.mockkObject
 import io.mockk.mockkStatic
 import io.mockk.unmockkObject
 import io.mockk.unmockkStatic
-import io.mockk.verify
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
-import kotlin.test.assertTrue
 
 @Suppress("IllegalIdentifier")
 class ShellCpuInfoSourceTest {
     private val logger = mockk<Logger>(relaxed = true)
-
     private val classToTest: ShellCpuInfoSource = ShellCpuInfoSource(logger)
 
     @Before
     fun setup() {
+        mockkStatic(Process::class)
+        every { Process.myPid() } returns PID
+
+        mockkStatic(SystemClock::class)
+        mockkObject(ProcFileReader)
         mockkStatic(Runtime::class)
-        mockkStatic(android.os.Process::class)
-        every { android.os.Process.myPid() } returns PID
-        mockkObject(ShellProcFileReader)
+        every { Runtime.getRuntime().availableProcessors() } returns NUM_CORES
     }
 
     @After
     fun tearDown() {
-        unmockkObject(ShellProcFileReader)
-        unmockkStatic(android.os.Process::class)
+        unmockkStatic(Process::class)
+        unmockkStatic(SystemClock::class)
+        unmockkObject(ProcFileReader)
         unmockkStatic(Runtime::class)
     }
 
     @Test
-    fun `getCpuInfoDto never invokes Runtime exec`() {
-        stubReads(PROC_STAT_LINE_1, PROC_PID_STAT_LINE_1)
-
-        classToTest.getCpuInfoDto()
-
-        verify(exactly = 0) { Runtime.getRuntime().exec(any<String>()) }
-    }
-
-    @Test
-    fun `getCpuInfoDto returns INVALID on first call before any cached snapshot exists`() {
-        stubReads(PROC_STAT_LINE_1, PROC_PID_STAT_LINE_1)
+    fun `getCpuInfoDto returns INVALID on first call (no delta yet)`() {
+        every { ProcFileReader.getCpuProcPidStatTime(PID) } returns PID_STAT_SAMPLE_1
+        every { SystemClock.elapsedRealtime() } returns 0L
 
         val dto = classToTest.getCpuInfoDto()
 
@@ -56,25 +51,70 @@ class ShellCpuInfoSourceTest {
     }
 
     @Test
-    fun `getCpuInfoDto returns valid delta on second call after cache is seeded`() {
-        stubReads(PROC_STAT_LINE_1, PROC_PID_STAT_LINE_1)
-        classToTest.getCpuInfoDto()
+    fun `getCpuInfoDto returns valid dto with correct appTime on second call`() {
+        every { ProcFileReader.getCpuProcPidStatTime(PID) } returnsMany listOf(
+            PID_STAT_SAMPLE_1,
+            PID_STAT_SAMPLE_2
+        )
+        every { SystemClock.elapsedRealtime() } returnsMany listOf(0L, ELAPSED_MS)
 
-        stubReads(PROC_STAT_LINE_2, PROC_PID_STAT_LINE_2)
+        classToTest.getCpuInfoDto()  // first call — cache only
         val dto = classToTest.getCpuInfoDto()
 
         assertNotEquals(CpuInfoDto.INVALID, dto)
-        assertTrue(dto.totalTime >= 0.0)
-        assertTrue(dto.userTime >= 0.0)
-        assertTrue(dto.systemTime >= 0.0)
-        assertTrue(dto.idleTime >= 0.0)
-        assertTrue(dto.ioWaitTime >= 0.0)
+        assertEquals(EXPECTED_APP_DELTA, dto.appTime, DELTA_TOLERANCE)
     }
 
     @Test
-    fun `getCpuInfoDto returns INVALID when proc stat read throws`() {
-        every { ShellProcFileReader.getPidStatLine(PID) } returns PROC_PID_STAT_LINE_1
-        every { ShellProcFileReader.getStatLine() } throws RuntimeException("SELinux: /proc/stat denied")
+    fun `getCpuInfoDto returns correct totalTime based on cores and elapsed time`() {
+        every { ProcFileReader.getCpuProcPidStatTime(PID) } returnsMany listOf(
+            PID_STAT_SAMPLE_1,
+            PID_STAT_SAMPLE_2
+        )
+        every { SystemClock.elapsedRealtime() } returnsMany listOf(0L, ELAPSED_MS)
+
+        classToTest.getCpuInfoDto()  // first call
+        val dto = classToTest.getCpuInfoDto()
+
+        // totalTicks = (elapsedMs / 10.0) * numCores = (1000 / 10.0) * 4 = 400
+        assertEquals(EXPECTED_TOTAL_TICKS, dto.totalTime, DELTA_TOLERANCE)
+    }
+
+    @Test
+    fun `getCpuInfoDto returns idleTime as totalTime minus appDelta`() {
+        every { ProcFileReader.getCpuProcPidStatTime(PID) } returnsMany listOf(
+            PID_STAT_SAMPLE_1,
+            PID_STAT_SAMPLE_2
+        )
+        every { SystemClock.elapsedRealtime() } returnsMany listOf(0L, ELAPSED_MS)
+
+        classToTest.getCpuInfoDto()  // first call
+        val dto = classToTest.getCpuInfoDto()
+
+        assertEquals(EXPECTED_TOTAL_TICKS - EXPECTED_APP_DELTA, dto.idleTime, DELTA_TOLERANCE)
+    }
+
+    @Test
+    fun `getCpuInfoDto returns correct user and system deltas from pid stat`() {
+        every { ProcFileReader.getCpuProcPidStatTime(PID) } returnsMany listOf(
+            PID_STAT_SAMPLE_1,
+            PID_STAT_SAMPLE_2
+        )
+        every { SystemClock.elapsedRealtime() } returnsMany listOf(0L, ELAPSED_MS)
+
+        classToTest.getCpuInfoDto()  // first call
+        val dto = classToTest.getCpuInfoDto()
+
+        // userDelta = (utime2+cutime2) - (utime1+cutime1) = (150+25) - (100+20) = 55
+        assertEquals(EXPECTED_USER_DELTA, dto.userTime, DELTA_TOLERANCE)
+        // sysDelta = (stime2+cstime2) - (stime1+cstime1) = (75+15) - (50+10) = 30
+        assertEquals(EXPECTED_SYS_DELTA, dto.systemTime, DELTA_TOLERANCE)
+        assertEquals(0.0, dto.ioWaitTime, DELTA_TOLERANCE)
+    }
+
+    @Test
+    fun `getCpuInfoDto returns INVALID when pid stat read fails`() {
+        every { ProcFileReader.getCpuProcPidStatTime(PID) } throws RuntimeException("read failed")
 
         val dto = classToTest.getCpuInfoDto()
 
@@ -82,43 +122,37 @@ class ShellCpuInfoSourceTest {
     }
 
     @Test
-    fun `getCpuInfoDto computes correct deltas from two seeded readings`() {
-        // PROC_STAT_LINE_1: user=100, nice=0, system=50, idle=800, iowait=10, total=965
-        // PROC_STAT_LINE_2: user=200, nice=0, system=100, idle=1600, iowait=20, total=1930
-        // Deltas: totalTime=965, userTime=100, systemTime=50, idleTime=800, ioWaitTime=10
-        stubReads(PROC_STAT_LINE_1, PROC_PID_STAT_LINE_1)
-        classToTest.getCpuInfoDto()
+    fun `getCpuInfoDto returns INVALID when pid stat line has too few fields`() {
+        every { ProcFileReader.getCpuProcPidStatTime(PID) } returns "123 (myapp) S 1 2"
+        every { SystemClock.elapsedRealtime() } returns 0L
 
-        stubReads(PROC_STAT_LINE_2, PROC_PID_STAT_LINE_2)
         val dto = classToTest.getCpuInfoDto()
 
-        assertEquals(965.0, dto.totalTime, DELTA_TOLERANCE)
-        assertEquals(100.0, dto.userTime, DELTA_TOLERANCE)
-        assertEquals(50.0, dto.systemTime, DELTA_TOLERANCE)
-        assertEquals(800.0, dto.idleTime, DELTA_TOLERANCE)
-        assertEquals(10.0, dto.ioWaitTime, DELTA_TOLERANCE)
-    }
-
-    private fun stubReads(procStatLine: String, procPidStatLine: String) {
-        every { ShellProcFileReader.getStatLine() } returns procStatLine
-        every { ShellProcFileReader.getPidStatLine(PID) } returns procPidStatLine
+        assertEquals(CpuInfoDto.INVALID, dto)
     }
 }
 
 private const val PID = 11916
+private const val NUM_CORES = 4
+private const val ELAPSED_MS = 1000L
 private const val DELTA_TOLERANCE = 0.001
 
-// /proc/stat first line — note double space after "cpu" per kernel format:
-// user=100, nice=0, system=50, idle=800, iowait=10, irq=0, softirq=0, steal=5; total=965
-private const val PROC_STAT_LINE_1 = "cpu  100 0 50 800 10 0 0 5 0 0"
+// utime=100, stime=50, cutime=20, cstime=10 → total=180
+private const val PID_STAT_SAMPLE_1 =
+    "$PID (com.smellouk.k+) S 296 296 0 0 -1 1077936448 1000 0 0 0 100 50 20 10 10 -10 32 0 123456"
 
-// user=200, nice=0, system=100, idle=1600, iowait=20, irq=0, softirq=0, steal=10; total=1930
-// Deltas vs line 1: total=965, user=100, system=50, idle=800, iowait=10
-private const val PROC_STAT_LINE_2 = "cpu  200 0 100 1600 20 0 0 10 0 0"
+// utime=150, stime=75, cutime=25, cstime=15 → total=265, delta=265-180=85
+private const val PID_STAT_SAMPLE_2 =
+    "$PID (com.smellouk.k+) S 296 296 0 0 -1 1077936448 1000 0 0 0 150 75 25 15 10 -10 32 0 123456"
 
-// /proc/[pid]/stat — indices 13-16 are utime/stime/cutime/cstime
-private const val PROC_PID_STAT_LINE_1 =
-    "11916 (kamper) S 1 1 0 0 -1 0 0 0 0 0 0 0 100 50 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0"
+// userDelta = (utime2+cutime2) - (utime1+cutime1) = (150+25) - (100+20) = 55
+private const val EXPECTED_USER_DELTA = 55.0
 
-private const val PROC_PID_STAT_LINE_2 =
-    "11916 (kamper) S 1 1 0 0 -1 0 0 0 0 0 0 0 200 100 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0"
+// sysDelta = (stime2+cstime2) - (stime1+cstime1) = (75+15) - (50+10) = 30
+private const val EXPECTED_SYS_DELTA = 30.0
+
+// appDelta = userDelta + sysDelta = 55 + 30 = 85
+private const val EXPECTED_APP_DELTA = 85.0
+
+// totalTicks = (1000 / 10.0) * 4 = 400
+private const val EXPECTED_TOTAL_TICKS = 400.0

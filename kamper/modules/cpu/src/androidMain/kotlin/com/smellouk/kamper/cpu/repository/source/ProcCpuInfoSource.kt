@@ -16,10 +16,10 @@ internal class ProcCpuInfoSource(private val logger: Logger) : CpuInfoSource {
 
     override fun getCpuInfoDto(): CpuInfoDto {
         val pid = Process.myPid()
-        val statLine = try { ProcFileReader.getCpuProcStatTime().also { Log.d("Kamper/CPU/Proc", "/proc/stat first line: $it") } }
-            catch (e: Exception) { Log.e("Kamper/CPU/Proc", "/proc/stat read failed: ${e.message}"); throw e }
-        val pidStatLine = try { ProcFileReader.getCpuProcPidStatTime(pid).also { Log.d("Kamper/CPU/Proc", "/proc/$pid/stat first line: $it") } }
-            catch (e: Exception) { Log.e("Kamper/CPU/Proc", "/proc/$pid/stat read failed: ${e.message}"); throw e }
+        val statLine = try { ProcFileReader.getCpuProcStatTime().also { Log.d("Kamper/CPU/Proc", "/proc/stat line: $it") } }
+            catch (e: Exception) { Log.e("Kamper/CPU/Proc", "/proc/stat read failed: ${e.javaClass.simpleName}: ${e.message}"); return CpuInfoDto.INVALID }
+        val pidStatLine = try { ProcFileReader.getCpuProcPidStatTime(pid).also { Log.d("Kamper/CPU/Proc", "/proc/$pid/stat line: $it") } }
+            catch (e: Exception) { Log.e("Kamper/CPU/Proc", "/proc/$pid/stat read failed: ${e.javaClass.simpleName}: ${e.message}"); return CpuInfoDto.INVALID }
         val currentCpuInfoDto = parse(statLine, pidStatLine)
 
         Log.d("Kamper/CPU/Proc", "parsed current=$currentCpuInfoDto cached=${if (this::cachedDto.isInitialized) cachedDto else null}")
