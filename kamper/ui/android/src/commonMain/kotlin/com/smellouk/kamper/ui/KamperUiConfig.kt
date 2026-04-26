@@ -3,7 +3,8 @@ package com.smellouk.kamper.ui
 data class KamperUiConfig(
     var isEnabled: Boolean = true,
     var intervalInMs: Long = 1_000L,
-    var position: ChipPosition = ChipPosition.CENTER_END
+    var position: ChipPosition = ChipPosition.CENTER_END,
+    var maxRecordingSamples: Int = 4_200
 )
 
 enum class ChipPosition {

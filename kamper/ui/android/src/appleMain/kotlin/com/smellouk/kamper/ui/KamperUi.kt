@@ -73,7 +73,8 @@ actual object KamperUi {
 
     actual fun attach() {
         if (!config.isEnabled) return
-        val repo = KamperUiRepository().also { repository = it }
+        val repo = KamperUiRepository(maxRecordingSamples = config.maxRecordingSamples.coerceAtLeast(100))
+            .also { repository = it }
         val rootVC = UIApplication.sharedApplication.keyWindow?.rootViewController ?: return
 
         UIScreen.mainScreen.bounds.useContents {
@@ -201,6 +202,7 @@ actual object KamperUi {
                 settings             = repo.settings,
                 isRecording          = repo.isRecording,
                 recordingSampleCount = repo.recordingSampleCount,
+                maxRecordingSamples  = repo.maxRecordingSamples,
                 onSettingsChange     = { repo.updateSettings(it) },
                 onClearIssues        = { repo.clearIssues() },
                 onStartRecording     = { repo.startRecording() },

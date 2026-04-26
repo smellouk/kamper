@@ -29,6 +29,7 @@ class KamperPanelActivity : AppCompatActivity() {
                     settings             = repo.settings,
                     isRecording          = repo.isRecording,
                     recordingSampleCount = repo.recordingSampleCount,
+                    maxRecordingSamples  = repo.maxRecordingSamples,
                     onSettingsChange     = { repo.updateSettings(it) },
                     onClearIssues        = { repo.clearIssues() },
                     onStartRecording     = { repo.startRecording() },

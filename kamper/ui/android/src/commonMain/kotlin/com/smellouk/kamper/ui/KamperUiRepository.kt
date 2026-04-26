@@ -7,6 +7,7 @@ internal expect class KamperUiRepository {
     val settings: StateFlow<KamperUiSettings>
     val isRecording: StateFlow<Boolean>
     val recordingSampleCount: StateFlow<Int>
+    val maxRecordingSamples: Int
     fun updateSettings(s: KamperUiSettings)
     fun clearIssues()
     fun startRecording()

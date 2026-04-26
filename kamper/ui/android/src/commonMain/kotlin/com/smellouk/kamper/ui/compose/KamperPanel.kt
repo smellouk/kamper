@@ -54,6 +54,7 @@ internal fun KamperPanel(
     settings: StateFlow<KamperUiSettings>,
     isRecording: StateFlow<Boolean>,
     recordingSampleCount: StateFlow<Int>,
+    maxRecordingSamples: Int,
     onSettingsChange: (KamperUiSettings) -> Unit,
     onClearIssues: () -> Unit,
     onStartRecording: () -> Unit,
@@ -150,6 +151,7 @@ internal fun KamperPanel(
                         1    -> PerfettoTab(
                             isRecording = recording,
                             sampleCount = sampleCount,
+                            maxRecordingSamples = maxRecordingSamples,
                             onStartRecording = onStartRecording,
                             onStopRecording = onStopRecording,
                             onExportTrace = onExportTrace

@@ -19,7 +19,8 @@ actual object KamperUi {
     internal fun attach(context: Context) {
         if (!config.isEnabled) return
         val app = context.applicationContext as Application
-        val repo = KamperUiRepository(app).also { repository = it }
+        val repo = KamperUiRepository(app, config.maxRecordingSamples.coerceAtLeast(100))
+            .also { repository = it }
         overlayManager = AndroidOverlayManager(app, repo.state, repo.settings, config, repo::clearIssues).also { it.show() }
     }
 

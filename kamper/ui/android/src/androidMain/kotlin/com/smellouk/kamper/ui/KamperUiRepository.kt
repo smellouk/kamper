@@ -43,9 +43,11 @@ import kotlinx.coroutines.flow.update
 private const val HISTORY_SIZE = 60
 private const val MAX_ISSUES = 100
 private const val PREF_ISSUES = "issues_list"
-private const val MAX_RECORDING_SAMPLES = 4_200 // ~10 min at 7 metrics/s
 
-internal actual class KamperUiRepository(context: Context) {
+internal actual class KamperUiRepository(
+    context: Context,
+    actual val maxRecordingSamples: Int
+) {
     private val appContext = context.applicationContext as Application
     private val prefs = appContext.getSharedPreferences("kamper_ui_prefs", Context.MODE_PRIVATE)
 
@@ -146,7 +148,7 @@ internal actual class KamperUiRepository(context: Context) {
 
     private fun record(trackId: Int, value: Double) {
         if (!_isRecording.value) return
-        if (recordingBuffer.size >= MAX_RECORDING_SAMPLES) recordingBuffer.removeFirst()
+        if (recordingBuffer.size >= maxRecordingSamples) recordingBuffer.removeFirst()
         recordingBuffer.addLast(RecordedSample(nowNs(), trackId, value))
         _recordingSampleCount.value = recordingBuffer.size
     }

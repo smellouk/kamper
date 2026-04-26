@@ -49,6 +49,7 @@ private const val URL_UI = "https://ui.perfetto.dev"
 internal fun PerfettoTab(
     isRecording: Boolean,
     sampleCount: Int,
+    maxRecordingSamples: Int,
     onStartRecording: () -> Unit,
     onStopRecording: () -> Unit,
     onExportTrace: () -> Unit
@@ -100,7 +101,11 @@ internal fun PerfettoTab(
                     fontWeight = FontWeight.SemiBold,
                     modifier = Modifier.weight(1f)
                 )
-                RecordingBadge(isRecording = isRecording, sampleCount = sampleCount)
+                RecordingBadge(
+                    isRecording = isRecording,
+                    sampleCount = sampleCount,
+                    maxRecordingSamples = maxRecordingSamples
+                )
             }
 
             // Control buttons row
@@ -201,7 +206,14 @@ internal expect val showAdbGuide: Boolean
 // ── Recording badge with live elapsed timer ───────────────────────────────────
 
 @Composable
-private fun RecordingBadge(isRecording: Boolean, sampleCount: Int) {
+private fun RecordingBadge(
+    isRecording: Boolean,
+    sampleCount: Int,
+    maxRecordingSamples: Int
+) {
+    val warningSampleCount = maxRecordingSamples * 9 / 10
+    val isWarning = isRecording && sampleCount >= warningSampleCount
+
     var elapsed by remember { mutableStateOf(0) }
     LaunchedEffect(isRecording) {
         elapsed = 0
@@ -215,12 +227,17 @@ private fun RecordingBadge(isRecording: Boolean, sampleCount: Int) {
         transitionSpec = { fadeIn() togetherWith fadeOut() },
         label = "recording_badge"
     ) { recording ->
+        val badgeColor = when {
+            recording && isWarning -> KamperTheme.WARNING
+            recording              -> KamperTheme.RED
+            else                   -> KamperTheme.SUBTEXT
+        }
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .clip(RoundedCornerShape(4.dp))
                 .background(
-                    if (recording) KamperTheme.RED.copy(alpha = 0.15f)
+                    if (recording) badgeColor.copy(alpha = 0.15f)
                     else KamperTheme.SURFACE.copy(alpha = 0.6f)
                 )
                 .padding(horizontal = 8.dp, vertical = 3.dp)
@@ -229,7 +246,7 @@ private fun RecordingBadge(isRecording: Boolean, sampleCount: Int) {
                 modifier = Modifier
                     .size(6.dp)
                     .clip(CircleShape)
-                    .background(if (recording) KamperTheme.RED else KamperTheme.SUBTEXT)
+                    .background(if (recording) badgeColor else KamperTheme.SUBTEXT)
             )
             Spacer(Modifier.width(5.dp))
             if (recording) {
@@ -237,13 +254,25 @@ private fun RecordingBadge(isRecording: Boolean, sampleCount: Int) {
                 val s = elapsed % 60
                 val mm = m.toString().padStart(2, '0')
                 val ss = s.toString().padStart(2, '0')
-                Text(
-                    "REC  $mm:$ss  $sampleCount pts",
-                    color = KamperTheme.RED,
-                    fontSize = 10.sp,
-                    fontWeight = FontWeight.Bold,
-                    fontFamily = FontFamily.Monospace
-                )
+                Column {
+                    Text(
+                        "REC  $mm:$ss  $sampleCount pts",
+                        color = badgeColor,
+                        fontSize = 10.sp,
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = FontFamily.Monospace
+                    )
+                    if (isWarning) {
+                        val pct = sampleCount * 100 / maxRecordingSamples
+                        Text(
+                            "⚠ Buffer ${pct}% full",
+                            color = KamperTheme.WARNING,
+                            fontSize = 10.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            fontFamily = FontFamily.Monospace
+                        )
+                    }
+                }
             } else {
                 Text(
                     if (sampleCount > 0) "STOPPED  $sampleCount pts" else "IDLE",

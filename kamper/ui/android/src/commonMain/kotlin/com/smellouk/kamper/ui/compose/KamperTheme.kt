@@ -16,6 +16,7 @@ internal data class KamperColors(
     val PEACH: Color,
     val TEAL: Color,
     val RED: Color,
+    val WARNING: Color,
     val YELLOW: Color,
     val MAUVE: Color,
     val TEXT: Color,
@@ -34,6 +35,7 @@ internal data class KamperColors(
             PEACH    = Color(0xFFFAB387),
             TEAL     = Color(0xFF94E2D5),
             RED      = Color(0xFFF38BA8),
+            WARNING  = Color(0xFFFFA500),
             YELLOW   = Color(0xFFF9E2AF),
             MAUVE    = Color(0xFFCBA6F7),
             TEXT     = Color(0xFFCDD6F4),
@@ -51,6 +53,7 @@ internal data class KamperColors(
             PEACH    = Color(0xFFFE640B),
             TEAL     = Color(0xFF179299),
             RED      = Color(0xFFD20F39),
+            WARNING  = Color(0xFFFFA500),
             YELLOW   = Color(0xFFDF8E1D),
             MAUVE    = Color(0xFF8839EF),
             TEXT     = Color(0xFF4C4F69),
@@ -81,6 +84,7 @@ internal object KamperTheme {
     val PEACH: Color    @Composable get() = LocalKamperColors.current.PEACH
     val TEAL: Color     @Composable get() = LocalKamperColors.current.TEAL
     val RED: Color      @Composable get() = LocalKamperColors.current.RED
+    val WARNING: Color  @Composable get() = LocalKamperColors.current.WARNING
     val YELLOW: Color   @Composable get() = LocalKamperColors.current.YELLOW
     val MAUVE: Color    @Composable get() = LocalKamperColors.current.MAUVE
     val TEXT: Color     @Composable get() = LocalKamperColors.current.TEXT

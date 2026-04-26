@@ -44,7 +44,9 @@ private const val HISTORY_SIZE = 60
 private const val MAX_ISSUES = 100
 private const val PREF_ISSUES = "kamper_issues_list"
 
-internal actual class KamperUiRepository {
+internal actual class KamperUiRepository(
+    actual val maxRecordingSamples: Int = 4_200
+) {
     private val defaults = NSUserDefaults.standardUserDefaults
 
     // ── Settings persistence ──────────────────────────────────────────────────
