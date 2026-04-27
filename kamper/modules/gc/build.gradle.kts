@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "io.mellouk.kamper.gc"
+    namespace = "com.smellouk.kamper.gc"
 }
 
 kotlin {

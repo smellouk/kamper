@@ -9,6 +9,14 @@ plugins {
 android {
     namespace = "com.smellouk.kamper.ui"
     // compileSdk, minSdk, compileOptions provided by kamper.android.config
+
+    testOptions {
+        unitTests {
+            // Prevents RuntimeException("Method not mocked") when JVM unit tests call
+            // Android framework methods (e.g., SystemClock.elapsedRealtimeNanos()).
+            isReturnDefaultValues = true
+        }
+    }
 }
 
 kotlin {

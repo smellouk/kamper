@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "io.mellouk.kamper.thermal"
+    namespace = "com.smellouk.kamper.thermal"
 }
 
 kotlin {

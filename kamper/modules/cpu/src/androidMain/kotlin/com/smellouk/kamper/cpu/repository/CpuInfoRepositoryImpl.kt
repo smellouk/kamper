@@ -2,7 +2,7 @@ package com.smellouk.kamper.cpu.repository
 
 import android.os.Build
 import android.util.Log
-import io.mellouk.kamper.cpu.BuildConfig
+import com.smellouk.kamper.cpu.BuildConfig
 import com.smellouk.kamper.cpu.CpuInfo
 import com.smellouk.kamper.cpu.repository.source.CpuInfoSource
 import java.io.FileInputStream

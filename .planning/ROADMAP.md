@@ -22,7 +22,7 @@ Kamper v1.0 takes an existing KMP performance monitoring library from a rough br
 - [x] **Phase 10: Test Coverage** — Close unit and instrumented test coverage gaps (completed 2026-04-26)
 - [x] **Phase 11: Migrate buildSrc to Composite Build** — Replace buildSrc with convention plugins (completed 2026-04-26)
 - [x] **Phase 12: Kotlin-Gradle Monorepo Consolidation** — Kotlin-first Gradle structure consolidation (completed 2026-04-26)
-- [ ] **Phase 13: Stack Alignment & Dependency Unification** — Single version catalog for all dependencies
+- [x] **Phase 13: Stack Alignment & Dependency Unification** — Single version catalog for all dependencies (completed 2026-04-27)
 - [ ] **Phase 14: React Native Package** — Create and publish RN wrapper for Kamper engine and UI
 - [ ] **Phase 15: Adjust Kamper UI for React Native** — Align UI layer to support the RN package
 - [ ] **Phase 16: Release Automation** — GitHub Releases, changelogs, multi-registry publishing
@@ -234,11 +234,11 @@ Plans:
 **Plans**: 5 plans
 
 Plans:
-- [ ] 13-01: Audit all dependency declarations
-- [ ] 13-02: Create libs.versions.toml
-- [ ] 13-03: Migrate kamper/* modules
-- [ ] 13-04: Migrate samples/* and demos/*
-- [ ] 13-05: Verify and clean up conflicts
+- [x] 13-01: Audit all dependency declarations
+- [x] 13-02: Create libs.versions.toml
+- [x] 13-03: Migrate kamper/* modules
+- [x] 13-04: Migrate samples/* and demos/*
+- [x] 13-05: Verify and clean up conflicts
 
 ### Phase 14: React Native Package
 **Goal**: Create and publish a React Native package wrapping the Kamper engine and UI
@@ -363,7 +363,7 @@ Plans:
 | 10. Test Coverage | 3/3 | Complete   | 2026-04-26 |
 | 11. Migrate buildSrc | 4/4 | Complete    | 2026-04-26 |
 | 12. Monorepo Consolidation | 5/5 | Complete   | 2026-04-26 |
-| 13. Dependency Unification | 0/5 | Not started | - |
+| 13. Dependency Unification | 5/5 | Complete    | 2026-04-27 |
 | 14. React Native Package | 0/7 | Not started | - |
 | 15. Kamper UI for RN | 0/3 | Not started | - |
 | 16. Release Automation | 0/8 | Not started | - |

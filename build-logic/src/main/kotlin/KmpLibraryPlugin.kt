@@ -64,7 +64,7 @@ class KmpLibraryPlugin : Plugin<Project> {
                 implementation(project.dependencies.kotlin("test-common"))
                 implementation(project.dependencies.kotlin("test-annotations-common"))
                 implementation(
-                    project.dependencies.create("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.1")
+                    project.dependencies.create("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2")
                 )
             }
 
@@ -75,7 +75,7 @@ class KmpLibraryPlugin : Plugin<Project> {
 
             // androidInstrumentedTest deps (root build.gradle.kts lines 85-87)
             sourceSets.findByName("androidInstrumentedTest")?.dependencies {
-                implementation(project.dependencies.create("io.mockk:mockk:1.14.3"))
+                implementation(project.dependencies.create("io.mockk:mockk:1.14.5"))
             }
 
             // jvmTest deps (root build.gradle.kts lines 89-91)

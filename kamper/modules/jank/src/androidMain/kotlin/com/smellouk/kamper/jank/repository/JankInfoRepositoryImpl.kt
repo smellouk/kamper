@@ -1,5 +1,6 @@
 package com.smellouk.kamper.jank.repository
 
+import android.os.Build
 import android.view.FrameMetrics
 import com.smellouk.kamper.jank.JankInfo
 
@@ -9,6 +10,7 @@ internal class JankInfoRepositoryImpl(
 ) : JankInfoRepository {
 
     override fun getInfo(): JankInfo {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) return JankInfo.INVALID
         val snapshot = frameTracker.snapshot()
         if (snapshot.totalFrames == 0) return JankInfo.INVALID
 
@@ -32,6 +34,9 @@ internal data class FrameSnapshot(
 internal class JankFrameTracker {
     private val durations = mutableListOf<Long>()
 
+    // onFrame is only called from Window.OnFrameMetricsAvailableListener which is API 24+;
+    // the caller (JankPerformance) only registers the listener on API >= N.
+    @Suppress("NewApi")
     fun onFrame(metrics: FrameMetrics) {
         val totalNs = metrics.getMetric(FrameMetrics.TOTAL_DURATION)
         if (totalNs > 0) {

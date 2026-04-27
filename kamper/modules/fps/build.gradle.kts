@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "io.mellouk.kamper.fps"
+    namespace = "com.smellouk.kamper.fps"
 }
 
 kotlin {

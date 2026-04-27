@@ -3,7 +3,7 @@ plugins {
 }
 
 android {
-    namespace = "io.mellouk.kamper.api"
+    namespace = "com.smellouk.kamper.api"
 }
 
 kotlin {

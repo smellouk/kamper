@@ -1,6 +1,7 @@
 import com.adarshr.gradle.testlogger.TestLoggerExtension
 import com.adarshr.gradle.testlogger.theme.ThemeType
 import io.gitlab.arturbosch.detekt.Detekt
+import io.gitlab.arturbosch.detekt.DetektCreateBaselineTask
 import java.lang.System.getenv as Env
 
 plugins {
@@ -52,12 +53,31 @@ tasks.named<Detekt>("detekt") {
     description = "Runs a custom detekt build on all project modules"
     setSource(files("$projectDir"))
     config.setFrom(files("$rootDir/quality/code/detekt.yml"))
+    baseline.set(file("$rootDir/quality/code/detekt-baseline.xml"))
     reports {
         html {
             required.set(true)
             outputLocation.set(file("build/reports/detekt.html"))
         }
     }
+    include("**/*.kt")
+    exclude("**/*.kts")
+    exclude("**/resources/")
+    exclude("**/build/")
+    exclude("**/console/")
+    exclude("**/android/")
+    exclude("**/demos/")
+
+    dependencies {
+        detektPlugins(libs.detekt.formatting)
+    }
+}
+
+tasks.named<DetektCreateBaselineTask>("detektBaseline") {
+    description = "Creates a detekt baseline for all project modules"
+    setSource(files("$projectDir"))
+    config.setFrom(files("$rootDir/quality/code/detekt.yml"))
+    baseline.set(file("$rootDir/quality/code/detekt-baseline.xml"))
     include("**/*.kt")
     exclude("**/*.kts")
     exclude("**/resources/")

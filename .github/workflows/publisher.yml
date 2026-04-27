@@ -4,33 +4,40 @@ name: Artifact publisher
 on:
   push:
     tags:
-      - '*' # Whenever pushed new tag
+      - '*'
 env:
-  #Github packages credentials
   KAMPER_GH_USER: ${{ secrets.KAMPER_GH_USER }}
   KAMPER_GH_PAT: ${{ secrets.KAMPER_GH_PAT }}
 
 jobs:
-  gradle:
-    name: Artifact publisher
+  publish-linux:
+    name: Publish (Android / JVM / JS / WASM)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Publish Android/JVM/JS/WASM
+        run: ./gradlew publishAllPublicationsToGithubPackagesRepository
+
+  publish-apple:
+    name: Publish (iOS / macOS / tvOS)
     runs-on: macos-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
-      - name: Cache Gradle Files
-        uses: actions/cache@v2
+      - uses: actions/setup-java@v4
         with:
-          path: |
-            ~/.gradle/caches/
-            ~/.gradle/wrapper/
-          key: cache-gradle
+          distribution: 'temurin'
+          java-version: '17'
 
-      - name: Configure JDK
-        uses: actions/setup-java@v1
-        with:
-          distribution: 'adopt'
-          java-version: 11
+      - uses: gradle/actions/setup-gradle@v4
 
-      - name: Gradle publishing to github packages
+      - name: Publish iOS/macOS/tvOS
         run: ./gradlew publishAllPublicationsToGithubPackagesRepository

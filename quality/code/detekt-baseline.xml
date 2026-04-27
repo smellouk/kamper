@@ -1,0 +1,77 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>ComplexCondition:CpuInfoRepositoryImpl.kt$CpuInfoRepositoryImpl$firstCallComplete &amp;&amp; dto == CpuInfoDto.INVALID &amp;&amp; apiLevel &gt;= Build.VERSION_CODES.O &amp;&amp; !procStatOk</ID>
+    <ID>ComplexCondition:IosNetworkInfoSource.kt$IosNetworkInfoSource$name != null &amp;&amp; !name.startsWith("lo") &amp;&amp; addr != null &amp;&amp; addr.pointed.sa_family.toInt() == AF_LINK</ID>
+    <ID>EmptyFunctionBlock:DroppedFramesDetector.kt$DroppedFramesDetector.&lt;no name provided&gt;${}</ID>
+    <ID>EmptyFunctionBlock:SlowStartDetector.kt$SlowStartDetector.&lt;no name provided&gt;${}</ID>
+    <ID>Filename:TestListeners.kt$com.smellouk.kamper.api.TestListeners.kt</ID>
+    <ID>MagicNumber:AndroidConfigPlugin.kt$AndroidConfigPlugin$21</ID>
+    <ID>MagicNumber:AndroidConfigPlugin.kt$AndroidConfigPlugin$35</ID>
+    <ID>MagicNumber:CpuInfoRepositoryImpl.kt$ProcStatAccessibilityProvider$5</ID>
+    <ID>MagicNumber:CrashDetector.kt$CrashDetector$1048576</ID>
+    <ID>MagicNumber:CrashDetector.kt$CrashDetector$16</ID>
+    <ID>MagicNumber:DroppedFramesDetector.kt$DroppedFramesDetector.&lt;no name provided&gt;$16</ID>
+    <ID>MagicNumber:DroppedFramesDetector.kt$DroppedFramesDetector.&lt;no name provided&gt;$1_000_000L</ID>
+    <ID>MagicNumber:IosFpsTimer.kt$IosFpsTimer$1_000_000_000L</ID>
+    <ID>MagicNumber:JankInfoRepositoryImpl.kt$JankFrameTracker$1_000_000L</ID>
+    <ID>MagicNumber:JvmCpuInfoSource.kt$JvmCpuInfoSource$100.0</ID>
+    <ID>MagicNumber:JvmNetworkInfoSource.kt$JvmNetworkInfoSource$10</ID>
+    <ID>MagicNumber:JvmNetworkInfoSource.kt$JvmNetworkInfoSource$3</ID>
+    <ID>MagicNumber:JvmNetworkInfoSource.kt$JvmNetworkInfoSource$5</ID>
+    <ID>MagicNumber:JvmNetworkInfoSource.kt$JvmNetworkInfoSource$6</ID>
+    <ID>MagicNumber:JvmNetworkInfoSource.kt$JvmNetworkInfoSource$8</ID>
+    <ID>MagicNumber:JvmNetworkInfoSource.kt$JvmNetworkInfoSource$9</ID>
+    <ID>MagicNumber:MacosCpuInfoSource.kt$MacosCpuInfoSource$100.0</ID>
+    <ID>MagicNumber:MacosFpsTimer.kt$MacosFpsTimer$1_000_000_000L</ID>
+    <ID>MagicNumber:MacosNetworkInfoSource.kt$MacosNetworkInfoSource$3</ID>
+    <ID>MagicNumber:MacosNetworkInfoSource.kt$MacosNetworkInfoSource$5</ID>
+    <ID>MagicNumber:MacosNetworkInfoSource.kt$MacosNetworkInfoSource$6</ID>
+    <ID>MagicNumber:MacosNetworkInfoSource.kt$MacosNetworkInfoSource$8</ID>
+    <ID>MagicNumber:MacosNetworkInfoSource.kt$MacosNetworkInfoSource$9</ID>
+    <ID>MagicNumber:MemoryPressureDetector.kt$MemoryPressureDetector$1048576</ID>
+    <ID>MagicNumber:MemoryPressureDetector.kt$MemoryPressureDetector$16</ID>
+    <ID>MagicNumber:PlatformTime.kt$1_000L</ID>
+    <ID>MagicNumber:PlatformTime.kt$1_000_000L</ID>
+    <ID>MagicNumber:PlatformUtils.kt$1_000L</ID>
+    <ID>MagicNumber:PlatformUtils.kt$1_000_000L</ID>
+    <ID>MagicNumber:PlatformUtils.kt$3</ID>
+    <ID>MagicNumber:ShellCpuInfoSource.kt$ShellCpuInfoSource$10.0</ID>
+    <ID>MagicNumber:SlowSpanDetector.kt$SlowSpanDetector$16</ID>
+    <ID>MagicNumber:SlowStartDetector.kt$SlowStartDetector$16</ID>
+    <ID>MagicNumber:StrictModeDetector.kt$StrictModeDetector$16</ID>
+    <ID>MatchingDeclarationName:TestListeners.kt$MockableListener&lt;I : Info&gt; : </ID>
+    <ID>MaxLineLength:CpuInfoRepositoryImpl.kt$CpuInfoRepositoryImpl$Log.d("Kamper/CPU", "platformSupported=false (both sources unavailable) — returning CpuInfo.UNSUPPORTED")</ID>
+    <ID>MaxLineLength:CpuInfoRepositoryImpl.kt$ProcStatAccessibilityProvider$if (BuildConfig.DEBUG) Log.d("Kamper/CPU", "/proc/stat accessible=false ${e.javaClass.simpleName}: ${e.message}")</ID>
+    <ID>MaxLineLength:IssuesConfig.kt$CrashConfig.Builder$fun build()</ID>
+    <ID>MaxLineLength:IssuesConfig.kt$MemoryPressureConfig.Builder$fun build()</ID>
+    <ID>MaxLineLength:IssuesConfig.kt$SlowSpanConfig.Builder$fun build()</ID>
+    <ID>MaxLineLength:IssuesConfig.kt$SlowStartConfig.Builder$fun build()</ID>
+    <ID>MaxLineLength:JsNetworkInfoSource.kt$JsNetworkInfoSource$val uplinkMbps: Double = js("navigator.connection &amp;&amp; navigator.connection.uplink ? +navigator.connection.uplink : 0")</ID>
+    <ID>MaxLineLength:MemoryPressureDetector.kt$MemoryPressureDetector$message = "Heap at ${(heapRatio * 100).toInt()}% of max (threshold: ${(threshold * 100).toInt()}%)"</ID>
+    <ID>MaxLineLength:ProcCpuInfoSource.kt$ProcCpuInfoSource$Log.d("Kamper/CPU/Proc", "parsed current=$currentCpuInfoDto cached=${if (this::cachedDto.isInitialized) cachedDto else null}")</ID>
+    <ID>MaxLineLength:ProcCpuInfoSource.kt$ProcCpuInfoSource$catch (e: Exception) { Log.e("Kamper/CPU/Proc", "/proc/$pid/stat read failed: ${e.javaClass.simpleName}: ${e.message}"); return CpuInfoDto.INVALID }</ID>
+    <ID>MaxLineLength:ProcCpuInfoSource.kt$ProcCpuInfoSource$catch (e: Exception) { Log.e("Kamper/CPU/Proc", "/proc/stat read failed: ${e.javaClass.simpleName}: ${e.message}"); return CpuInfoDto.INVALID }</ID>
+    <ID>MaxLineLength:ProcCpuInfoSource.kt$ProcCpuInfoSource$val</ID>
+    <ID>MaxLineLength:ShellCpuInfoSource.kt$ShellCpuInfoSource$Log.d(TAG, "userDelta=$userDelta sysDelta=$sysDelta appDelta=$appDelta totalTicks=$totalTicks elapsedMs=$elapsedMs numCores=$numCores")</ID>
+    <ID>MaxLineLength:SlowStartDetector.kt$SlowStartDetector$message = "${type.name.replace("_", " ").lowercase().replaceFirstChar { it.uppercase() }} took ${elapsed}ms (threshold: ${threshold}ms)"</ID>
+    <ID>MultiLineIfElse:IosCpuInfoSource.kt$IosCpuInfoSource$CpuInfoDto( totalTime = total, userTime = dUser + dNice, systemTime = dSystem, idleTime = dIdle, ioWaitTime = 0.0, appTime = 0.0 )</ID>
+    <ID>MultiLineIfElse:IosCpuInfoSource.kt$IosCpuInfoSource$CpuInfoDto.INVALID</ID>
+    <ID>MultiLineIfElse:IosMemoryInfoSource.kt$IosMemoryInfoSource$0L</ID>
+    <ID>NoMultipleSpaces:Engine.kt$Engine$ </ID>
+    <ID>NoMultipleSpaces:ShellCpuInfoSourceTest.kt$ShellCpuInfoSourceTest$ </ID>
+    <ID>NoMultipleSpaces:ThermalInfoRepositoryImpl.kt$ThermalInfoRepositoryImpl$ </ID>
+    <ID>NoUnusedImports:CpuInfoMapperTest.kt$com.smellouk.kamper.cpu.repository.CpuInfoMapperTest.kt</ID>
+    <ID>NoUnusedImports:JankPerformance.kt$com.smellouk.kamper.jank.JankPerformance.kt</ID>
+    <ID>NoUnusedImports:Module.kt$com.smellouk.kamper.cpu.Module.kt</ID>
+    <ID>NoUnusedImports:Module.kt$com.smellouk.kamper.fps.Module.kt</ID>
+    <ID>NoUnusedImports:Module.kt$com.smellouk.kamper.jank.Module.kt</ID>
+    <ID>NoUnusedImports:Module.kt$com.smellouk.kamper.memory.Module.kt</ID>
+    <ID>NoUnusedImports:Module.kt$com.smellouk.kamper.network.Module.kt</ID>
+    <ID>ParameterListWrapping:ProcCpuInfoSource.kt$ProcCpuInfoSource$(e: Exception)</ID>
+    <ID>ReturnCount:MacosCpuInfoSource.kt$MacosCpuInfoSource$override fun getCpuInfoDto(): CpuInfoDto</ID>
+    <ID>ReturnCount:ShellCpuInfoSource.kt$ShellCpuInfoSource$override fun getCpuInfoDto(): CpuInfoDto</ID>
+    <ID>SpacingAroundKeyword:ProcCpuInfoSource.kt$ProcCpuInfoSource$catch</ID>
+  </CurrentIssues>
+</SmellBaseline>

@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "io.mellouk.kamper.cpu"
+    namespace = "com.smellouk.kamper.cpu"
     buildFeatures { buildConfig = true }
 }
 

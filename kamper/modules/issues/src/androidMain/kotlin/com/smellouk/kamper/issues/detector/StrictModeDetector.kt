@@ -21,8 +21,12 @@ internal class StrictModeDetector(private val config: StrictModeConfig) : IssueD
             if (config.detectNetwork) detectNetwork()
             if (config.detectCustomSlowCalls) detectCustomSlowCalls()
             if (config.detectUnbufferedIo && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) detectUnbufferedIo()
-            penaltyListener(java.util.concurrent.Executors.newSingleThreadExecutor()) { violation ->
-                onIssue(buildIssue(violation.javaClass.simpleName, violation.stackTraceToString()))
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                penaltyListener(java.util.concurrent.Executors.newSingleThreadExecutor()) { violation ->
+                    onIssue(buildIssue(violation.javaClass.simpleName, violation.stackTraceToString()))
+                }
+            } else {
+                penaltyLog()
             }
         }.build()
 
@@ -30,8 +34,12 @@ internal class StrictModeDetector(private val config: StrictModeConfig) : IssueD
             if (config.detectActivityLeaks) detectActivityLeaks()
             if (config.detectLeakedClosableObjects) detectLeakedClosableObjects()
             if (config.detectLeakedSqliteObjects) detectLeakedSqlLiteObjects()
-            penaltyListener(java.util.concurrent.Executors.newSingleThreadExecutor()) { violation ->
-                onIssue(buildIssue(violation.javaClass.simpleName, violation.stackTraceToString()))
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                penaltyListener(java.util.concurrent.Executors.newSingleThreadExecutor()) { violation ->
+                    onIssue(buildIssue(violation.javaClass.simpleName, violation.stackTraceToString()))
+                }
+            } else {
+                penaltyLog()
             }
         }.build()
 
