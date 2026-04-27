@@ -1,19 +1,42 @@
 pluginManagement { includeBuild("../node_modules/@react-native/gradle-plugin") }
 plugins { id("com.facebook.react.settings") }
-extensions.configure(com.facebook.react.ReactSettingsExtension){ ex -> ex.autolinkLibrariesFromCommand() }
+
+// Gradle's JVM process doesn't load the shell profile, so `npx` from nvm is not on PATH.
+// Use providers.exec (configuration-cache compatible) to ask the login shell for the full path.
+def resolveNpx = { ->
+    try {
+        def result = providers.exec { spec ->
+            spec.commandLine 'zsh', '-l', '-c', 'which npx 2>/dev/null'
+            spec.ignoreExitValue = true
+        }.standardOutput.asText.get().trim()
+        (result && !result.empty) ? result : 'npx'
+    } catch (ignored) {
+        'npx'
+    }
+}
+
+extensions.configure(com.facebook.react.ReactSettingsExtension){ ex ->
+    ex.autolinkLibrariesFromCommand([resolveNpx(), '@react-native-community/cli', 'config'])
+}
+
 rootProject.name = 'demos.rn'
 include ':app'
 includeBuild('../node_modules/@react-native/gradle-plugin')
 
-// Use Kamper modules from source (composite build with dependency substitution)
+// Include monorepo root with explicit substitution — Gradle composite auto-substitution
+// matches project.name (e.g. "gc"), not Maven artifactId (e.g. "gc-module"), so we must
+// enumerate each mapping explicitly.
 includeBuild('../../..') {
     dependencySubstitution {
-        substitute(module('com.smellouk.kamper:engine:1.0.0')).using(project(':kamper:engine'))
-        substitute(module('com.smellouk.kamper:cpu-module:1.0.0')).using(project(':kamper:modules:cpu'))
-        substitute(module('com.smellouk.kamper:fps-module:1.0.0')).using(project(':kamper:modules:fps'))
-        substitute(module('com.smellouk.kamper:memory-module:1.0.0')).using(project(':kamper:modules:memory'))
-        substitute(module('com.smellouk.kamper:network-module:1.0.0')).using(project(':kamper:modules:network'))
-        substitute(module('com.smellouk.kamper:issues-module:1.0.0')).using(project(':kamper:modules:issues'))
-        substitute(module('com.smellouk.kamper:ui-android:1.0.0')).using(project(':kamper:ui:android'))
+        substitute module('com.smellouk.kamper:engine') using project(':kamper:engine')
+        substitute module('com.smellouk.kamper:cpu-module') using project(':kamper:modules:cpu')
+        substitute module('com.smellouk.kamper:fps-module') using project(':kamper:modules:fps')
+        substitute module('com.smellouk.kamper:memory-module') using project(':kamper:modules:memory')
+        substitute module('com.smellouk.kamper:network-module') using project(':kamper:modules:network')
+        substitute module('com.smellouk.kamper:issues-module') using project(':kamper:modules:issues')
+        substitute module('com.smellouk.kamper:jank-module') using project(':kamper:modules:jank')
+        substitute module('com.smellouk.kamper:gc-module') using project(':kamper:modules:gc')
+        substitute module('com.smellouk.kamper:thermal-module') using project(':kamper:modules:thermal')
+        substitute module('com.smellouk.kamper:kmm') using project(':kamper:ui:kmm')
     }
 }

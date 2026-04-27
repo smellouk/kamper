@@ -60,14 +60,14 @@ kotlin {
             dependencies {
                 implementation(compose.preview)
                 implementation("androidx.activity:activity-compose:1.10.1")
-                implementation(project(":kamper:ui:android"))
+                implementation(project(":kamper:ui:kmm"))
             }
         }
 
         val iosMain by creating {
             dependsOn(commonMain)
             dependencies {
-                implementation(project(":kamper:ui:android"))
+                implementation(project(":kamper:ui:kmm"))
             }
         }
         val iosArm64Main by getting { dependsOn(iosMain) }

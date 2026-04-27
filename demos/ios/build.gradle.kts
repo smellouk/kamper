@@ -30,7 +30,7 @@ kotlin {
                 implementation(project(":kamper:modules:jank"))
                 implementation(project(":kamper:modules:gc"))
                 implementation(project(":kamper:modules:thermal"))
-                implementation(project(":kamper:ui:android"))
+                implementation(project(":kamper:ui:kmm"))
             }
         }
     }

@@ -23,7 +23,7 @@ Kamper v1.0 takes an existing KMP performance monitoring library from a rough br
 - [x] **Phase 11: Migrate buildSrc to Composite Build** — Replace buildSrc with convention plugins (completed 2026-04-26)
 - [x] **Phase 12: Kotlin-Gradle Monorepo Consolidation** — Kotlin-first Gradle structure consolidation (completed 2026-04-26)
 - [x] **Phase 13: Stack Alignment & Dependency Unification** — Single version catalog for all dependencies (completed 2026-04-27)
-- [ ] **Phase 14: React Native Package** — Create and publish RN wrapper for Kamper engine and UI
+- [x] **Phase 14: React Native Package** — Create and publish RN wrapper for Kamper engine and UI (completed 2026-04-27)
 - [ ] **Phase 15: Adjust Kamper UI for React Native** — Align UI layer to support the RN package
 - [ ] **Phase 16: Release Automation** — GitHub Releases, changelogs, multi-registry publishing
 - [ ] **Phase 17: Medium Article Series** — Android performance bottlenecks series using Kamper
@@ -251,13 +251,13 @@ Plans:
 **Plans**: 7 plans
 
 Plans:
-- [ ] 14-00: Architecture design and RN bridge approach
-- [ ] 14-01: RN package scaffolding
-- [ ] 14-02: Android bridge — engine API
-- [ ] 14-03: Android bridge — UI (KamperPanel)
-- [ ] 14-04: iOS bridge — engine API
-- [ ] 14-05: RN JavaScript API layer
-- [ ] 14-06: Publish to npm + documentation
+- [x] 14-00: Architecture design and RN bridge approach
+- [x] 14-01: RN package scaffolding
+- [x] 14-02: Android bridge — engine API
+- [x] 14-03: Android bridge — UI (KamperPanel)
+- [x] 14-04: iOS bridge — engine API
+- [x] 14-05: RN JavaScript API layer
+- [x] 14-06: Publish to npm + documentation
 
 ### Phase 15: Adjust Kamper UI for React Native
 **Goal**: Align Kamper UI layer to properly support the React Native package
@@ -364,7 +364,7 @@ Plans:
 | 11. Migrate buildSrc | 4/4 | Complete    | 2026-04-26 |
 | 12. Monorepo Consolidation | 5/5 | Complete   | 2026-04-26 |
 | 13. Dependency Unification | 5/5 | Complete    | 2026-04-27 |
-| 14. React Native Package | 0/7 | Not started | - |
+| 14. React Native Package | 7/7 | Complete    | 2026-04-27 |
 | 15. Kamper UI for RN | 0/3 | Not started | - |
 | 16. Release Automation | 0/8 | Not started | - |
 | 17. Medium Articles | 0/5 | Not started | - |

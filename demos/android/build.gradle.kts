@@ -53,5 +53,5 @@ dependencies {
     implementation(project(":kamper:modules:jank"))
     implementation(project(":kamper:modules:gc"))
     implementation(project(":kamper:modules:thermal"))
-    debugImplementation(project(":kamper:ui:android"))
+    debugImplementation(project(":kamper:ui:kmm"))
 }

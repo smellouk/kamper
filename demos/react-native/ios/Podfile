@@ -29,7 +29,7 @@ target 'KamperRn' do
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
 
-  pod 'KamperNative', :path => 'KamperNative'
+  pod 'react-native-kamper', :path => '../../../kamper/ui/rn'
 
   post_install do |installer|
     react_native_post_install(

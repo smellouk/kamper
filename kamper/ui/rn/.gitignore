@@ -1,0 +1,18 @@
+# Build outputs
+android/build/
+android/.cxx/
+ios/build/
+ios/Pods/
+ios/*.xcworkspace/xcuserdata/
+
+# Codegen-generated
+android/build/generated/
+ios/build/generated/
+
+# Editor
+.idea/
+*.iml
+.DS_Store
+
+# Node (if local installs occur during dev)
+node_modules/

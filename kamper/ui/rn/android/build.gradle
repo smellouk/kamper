@@ -1,0 +1,75 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+
+// kamper.android.config (from build-logic) sets compileSdk=35, minSdk=21, Java 17.
+// Available in the monorepo build context; absent in the demo autolink context — skipped safely.
+try {
+    apply plugin: 'kamper.android.config'
+} catch (org.gradle.api.plugins.UnknownPluginException ignored) { }
+
+// com.facebook.react configures codegen and build-config fields for RN turbo modules.
+// Available only in the RN demo context (node_modules/@react-native/gradle-plugin present).
+try {
+    apply plugin: 'com.facebook.react'
+} catch (org.gradle.api.plugins.UnknownPluginException ignored) { }
+
+android {
+    namespace 'com.smellouk.kamper.rn'
+    // Explicit compileSdk: ensures it is always set even when kamper.android.config is absent.
+    compileSdk = 35
+    defaultConfig {
+        // minSdk 24: RN 0.85 minimum; overrides the kamper.android.config default of 21.
+        minSdk 24
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    kotlinOptions {
+        jvmTarget = '17'
+    }
+
+    sourceSets {
+        main {
+            java {
+                srcDirs += ["${project.buildDir}/generated/source/codegen/java"]
+            }
+        }
+    }
+}
+
+dependencies {
+    implementation 'com.facebook.react:react-android'
+
+    // Dual-context dependency strategy:
+    //   Monorepo context  → project(':kamper:...') resolves directly within the same build.
+    //   Demo autolink context → Maven coordinates; Gradle substitutes them with the monorepo
+    //     projects via the demo's `includeBuild('../../../')` composite-build rule.
+    if (findProject(':kamper:engine') != null) {
+        implementation project(':kamper:engine')
+        implementation project(':kamper:modules:cpu')
+        implementation project(':kamper:modules:fps')
+        implementation project(':kamper:modules:memory')
+        implementation project(':kamper:modules:network')
+        implementation project(':kamper:modules:issues')
+        implementation project(':kamper:modules:jank')
+        implementation project(':kamper:modules:gc')
+        implementation project(':kamper:modules:thermal')
+        debugImplementation project(':kamper:ui:kmm')
+    } else {
+        // Version string is a placeholder; composite-build substitution ignores the version.
+        def v = "local"
+        implementation "com.smellouk.kamper:engine:$v"
+        implementation "com.smellouk.kamper:cpu-module:$v"
+        implementation "com.smellouk.kamper:fps-module:$v"
+        implementation "com.smellouk.kamper:memory-module:$v"
+        implementation "com.smellouk.kamper:network-module:$v"
+        implementation "com.smellouk.kamper:issues-module:$v"
+        implementation "com.smellouk.kamper:jank-module:$v"
+        implementation "com.smellouk.kamper:gc-module:$v"
+        implementation "com.smellouk.kamper:thermal-module:$v"
+        debugImplementation "com.smellouk.kamper:kmm:$v"
+    }
+}

@@ -57,7 +57,9 @@ include(":kamper:modules:jank")
 include(":kamper:modules:gc")
 include(":kamper:modules:thermal")
 
-include(":kamper:ui:android")
+include(":kamper:ui:kmm")
+include(":kamper:ui:rn")
+project(":kamper:ui:rn").projectDir = File(rootDir, "kamper/ui/rn/android")
 
 include(":demos:android")
 include(":demos:jvm")
