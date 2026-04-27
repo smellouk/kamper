@@ -4,6 +4,7 @@ package com.smellouk.kamper.ui.compose
 // IssuesTab.kt, and PerfettoTab.kt. See <interfaces> section of PLAN for source mapping.
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.focusable
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
@@ -41,8 +42,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalClipboardManager
@@ -76,30 +84,36 @@ internal val INTERVAL_OPTIONS = listOf(
 internal fun ThemeToggle(isDark: Boolean, onToggle: () -> Unit) {
     val outerShape = RoundedCornerShape(8.dp)
     val innerShape = RoundedCornerShape(6.dp)
+    var isFocused by remember { mutableStateOf(false) }
     Row(
         modifier = Modifier
             .clip(outerShape)
             .background(KamperTheme.BASE)
-            .border(0.5.dp, KamperTheme.BORDER, outerShape)
+            .border(
+                if (isFocused) 1.5.dp else 0.5.dp,
+                if (isFocused) KamperTheme.BLUE else KamperTheme.BORDER,
+                outerShape
+            )
+            .onFocusChanged { isFocused = it.isFocused }
+            .clickable(onClick = onToggle)
             .padding(2.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        ThemeSegment(icon = "🌙", label = "Dark",  active = isDark,  shape = innerShape, onClick = { if (!isDark) onToggle() })
-        ThemeSegment(icon = "☀",  label = "Light", active = !isDark, shape = innerShape, onClick = { if (isDark)  onToggle() })
+        ThemeSegment(icon = "🌙", label = "Dark",  active = isDark,  shape = innerShape)
+        ThemeSegment(icon = "☀",  label = "Light", active = !isDark, shape = innerShape)
     }
 }
 
 // ── 2. ThemeSegment ────────────────────────────────────────────────────────────
 
 @Composable
-internal fun ThemeSegment(icon: String, label: String, active: Boolean, shape: RoundedCornerShape, onClick: () -> Unit) {
+internal fun ThemeSegment(icon: String, label: String, active: Boolean, shape: RoundedCornerShape) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(3.dp),
         modifier = Modifier
             .clip(shape)
             .background(if (active) KamperTheme.SURFACE1 else Color.Transparent)
-            .clickable(onClick = onClick)
             .padding(horizontal = 7.dp, vertical = 4.dp)
     ) {
         Text(icon, fontSize = 10.sp)
@@ -300,6 +314,7 @@ internal fun ModuleCard(
     extraContent: (@Composable () -> Unit)? = null
 ) {
     var expanded by remember { mutableStateOf(false) }
+    var cardHasFocus by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -307,41 +322,54 @@ internal fun ModuleCard(
             .clip(RoundedCornerShape(10.dp))
             .background(KamperTheme.BASE)
             .border(
-                0.5.dp,
-                if (enabled) color.copy(alpha = 0.3f) else KamperTheme.BORDER,
+                if (cardHasFocus) 1.5.dp else 0.5.dp,
+                when {
+                    cardHasFocus -> KamperTheme.BLUE
+                    enabled      -> color.copy(alpha = 0.3f)
+                    else         -> KamperTheme.BORDER
+                },
                 RoundedCornerShape(10.dp)
             )
+            .onFocusChanged { cardHasFocus = it.hasFocus }
             .animateContentSize()
     ) {
-        // Header row
+        // Header row — expand area and switch are peer focusable elements
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable { if (enabled) expanded = !expanded }
                 .padding(horizontal = 12.dp, vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                icon,
-                color = if (enabled) color else KamperTheme.SUBTEXT,
-                fontSize = 14.sp
-            )
-            Spacer(Modifier.width(8.dp))
-            Text(
-                name,
-                color = if (enabled) KamperTheme.TEXT else KamperTheme.SUBTEXT,
-                fontSize = 13.sp,
-                fontWeight = FontWeight.SemiBold,
-                modifier = Modifier.weight(1f)
-            )
-            if (enabled) {
+            // Expand-clickable area
+            Row(
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable { if (enabled) expanded = !expanded },
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Text(
-                    if (expanded) "▲" else "▼",
-                    color = KamperTheme.SUBTEXT,
-                    fontSize = 10.sp,
-                    modifier = Modifier.padding(end = 8.dp)
+                    icon,
+                    color = if (enabled) color else KamperTheme.SUBTEXT,
+                    fontSize = 14.sp
                 )
+                Spacer(Modifier.width(8.dp))
+                Text(
+                    name,
+                    color = if (enabled) KamperTheme.TEXT else KamperTheme.SUBTEXT,
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier.weight(1f)
+                )
+                if (enabled) {
+                    Text(
+                        if (expanded) "▲" else "▼",
+                        color = KamperTheme.SUBTEXT,
+                        fontSize = 10.sp,
+                        modifier = Modifier.padding(end = 8.dp)
+                    )
+                }
             }
+            // Switch is a standalone peer — independently focusable via D-pad
             KamperSwitch(
                 checked = enabled,
                 color = color,
@@ -776,12 +804,19 @@ internal fun MetricCard(
         dimmed      -> KamperTheme.SUBTEXT
         else        -> KamperTheme.TEXT
     }
+    var isFocused by remember { mutableStateOf(false) }
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(8.dp))
             .background(KamperTheme.BASE)
-            .border(0.5.dp, KamperTheme.BORDER, RoundedCornerShape(8.dp))
+            .border(
+                if (isFocused) 1.5.dp else 0.5.dp,
+                if (isFocused) KamperTheme.BLUE else KamperTheme.BORDER,
+                RoundedCornerShape(8.dp)
+            )
+            .onFocusChanged { isFocused = it.isFocused }
+            .focusable()
             .padding(12.dp)
     ) {
         Row(

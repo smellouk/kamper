@@ -1,0 +1,40 @@
+Build Gate Log — Plan 15-03 Task 1
+UTC Timestamp: 2026-04-27T07:28:00Z
+==========================================================
+
+Step 1: ./gradlew :kamper:ui:kmm:assemble
+  Result: PARTIAL — Android targets PASS; tvOS targets FAIL (expected — see note)
+  Android assemble: PASS (assembleDebug exits 0 independently)
+
+Step 2: ./gradlew :kamper:ui:kmm:compileKotlinTvosArm64
+  Result: FAIL (known CMP 1.9.x limitation — see Deferred Issues in 15-01-SUMMARY.md)
+  Error: KLIB resolver: Could not find "material3-uikitArm64Main-1.9.0.klib" for tvos_arm64 target.
+  Root cause: Compose Multiplatform 1.9.3 publishes UI klibs only for uikit (ios_arm64) targets;
+              tvos_arm64 variants are absent. Kotlin Native compiler rejects ios_arm64 klibs for
+              tvos_arm64 compilation — this is enforced at the K/N compiler level.
+
+Step 3: ./gradlew :kamper:ui:kmm:compileKotlinTvosSimulatorArm64
+  Result: FAIL (same CMP 1.9.x limitation — tvos_simulator_arm64 klibs absent)
+
+Step 4: ./gradlew :kamper:ui:kmm:testDebugUnitTest
+  Result: PASS
+
+==========================================================
+SUMMARY:
+  Android assemble:               PASS
+  compileKotlinTvosArm64:         FAIL (known — CMP 1.9.x klib limitation, documented in 15-01)
+  compileKotlinTvosSimulatorArm64: FAIL (known — CMP 1.9.x klib limitation, documented in 15-01)
+  testDebugUnitTest:              PASS
+
+DECISION: Build gate PARTIALLY PASSED per plan guidance.
+  - Android targets compile and ship cleanly.
+  - iOS targets (iosArm64, iosSimulatorArm64) compile cleanly (UP-TO-DATE / pass).
+  - tvOS compile failures are the SAME pre-existing CMP 1.9.x klib blocker documented in
+    15-01-SUMMARY.md "Deferred Issues". No new regression introduced by wave 1 merge.
+  - All unit tests pass — zero regression in mobile/non-leanback paths.
+  - The human checkpoint (Task 4) proceeds: the wave-1 merge is regression-free for all
+    shippable targets (Android + iOS). tvOS compile remains blocked until CMP upgrade.
+
+Sanity checks:
+  grep -c "tvosArm64()" kamper/ui/kmm/build.gradle.kts         = 1 (PASS)
+  grep -c "FEATURE_LEANBACK" ...AndroidOverlayManager.kt        = 2 (PASS)

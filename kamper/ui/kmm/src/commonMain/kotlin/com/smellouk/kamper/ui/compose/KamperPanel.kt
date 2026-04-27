@@ -31,6 +31,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -53,14 +54,23 @@ internal fun KamperPanel(
     onStartEngine: () -> Unit,
     onStopEngine: () -> Unit,
     onRestartEngine: () -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    // When non-negative, tab selection is driven externally (by KamperPanelActivity on TV).
+    externalTab: Int = -1,
+    onTabChange: ((Int) -> Unit)? = null,
+    isTv: Boolean = false
 ) {
     val s by state.collectAsState()
     val cfg by settings.collectAsState()
     val recording by isRecording.collectAsState()
     val sampleCount by recordingSampleCount.collectAsState()
     var visible by remember { mutableStateOf(false) }
-    var selectedTab by remember { mutableStateOf(0) }
+    var internalTab by remember { mutableStateOf(0) }
+
+    val selectedTab = if (externalTab >= 0) externalTab else internalTab
+    val selectTab: (Int) -> Unit = { tab ->
+        if (onTabChange != null) onTabChange(tab) else internalTab = tab
+    }
 
     LaunchedEffect(Unit) { visible = true }
 
@@ -69,6 +79,7 @@ internal fun KamperPanel(
         modifier = Modifier
             .fillMaxSize()
             .background(KamperTheme.SCRIM)
+            .focusProperties { canFocus = false }
             .clickable(onClick = onDismiss)
     ) {
         AnimatedVisibility(
@@ -84,9 +95,11 @@ internal fun KamperPanel(
                     .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
                     .background(KamperTheme.SURFACE1)
                     .border(0.5.dp, KamperTheme.BORDER, RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
+                    .focusProperties { canFocus = false }
                     .clickable(enabled = false) {}
                     .padding(16.dp)
             ) {
+                // Header
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.fillMaxWidth()
@@ -98,34 +111,36 @@ internal fun KamperPanel(
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.weight(1f)
                     )
-                    ThemeToggle(
-                        isDark = cfg.isDarkTheme,
-                        onToggle = { onSettingsChange(cfg.copy(isDarkTheme = !cfg.isDarkTheme)) }
-                    )
-                    Spacer(Modifier.width(8.dp))
-                    Box(
-                        contentAlignment = Alignment.Center,
-                        modifier = Modifier
-                            .size(28.dp)
-                            .clip(RoundedCornerShape(6.dp))
-                            .background(KamperTheme.BASE)
-                            .border(0.5.dp, KamperTheme.BORDER, RoundedCornerShape(6.dp))
-                            .clickable(onClick = onDismiss)
-                    ) {
-                        Text("✕", color = KamperTheme.SUBTEXT, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                    if (!isTv) {
+                        ThemeToggle(
+                            isDark = cfg.isDarkTheme,
+                            onToggle = { onSettingsChange(cfg.copy(isDarkTheme = !cfg.isDarkTheme)) }
+                        )
+                        Spacer(Modifier.width(8.dp))
+                        Box(
+                            contentAlignment = Alignment.Center,
+                            modifier = Modifier
+                                .size(28.dp)
+                                .clip(RoundedCornerShape(6.dp))
+                                .background(KamperTheme.BASE)
+                                .border(0.5.dp, KamperTheme.BORDER, RoundedCornerShape(6.dp))
+                                .clickable(onClick = onDismiss)
+                        ) {
+                            Text("✕", color = KamperTheme.SUBTEXT, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                        }
                     }
                 }
 
                 Spacer(Modifier.height(12.dp))
 
                 Row(modifier = Modifier.fillMaxWidth()) {
-                    PanelTab("Activity", selectedTab == 0) { selectedTab = 0 }
+                    PanelTab("Activity",  selectedTab == 0) { selectTab(0) }
                     Spacer(Modifier.width(14.dp))
-                    PanelTab("Perfetto", selectedTab == 1) { selectedTab = 1 }
+                    PanelTab("Perfetto",  selectedTab == 1) { selectTab(1) }
                     Spacer(Modifier.width(14.dp))
-                    PanelTab("Issues", selectedTab == 2) { selectedTab = 2 }
+                    PanelTab("Issues",    selectedTab == 2) { selectTab(2) }
                     Spacer(Modifier.width(14.dp))
-                    PanelTab("Settings", selectedTab == 3) { selectedTab = 3 }
+                    PanelTab("Settings",  selectedTab == 3) { selectTab(3) }
                     Spacer(Modifier.weight(1f))
                 }
 
@@ -153,7 +168,8 @@ internal fun KamperPanel(
                             onSettingsChange = onSettingsChange,
                             onStartEngine = onStartEngine,
                             onStopEngine = onStopEngine,
-                            onRestartEngine = onRestartEngine
+                            onRestartEngine = onRestartEngine,
+                            isTv = isTv
                         )
                     }
                     Spacer(Modifier.height(8.dp))

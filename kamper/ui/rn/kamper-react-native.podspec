@@ -23,7 +23,8 @@ Pod::Spec.new do |s|
   s.homepage     = 'https://github.com/smellouk/kamper'
   s.license      = { :type => 'Apache-2.0' }
   s.author       = { 'smellouk' => 'sidali.mellouk@zattoo.com' }
-  s.platform     = :ios, '14.0'
+  s.ios.deployment_target  = '14.0'
+  s.tvos.deployment_target = '13.0'  # Phase 15: react-native-tvos support (D-19)
   s.source       = { :path => '.' }
 
   s.source_files = 'ios/*.{h,m,mm}'

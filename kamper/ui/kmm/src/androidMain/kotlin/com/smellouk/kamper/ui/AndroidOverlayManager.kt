@@ -6,6 +6,7 @@ import android.app.Application
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.content.pm.PackageManager
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
@@ -14,18 +15,23 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.Gravity
+import android.view.KeyEvent
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewTreeObserver
 import android.view.animation.DecelerateInterpolator
 import android.widget.FrameLayout
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import com.smellouk.kamper.ui.KamperUiSettings
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.unit.Density
 import androidx.core.view.doOnLayout
+import com.smellouk.kamper.ui.KamperUiSettings
 import com.smellouk.kamper.ui.compose.KamperChip
 import kotlinx.coroutines.flow.StateFlow
 import kotlin.math.sqrt
@@ -38,12 +44,21 @@ internal class AndroidOverlayManager(
     private val onClearIssues: () -> Unit
 ) {
     private val density = app.resources.displayMetrics.density
-    private val peekWidthPx get() = (PEEK_WIDTH_DP * density).toInt()
+    // D-07: runtime detection — no separate Gradle source set
+    private val isLeanback: Boolean by lazy {
+        app.packageManager.hasSystemFeature(PackageManager.FEATURE_LEANBACK)
+    }
+    // D-13: pixel-space overscan margin (Compose LocalDensity does NOT shift FrameLayout coordinates — Pitfall 4)
+    private val tvOverscanPx: Int get() = if (isLeanback) (TV_OVERSCAN_DP * density).toInt() else 0
+    // On TV the chip is rendered at TV_SCALE_FACTOR× layout density, so the peek window must
+    // also scale to show the same visual content width (label fits without clipping).
+    private val peekWidthPx get() = (PEEK_WIDTH_DP * density * if (isLeanback) TV_SCALE_FACTOR * 0.75f else 1f).toInt()
     private val screenW get() = app.resources.displayMetrics.widthPixels
     private val screenH get() = app.resources.displayMetrics.heightPixels
 
     private var chipState by mutableStateOf(ChipState.PEEK)
     private var mirrorLayout by mutableStateOf(false)
+    private var isTvFocused by mutableStateOf(false)
     // chipX/chipY = "home" = the fully-expanded left-edge of the chip.
     // translationX offsets from home for peek/expand (avoids FrameLayout width squeezing).
     private var chipX = 0
@@ -76,8 +91,11 @@ internal class AndroidOverlayManager(
 
     fun show() {
         app.registerActivityLifecycleCallbacks(lifecycleCallbacks)
-        shakeDetector = ShakeDetector(app) { expandChip() }
-        shakeDetector?.start()
+        // D-03 parity: shake detection disabled on Android TV (no accelerometer-based shake on TV).
+        if (!isLeanback) {
+            shakeDetector = ShakeDetector(app) { expandChip() }
+            shakeDetector?.start()
+        }
     }
 
     fun hide() {
@@ -92,34 +110,48 @@ internal class AndroidOverlayManager(
         val root = activity.window.decorView as? ViewGroup ?: return
         if (overlayViews.any { it.parent == root }) return
 
-        val view = ComposeView(activity).apply {
+        val leanbackView: LeanbackComposeView? = if (isLeanback) LeanbackComposeView(activity) else null
+        val view: View = leanbackView ?: ComposeView(activity)
+        val composeTarget: ComposeView = leanbackView?.composeView ?: (view as ComposeView)
+        composeTarget.apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnDetachedFromWindow)
             setContent {
                 val s by state.collectAsState()
                 val cfg by settings.collectAsState()
-                KamperChip(
-                    state = s,
-                    settings = cfg,
-                    chipState = chipState,
-                    mirrorLayout = mirrorLayout,
-                    onClick = {
-                        mainHandler.post {
-                            when (chipState) {
-                                ChipState.PEEK -> expandChip()
-                                ChipState.EXPANDED -> {
-                                    mainHandler.removeCallbacks(autoCollapseRunnable)
-                                    panelOpened = true
-                                    activity.startActivity(
-                                        Intent(activity, KamperPanelActivity::class.java)
-                                            .addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
-                                    )
+                val chipContent = @androidx.compose.runtime.Composable {
+                    KamperChip(
+                        state = s,
+                        settings = cfg,
+                        chipState = chipState,
+                        mirrorLayout = mirrorLayout,
+                        onClick = {
+                            mainHandler.post {
+                                when (chipState) {
+                                    ChipState.PEEK -> expandChip()
+                                    ChipState.EXPANDED -> {
+                                        mainHandler.removeCallbacks(autoCollapseRunnable)
+                                        launchPanel(activity)
+                                    }
                                 }
                             }
-                        }
-                    },
-                    onDrag = { dx, dy -> chipView?.let { v -> onDrag(v, dx, dy) } },
-                    onDragEnd = { chipView?.let { v -> onDragEnd(v) } }
-                )
+                        },
+                        onDrag    = if (!isLeanback) { dx, dy -> chipView?.let { v -> onDrag(v, dx, dy) } } else null,
+                        onDragEnd = if (!isLeanback) { { chipView?.let { v -> onDragEnd(v) } } } else null,
+                        isTv      = isLeanback,
+                        hasTvFocus = isTvFocused
+                    )
+                }
+                if (isLeanback) {
+                    // D-12: Scale layout dp for 10-foot readability; keep fontScale at system value
+                    // so text matches tab/system text size (not double-scaled).
+                    val scaledDensity = Density(
+                        density = LocalDensity.current.density * TV_SCALE_FACTOR,
+                        fontScale = LocalDensity.current.fontScale
+                    )
+                    CompositionLocalProvider(LocalDensity provides scaledDensity) { chipContent() }
+                } else {
+                    chipContent()
+                }
             }
         }
 
@@ -137,6 +169,37 @@ internal class AndroidOverlayManager(
         root.addView(view, lp)
         overlayViews.add(view)
         chipView = view
+        // Pitfall 3: ComposeView in DecorView FrameLayout requires explicit focus request to receive
+        // key events on Android TV. Request focus after window gains focus so DecorView's own
+        // focus restoration (which fires at onWindowFocusChanged) doesn't steal it back.
+        if (isLeanback) {
+            view.setOnFocusChangeListener { _, hasFocus -> isTvFocused = hasFocus }
+            root.viewTreeObserver.addOnWindowFocusChangeListener(
+                object : ViewTreeObserver.OnWindowFocusChangeListener {
+                    override fun onWindowFocusChanged(hasFocus: Boolean) {
+                        if (hasFocus) {
+                            chipView?.requestFocus()
+                            try { root.viewTreeObserver.removeOnWindowFocusChangeListener(this) }
+                            catch (_: Exception) {}
+                        }
+                    }
+                }
+            )
+        }
+        if (isLeanback && view is LeanbackComposeView) {
+            view.onSelect = {
+                mainHandler.post {
+                    when (chipState) {
+                        ChipState.PEEK -> expandChip()
+                        ChipState.EXPANDED -> {
+                            mainHandler.removeCallbacks(autoCollapseRunnable)
+                            launchPanel(activity)
+                        }
+                    }
+                }
+            }
+            view.onLongPressMenu = { mainHandler.post { launchPanel(activity) } }
+        }
 
         view.doOnLayout { v ->
             chipW = v.width
@@ -162,6 +225,14 @@ internal class AndroidOverlayManager(
         }
     }
 
+    private fun launchPanel(activity: Activity) {
+        panelOpened = true
+        activity.startActivity(
+            Intent(activity, KamperPanelActivity::class.java)
+                .addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
+        )
+    }
+
     private fun detachFromActivity(activity: Activity) {
         val root = activity.window.decorView as? ViewGroup ?: return
         val toRemove = overlayViews.filter { it.parent == root }
@@ -178,22 +249,32 @@ internal class AndroidOverlayManager(
         val savedY = prefs.getInt(PREF_CHIP_Y, -1)
         val savedRight = prefs.getBoolean(PREF_ON_RIGHT, true)
 
-        onRightSide = savedRight
+        // D-10 / D-13: on TV, position is fixed from config; chipX is anchored from edge with overscan margin.
+        if (isLeanback) {
+            onRightSide = isRightCorner(config.position)
+        } else {
+            onRightSide = savedRight
+        }
         mirrorLayout = !onRightSide
         chipX = if (onRightSide) screenW - chipW else 0
-        chipY = if (savedY >= 0) {
+        chipY = if (savedY >= 0 && !isLeanback) {
             savedY.coerceIn(0, screenH - chipH)
         } else {
             when (config.position) {
                 ChipPosition.TOP_START, ChipPosition.TOP_END ->
-                    (STATUS_BAR_DP * density + MARGIN_DP * density).toInt()
+                    (STATUS_BAR_DP * density + MARGIN_DP * density).toInt() + tvOverscanPx
                 ChipPosition.CENTER_START, ChipPosition.CENTER_END ->
                     (screenH - chipH) / 2
                 ChipPosition.BOTTOM_START, ChipPosition.BOTTOM_END ->
-                    screenH - chipH - (BOTTOM_MARGIN_DP * density).toInt()
+                    screenH - chipH - (BOTTOM_MARGIN_DP * density).toInt() - tvOverscanPx
             }
         }
         chipState = ChipState.PEEK
+    }
+
+    private fun isRightCorner(p: ChipPosition): Boolean = when (p) {
+        ChipPosition.TOP_END, ChipPosition.CENTER_END, ChipPosition.BOTTOM_END -> true
+        ChipPosition.TOP_START, ChipPosition.CENTER_START, ChipPosition.BOTTOM_START -> false
     }
 
     // Peek offset from home: positive = shift right (right-side peek), negative = shift left (left-side peek)
@@ -271,6 +352,55 @@ internal class AndroidOverlayManager(
         const val BOTTOM_MARGIN_DP = 34f
         const val ANIM_DURATION_MS = 280L
         const val AUTO_COLLAPSE_MS = 3_000L
+        const val TV_SCALE_FACTOR = 1.5f   // D-12: 1.5x chosen over 2x to avoid corner overflow
+        const val TV_OVERSCAN_DP  = 48f    // D-13: title-safe area margin
+    }
+}
+
+/**
+ * FrameLayout wrapper that hosts a [ComposeView] for the Kamper TV overlay and intercepts
+ * D-pad and KEYCODE_MENU/KEYCODE_BACK events. Used only when [PackageManager.FEATURE_LEANBACK]
+ * is present. [ComposeView] is final and cannot be subclassed, so a FrameLayout wrapper is used.
+ *
+ * D-09: D-pad Select cycles PEEK -> EXPANDED -> launchPanel.
+ * D-11: KEYCODE_MENU long press (primary) or KEYCODE_BACK long press (Fire TV fallback)
+ * launches KamperPanelActivity directly.
+ *
+ * Long press is detected via ACTION_DOWN + repeatCount > 0 (RESEARCH.md Pitfall 5).
+ *
+ * The handler reads chipState/expandChip/launchPanel via a callback bag to avoid a back-reference
+ * to AndroidOverlayManager (would create a cycle). The bag is set by the manager when the view
+ * is created (see attachToActivity).
+ */
+internal class LeanbackComposeView(activity: Activity) : FrameLayout(activity) {
+    val composeView: ComposeView = ComposeView(activity)
+    var onSelect: (() -> Unit)? = null         // bound to AndroidOverlayManager.handleSelect()
+    var onLongPressMenu: (() -> Unit)? = null  // bound to AndroidOverlayManager.launchPanel()
+
+    init {
+        addView(composeView, LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT))
+        isFocusable = true
+        isFocusableInTouchMode = true
+    }
+
+    override fun dispatchKeyEvent(event: KeyEvent): Boolean {
+        // D-09: confirm key (Select / DPAD_CENTER / Enter on numpad) on UP -> select handler
+        // isConfirmKey added in API 22; min is 21, so use explicit key code check as fallback
+        val isConfirm = event.keyCode == KeyEvent.KEYCODE_DPAD_CENTER
+            || event.keyCode == KeyEvent.KEYCODE_ENTER
+            || event.keyCode == KeyEvent.KEYCODE_NUMPAD_ENTER
+        if (isConfirm && event.action == KeyEvent.ACTION_UP) {
+            onSelect?.invoke()
+            return true
+        }
+        // D-11: KEYCODE_MENU or KEYCODE_BACK long press -> launch panel directly
+        if ((event.keyCode == KeyEvent.KEYCODE_MENU || event.keyCode == KeyEvent.KEYCODE_BACK)
+            && event.action == KeyEvent.ACTION_DOWN
+            && event.repeatCount > 0) {
+            onLongPressMenu?.invoke()
+            return true
+        }
+        return super.dispatchKeyEvent(event)
     }
 }
 

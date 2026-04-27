@@ -22,6 +22,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -47,14 +48,18 @@ internal fun IssuesTab(issues: List<Issue>, onClear: () -> Unit) {
         )
         Spacer(Modifier.weight(1f))
         if (issues.isNotEmpty()) {
+            var clearFocused by remember { mutableStateOf(false) }
             Text(
                 "Clear",
                 color = KamperTheme.RED,
                 fontSize = 12.sp,
                 fontWeight = FontWeight.SemiBold,
                 modifier = Modifier
+                    .clip(RoundedCornerShape(4.dp))
+                    .background(if (clearFocused) KamperTheme.RED.copy(alpha = 0.15f) else Color.Transparent)
+                    .onFocusChanged { clearFocused = it.isFocused }
                     .clickable(onClick = onClear)
-                    .padding(horizontal = 4.dp, vertical = 2.dp)
+                    .padding(horizontal = 8.dp, vertical = 4.dp)
             )
         }
     }

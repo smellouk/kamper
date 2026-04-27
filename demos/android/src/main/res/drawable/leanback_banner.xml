@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Android TV leanback launcher banner — 320×180dp -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Deep background -->
+    <item>
+        <shape android:shape="rectangle">
+            <gradient android:type="linear" android:angle="135"
+                      android:startColor="#181825" android:endColor="#1E1E2E"/>
+            <size android:width="320dp" android:height="180dp"/>
+        </shape>
+    </item>
+
+    <!-- Subtle blue glow from top-left -->
+    <item android:right="180dp">
+        <shape android:shape="rectangle">
+            <gradient android:type="linear" android:angle="0"
+                      android:startColor="#2089B4FA" android:endColor="#00181825"/>
+        </shape>
+    </item>
+
+    <!-- Left accent bar -->
+    <item android:width="6dp" android:gravity="left">
+        <shape android:shape="rectangle">
+            <solid android:color="#89B4FA"/>
+        </shape>
+    </item>
+
+    <!-- Left panel: horizontal metric spark-bars -->
+    <!-- CPU (blue, 85dp) -->
+    <item android:left="18dp" android:right="217dp" android:top="42dp" android:bottom="132dp">
+        <shape android:shape="rectangle">
+            <solid android:color="#89B4FA"/>
+            <corners android:radius="2dp"/>
+        </shape>
+    </item>
+    <!-- FPS (green, 60dp) -->
+    <item android:left="18dp" android:right="242dp" android:top="58dp" android:bottom="116dp">
+        <shape android:shape="rectangle">
+            <solid android:color="#A6E3A1"/>
+            <corners android:radius="2dp"/>
+        </shape>
+    </item>
+    <!-- Memory (peach, 75dp) -->
+    <item android:left="18dp" android:right="227dp" android:top="74dp" android:bottom="100dp">
+        <shape android:shape="rectangle">
+            <solid android:color="#FAB387"/>
+            <corners android:radius="2dp"/>
+        </shape>
+    </item>
+    <!-- Network (teal, 50dp) -->
+    <item android:left="18dp" android:right="252dp" android:top="90dp" android:bottom="84dp">
+        <shape android:shape="rectangle">
+            <solid android:color="#94E2D5"/>
+            <corners android:radius="2dp"/>
+        </shape>
+    </item>
+    <!-- Jank (mauve, 68dp) -->
+    <item android:left="18dp" android:right="234dp" android:top="106dp" android:bottom="68dp">
+        <shape android:shape="rectangle">
+            <solid android:color="#CBA6F7"/>
+            <corners android:radius="2dp"/>
+        </shape>
+    </item>
+    <!-- GC (yellow, 40dp) -->
+    <item android:left="18dp" android:right="262dp" android:top="122dp" android:bottom="52dp">
+        <shape android:shape="rectangle">
+            <solid android:color="#F9E2AF"/>
+            <corners android:radius="2dp"/>
+        </shape>
+    </item>
+    <!-- Thermal (sky, 55dp) -->
+    <item android:left="18dp" android:right="247dp" android:top="138dp" android:bottom="36dp">
+        <shape android:shape="rectangle">
+            <solid android:color="#89DCEB"/>
+            <corners android:radius="2dp"/>
+        </shape>
+    </item>
+
+    <!-- Vertical divider -->
+    <item android:left="140dp" android:right="178dp" android:top="20dp" android:bottom="20dp">
+        <shape android:shape="rectangle">
+            <solid android:color="#313244"/>
+        </shape>
+    </item>
+
+    <!-- Right panel: vertical equalizer bars (10 bars, 12dp wide, 16dp pitch) -->
+    <!-- Bar 1 (blue, h=50) -->
+    <item android:left="152dp" android:right="156dp" android:top="115dp" android:bottom="15dp">
+        <shape android:shape="rectangle">
+            <solid android:color="#89B4FA"/>
+            <corners android:radius="3dp"/>
+        </shape>
+    </item>
+    <!-- Bar 2 (green, h=80) -->
+    <item android:left="168dp" android:right="140dp" android:top="85dp" android:bottom="15dp">
+        <shape android:shape="rectangle">
+            <solid android:color="#A6E3A1"/>
+            <corners android:radius="3dp"/>
+        </shape>
+    </item>
+    <!-- Bar 3 (peach, h=45) -->
+    <item android:left="184dp" android:right="124dp" android:top="120dp" android:bottom="15dp">
+        <shape android:shape="rectangle">
+            <solid android:color="#FAB387"/>
+            <corners android:radius="3dp"/>
+        </shape>
+    </item>
+    <!-- Bar 4 (teal, h=95) -->
+    <item android:left="200dp" android:right="108dp" android:top="70dp" android:bottom="15dp">
+        <shape android:shape="rectangle">
+            <solid android:color="#94E2D5"/>
+            <corners android:radius="3dp"/>
+        </shape>
+    </item>
+    <!-- Bar 5 (mauve, h=65) -->
+    <item android:left="216dp" android:right="92dp" android:top="100dp" android:bottom="15dp">
+        <shape android:shape="rectangle">
+            <solid android:color="#CBA6F7"/>
+            <corners android:radius="3dp"/>
+        </shape>
+    </item>
+    <!-- Bar 6 (yellow, h=115) -->
+    <item android:left="232dp" android:right="76dp" android:top="50dp" android:bottom="15dp">
+        <shape android:shape="rectangle">
+            <solid android:color="#F9E2AF"/>
+            <corners android:radius="3dp"/>
+        </shape>
+    </item>
+    <!-- Bar 7 (sky, h=70) -->
+    <item android:left="248dp" android:right="60dp" android:top="95dp" android:bottom="15dp">
+        <shape android:shape="rectangle">
+            <solid android:color="#89DCEB"/>
+            <corners android:radius="3dp"/>
+        </shape>
+    </item>
+    <!-- Bar 8 (red, h=85) -->
+    <item android:left="264dp" android:right="44dp" android:top="80dp" android:bottom="15dp">
+        <shape android:shape="rectangle">
+            <solid android:color="#F38BA8"/>
+            <corners android:radius="3dp"/>
+        </shape>
+    </item>
+    <!-- Bar 9 (blue, h=60) -->
+    <item android:left="280dp" android:right="28dp" android:top="105dp" android:bottom="15dp">
+        <shape android:shape="rectangle">
+            <solid android:color="#89B4FA"/>
+            <corners android:radius="3dp"/>
+        </shape>
+    </item>
+    <!-- Bar 10 (green, h=90) -->
+    <item android:left="296dp" android:right="12dp" android:top="75dp" android:bottom="15dp">
+        <shape android:shape="rectangle">
+            <solid android:color="#A6E3A1"/>
+            <corners android:radius="3dp"/>
+        </shape>
+    </item>
+
+    <!-- Bottom baseline -->
+    <item android:top="177dp">
+        <shape android:shape="rectangle">
+            <solid android:color="#313244"/>
+        </shape>
+    </item>
+
+</layer-list>
