@@ -17,7 +17,15 @@
       "Bash(git status:*)",
       "Bash(git log:*)",
       "Bash(git diff:*)",
-      "Bash(git tag:*)"
+      "Bash(git tag:*)",
+      "Bash(./gradlew *:jvmTest:*)",
+      "Bash(./gradlew *:test:*)",
+      "Bash(./gradlew :kamper:api:test:*)",
+      "Bash(./gradlew :kamper:engine:test:*)",
+      "Bash(./gradlew test:*)",
+      "Bash(./gradlew detekt:*)",
+      "Bash(test:*)",
+      "Bash(find:*)"
     ]
   }
 }

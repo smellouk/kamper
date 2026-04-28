@@ -28,7 +28,7 @@ Kamper v1.0 takes an existing KMP performance monitoring library from a rough br
 - [x] **Phase 16: Release Automation** — GitHub Releases, changelogs, multi-registry publishing (completed 2026-04-28)
 - [ ] **Phase 17: Medium Article Series** — Android performance bottlenecks series using Kamper
 - [x] **Phase 18: Service Integrations** — Kamper integration points for Sentry and similar services (completed 2026-04-28)
-- [ ] **Phase 19: Claude-Friendly Repo** — Research and define Claude skill offerings for the project
+- [x] **Phase 19: Claude-Friendly Repo** — Research and define Claude skill offerings for the project (completed 2026-04-28)
 - [ ] **Phase 20: Open Source Cleanup** — Contribution guidelines, open source readiness
 
 ## Phase Details
@@ -334,7 +334,12 @@ Plans:
 **Success Criteria** (what must be TRUE):
   1. CLAUDE.md exists with accurate project context
   2. At least 1 Claude skill defined for Kamper-specific workflows
-**Plans**: TBD
+**Plans**: 3 plans
+
+Plans:
+- [x] 19-01-PLAN.md — Create root CLAUDE.md (Quick Start + Build & Test + Module Patterns + Commit & PR Rules + Architecture & Key Files)
+- [x] 19-02-PLAN.md — Create kamper-new-module skill (full 8-platform module skeleton scaffolder)
+- [x] 19-03-PLAN.md — Create kamper-check + kamper-module-review skills and extend .claude/settings.json Gradle allowlist
 
 ### Phase 20: Open Source Cleanup
 **Goal**: Contribution guidelines, issue templates, open source readiness checklist completed
@@ -369,5 +374,5 @@ Plans:
 | 16. Release Automation | 8/8 | Complete    | 2026-04-28 |
 | 17. Medium Articles | 0/5 | Not started | - |
 | 18. Service Integrations | 6/6 | Complete    | 2026-04-28 |
-| 19. Claude-Friendly Repo | 0/TBD | Not started | - |
+| 19. Claude-Friendly Repo | 3/3 | Complete    | 2026-04-28 |
 | 20. Open Source Cleanup | 0/TBD | Not started | - |
