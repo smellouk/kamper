@@ -1,0 +1,45 @@
+# Publishes Kotlin/Gradle artifacts to Maven Central and GitHub Packages
+# on each root-component GitHub Release. Triggered by Release Please
+# creating a release with tag `v*` (root component); skips RN component releases.
+name: Publish Kotlin
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  publish:
+    # Only run for root-component releases (tag starts with v); skip RN releases.
+    if: ${{ !startsWith(github.event.release.tag_name, 'kamper/ui/rn-') }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.tag_name }}
+
+      - name: Configure JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Publish to Maven Central + GitHub Packages
+        run: ./gradlew publishToMavenCentral publishAllPublicationsToGithubPackagesRepository --no-configuration-cache
+        env:
+          # GitHub Packages credentials (existing pattern from publisher.yml)
+          KAMPER_GH_USER: ${{ secrets.KAMPER_GH_USER }}
+          KAMPER_GH_PAT: ${{ secrets.KAMPER_GH_PAT }}
+          # Maven Central Portal credentials (vanniktech reads these env var names)
+          ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.SONATYPE_USERNAME }}
+          ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.SONATYPE_PASSWORD }}
+          # GPG in-memory signing (vanniktech reads these env var names)
+          ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.SIGNING_KEY }}
+          ORG_GRADLE_PROJECT_signingInMemoryKeyId: ${{ secrets.SIGNING_KEY_ID }}
+          ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.SIGNING_PASSWORD }}

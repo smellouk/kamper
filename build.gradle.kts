@@ -37,7 +37,11 @@ extra.apply {
         }
     }
 
-    set("LIB_VERSION_NAME", generateVersionName())
+    val versionPropertiesFile = rootDir.resolve("gradle.properties")
+    val versionProperties = java.util.Properties().apply {
+        load(versionPropertiesFile.inputStream())
+    }
+    set("LIB_VERSION_NAME", versionProperties["VERSION_NAME"]?.toString() ?: "0.0.1")
 }
 
 allprojects {
@@ -97,24 +101,3 @@ tasks.withType<Delete>().configureEach {
 
 fun Project.testLoggerConfig(configure: Action<TestLoggerExtension>) =
     (this as ExtensionAware).extensions.configure("testlogger", configure)
-
-fun generateVersionName(): String {
-    val default = "git describe --tags --abbrev=0".execute() ?: "0.1.0"
-    val isRelease = Env().containsKey("CI")
-
-    return if (isRelease) {
-        default
-    } else {
-        val hash = "git rev-parse --short HEAD".execute()
-        "$default-snapshot-$hash"
-    }
-}
-
-fun String.execute(currentWorkingDir: File = file("./")): String? = try {
-    providers.exec {
-        workingDir(currentWorkingDir)
-        commandLine(this@execute.split("\\s".toRegex()))
-    }.standardOutput.asText.get().trim()
-} catch (e: Exception) {
-    null
-}

@@ -6,6 +6,7 @@ dependencies {
     compileOnly(libs.kotlin.gradle.plugin)
     compileOnly(libs.android.gradle.plugin)
     compileOnly(libs.mokkery.gradle.plugin)
+    implementation(libs.vanniktech.publish.plugin)
 }
 
 // Gradle 8.13 ships with embedded Kotlin 2.0.21. The compileOnly classpath

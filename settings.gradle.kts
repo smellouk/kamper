@@ -45,6 +45,7 @@ dependencyResolutionManagement {
 rootProject.name = "Kamper"
 
 include(":kamper:api")
+include(":kamper:bom")
 include(":kamper:engine")
 include(":kamper:xcframework")
 

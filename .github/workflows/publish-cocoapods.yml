@@ -1,0 +1,56 @@
+# Builds the Kamper XCFramework on macOS, attaches the zipped framework
+# to the GitHub Release as Kamper.xcframework.zip, then publishes the
+# podspec to CocoaPods trunk so the source URL is resolvable for consumers.
+name: Publish CocoaPods
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  publish:
+    # Only run for root-component releases (tag starts with v); skip RN releases.
+    if: ${{ !startsWith(github.event.release.tag_name, 'kamper/ui/rn-') }}
+    runs-on: macos-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.tag_name }}
+
+      - name: Configure JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Build XCFramework
+        run: ./gradlew :kamper:xcframework:assembleKamperReleaseXCFramework --no-configuration-cache
+
+      - name: Verify XCFramework output
+        run: |
+          test -d kamper/xcframework/build/XCFrameworks/release/Kamper.xcframework \
+            || (echo "Kamper.xcframework directory missing" && exit 1)
+
+      - name: Zip XCFramework
+        working-directory: kamper/xcframework/build/XCFrameworks/release
+        run: zip -r Kamper.xcframework.zip Kamper.xcframework
+
+      - name: Upload XCFramework to GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ github.event.release.tag_name }}
+        run: |
+          gh release upload "$TAG" \
+            kamper/xcframework/build/XCFrameworks/release/Kamper.xcframework.zip \
+            --clobber
+
+      - name: Push to CocoaPods trunk
+        env:
+          COCOAPODS_TRUNK_TOKEN: ${{ secrets.COCOAPODS_TRUNK_TOKEN }}
+        run: pod trunk push Kamper.podspec --allow-warnings --skip-import-validation

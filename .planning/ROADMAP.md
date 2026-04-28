@@ -25,7 +25,7 @@ Kamper v1.0 takes an existing KMP performance monitoring library from a rough br
 - [x] **Phase 13: Stack Alignment & Dependency Unification** — Single version catalog for all dependencies (completed 2026-04-27)
 - [x] **Phase 14: React Native Package** — Create and publish RN wrapper for Kamper engine and UI (completed 2026-04-27)
 - [x] **Phase 15: Adjust Kamper UI for React Native** — Align UI layer to support the RN package (completed 2026-04-27)
-- [ ] **Phase 16: Release Automation** — GitHub Releases, changelogs, multi-registry publishing
+- [x] **Phase 16: Release Automation** — GitHub Releases, changelogs, multi-registry publishing (completed 2026-04-28)
 - [ ] **Phase 17: Medium Article Series** — Android performance bottlenecks series using Kamper
 - [ ] **Phase 18: Service Integrations** — Kamper integration points for Sentry and similar services
 - [ ] **Phase 19: Claude-Friendly Repo** — Research and define Claude skill offerings for the project
@@ -284,14 +284,14 @@ Plans:
 **Plans**: 8 plans
 
 Plans:
-- [ ] 16-00: Release strategy and tooling selection
-- [ ] 16-01: Changelog generation (git-cliff or similar)
-- [ ] 16-02: GitHub Actions release workflow
-- [ ] 16-03: Maven Central publishing setup
-- [ ] 16-04: Signing and secrets configuration
-- [ ] 16-05: npm publishing workflow
-- [ ] 16-06: Version bump automation
-- [ ] 16-07: End-to-end release dry-run
+- [x] 16-00: Release strategy and tooling selection
+- [x] 16-01: Changelog generation (git-cliff or similar)
+- [x] 16-02: GitHub Actions release workflow
+- [x] 16-03: Maven Central publishing setup
+- [x] 16-04: Signing and secrets configuration
+- [x] 16-05: npm publishing workflow
+- [x] 16-06: Version bump automation
+- [x] 16-07: End-to-end release dry-run
 
 ### Phase 17: Medium Article Series
 **Goal**: Write and publish Medium article series on Android performance bottlenecks using Kamper
@@ -366,7 +366,7 @@ Plans:
 | 13. Dependency Unification | 5/5 | Complete    | 2026-04-27 |
 | 14. React Native Package | 7/7 | Complete    | 2026-04-27 |
 | 15. Kamper UI for RN | 3/3 | Complete   | 2026-04-27 |
-| 16. Release Automation | 0/8 | Not started | - |
+| 16. Release Automation | 8/8 | Complete    | 2026-04-28 |
 | 17. Medium Articles | 0/5 | Not started | - |
 | 18. Service Integrations | 0/5 | Not started | - |
 | 19. Claude-Friendly Repo | 0/TBD | Not started | - |

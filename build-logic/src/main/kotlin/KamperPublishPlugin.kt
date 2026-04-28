@@ -1,3 +1,4 @@
+import com.vanniktech.maven.publish.MavenPublishBaseExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.publish.PublishingExtension
@@ -27,13 +28,28 @@ import org.gradle.kotlin.dsl.withType
  * Credential loading (KAMPER_GH_USER / KAMPER_GH_PAT) is NOT done here. The root
  * build.gradle.kts continues to load credentials from credentials.properties or env vars
  * and stash them in rootProject.extra. This plugin only READS rootProject.extra.
+ *
+ * Maven Central Portal publishing is handled by the vanniktech gradle-maven-publish-plugin
+ * v0.36.0. It reads ORG_GRADLE_PROJECT_mavenCentral* and ORG_GRADLE_PROJECT_signingInMemory*
+ * environment variables set by the publish-kotlin.yml GitHub Actions workflow. GPG signing
+ * via signAllPublications() is enabled automatically when the env vars are present.
  */
 class KamperPublishPlugin : Plugin<Project> {
     override fun apply(project: Project) {
         // maven-publish is a core Gradle plugin — no artifact needed
         project.pluginManager.apply("maven-publish")
+        // vanniktech plugin handles Maven Central Portal upload + GPG signing + auto-release
+        project.pluginManager.apply("com.vanniktech.maven.publish")
 
         project.group = "com.smellouk.kamper"
+
+        // Configure vanniktech Maven Central publishing with automatic release and GPG signing.
+        // signAllPublications() reads ORG_GRADLE_PROJECT_signingInMemoryKey* env vars -- no
+        // explicit signing{} block needed.
+        project.configure<MavenPublishBaseExtension> {
+            publishToMavenCentral(automaticRelease = true)
+            signAllPublications()
+        }
 
         // Wrap ALL configuration in afterEvaluate so rootProject.extra is populated
         project.afterEvaluate {
@@ -82,8 +98,17 @@ class KamperPublishPlugin : Plugin<Project> {
                             system.set("Github")
                             url.set("https://github.com/smellouk/kamper/issues")
                         }
+                        developers {
+                            developer {
+                                id.set("smellouk")
+                                name.set("Sidali Mellouk")
+                                email.set("sidali.mellouk@zattoo.com")
+                                url.set("https://github.com/smellouk/")
+                            }
+                        }
                         scm {
-                            connection.set("https://github.com/smellouk/kamper.git")
+                            connection.set("scm:git:git://github.com/smellouk/kamper.git")
+                            developerConnection.set("scm:git:ssh://git@github.com/smellouk/kamper.git")
                             url.set("https://github.com/smellouk/kamper")
                         }
                     }

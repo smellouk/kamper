@@ -16,6 +16,7 @@ androidx-core-ktx = "1.16.0"
 compile-sdk = "35"
 min-sdk = "21"
 target-sdk = "35"
+vanniktech-publish = "0.36.0"
 
 [libraries]
 # Coroutines
@@ -41,6 +42,7 @@ detekt-formatting = { module = "io.gitlab.arturbosch.detekt:detekt-formatting", 
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 android-gradle-plugin = { module = "com.android.tools.build:gradle", version.ref = "agp" }
 mokkery-gradle-plugin = { module = "dev.mokkery:dev.mokkery.gradle.plugin", version.ref = "mokkery" }
+vanniktech-publish-plugin = { module = "com.vanniktech:gradle-maven-publish-plugin", version.ref = "vanniktech-publish" }
 
 [plugins]
 # External plugins
