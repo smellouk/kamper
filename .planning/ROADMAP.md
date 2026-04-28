@@ -27,7 +27,7 @@ Kamper v1.0 takes an existing KMP performance monitoring library from a rough br
 - [x] **Phase 15: Adjust Kamper UI for React Native** — Align UI layer to support the RN package (completed 2026-04-27)
 - [x] **Phase 16: Release Automation** — GitHub Releases, changelogs, multi-registry publishing (completed 2026-04-28)
 - [ ] **Phase 17: Medium Article Series** — Android performance bottlenecks series using Kamper
-- [ ] **Phase 18: Service Integrations** — Kamper integration points for Sentry and similar services
+- [x] **Phase 18: Service Integrations** — Kamper integration points for Sentry and similar services (completed 2026-04-28)
 - [ ] **Phase 19: Claude-Friendly Repo** — Research and define Claude skill offerings for the project
 - [ ] **Phase 20: Open Source Cleanup** — Contribution guidelines, open source readiness
 
@@ -321,11 +321,11 @@ Plans:
 **Plans**: 5 plans
 
 Plans:
-- [ ] 18-01: Integration API design
-- [ ] 18-02: Sentry integration implementation
-- [ ] 18-03: Generic integration hook for other services
-- [ ] 18-04: Integration tests
-- [ ] 18-05: Documentation and examples
+- [x] 18-01: Integration API design
+- [x] 18-02: Sentry integration implementation
+- [x] 18-03: Generic integration hook for other services
+- [x] 18-04: Integration tests
+- [x] 18-05: Documentation and examples
 
 ### Phase 19: Claude-Friendly Repo
 **Goal**: Make the repo Claude-friendly — research and define Claude skill offerings for the project
@@ -368,6 +368,6 @@ Plans:
 | 15. Kamper UI for RN | 3/3 | Complete   | 2026-04-27 |
 | 16. Release Automation | 8/8 | Complete    | 2026-04-28 |
 | 17. Medium Articles | 0/5 | Not started | - |
-| 18. Service Integrations | 0/5 | Not started | - |
+| 18. Service Integrations | 6/6 | Complete    | 2026-04-28 |
 | 19. Claude-Friendly Repo | 0/TBD | Not started | - |
 | 20. Open Source Cleanup | 0/TBD | Not started | - |

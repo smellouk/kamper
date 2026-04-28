@@ -13,7 +13,12 @@ androidx-lifecycle = "2.9.4"
 androidx-material = "1.13.0"
 androidx-constraintlayout = "2.2.1"
 androidx-core-ktx = "1.16.0"
+androidx-activity-compose = "1.10.1"
 compile-sdk = "35"
+# Integration dependencies
+sentry-kmp = "0.13.0"
+opentelemetry = "1.51.0"
+firebase-crashlytics = "20.0.5"
 min-sdk = "21"
 target-sdk = "35"
 vanniktech-publish = "0.36.0"
@@ -31,6 +36,13 @@ androidx-lifecycle-common = { module = "androidx.lifecycle:lifecycle-common", ve
 androidx-material = { module = "com.google.android.material:material", version.ref = "androidx-material" }
 androidx-constraintlayout = { module = "androidx.constraintlayout:constraintlayout", version.ref = "androidx-constraintlayout" }
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "androidx-core-ktx" }
+androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity-compose" }
+
+# Integrations
+sentry-kotlin-multiplatform = { module = "io.sentry:sentry-kotlin-multiplatform", version.ref = "sentry-kmp" }
+opentelemetry-sdk-metrics = { module = "io.opentelemetry:opentelemetry-sdk-metrics", version.ref = "opentelemetry" }
+opentelemetry-exporter-otlp = { module = "io.opentelemetry:opentelemetry-exporter-otlp", version.ref = "opentelemetry" }
+firebase-crashlytics = { module = "com.google.firebase:firebase-crashlytics", version.ref = "firebase-crashlytics" }
 
 # Testing
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }

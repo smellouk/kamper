@@ -58,9 +58,15 @@ include(":kamper:modules:jank")
 include(":kamper:modules:gc")
 include(":kamper:modules:thermal")
 
+include(":kamper:integrations:sentry")
+include(":kamper:integrations:firebase")
+include(":kamper:integrations:opentelemetry")
+
 include(":kamper:ui:kmm")
-include(":kamper:ui:rn")
-project(":kamper:ui:rn").projectDir = File(rootDir, "kamper/ui/rn/android")
+// :kamper:ui:rn is NOT included here: it imports com.facebook.react.* which requires
+// react-android (only resolvable in the RN demo context via com.facebook.react.settings).
+// It is compiled when building from demos/react-native/android, which composite-includes
+// this root build and discovers the module via autolink.
 
 include(":demos:android")
 include(":demos:jvm")

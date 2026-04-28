@@ -59,7 +59,7 @@ kotlin {
         val androidMain by getting {
             dependencies {
                 implementation(compose.preview)
-                implementation("androidx.activity:activity-compose:1.10.1")
+                implementation(libs.androidx.activity.compose)
                 implementation(project(":kamper:ui:kmm"))
             }
         }

@@ -5,9 +5,12 @@ import com.smellouk.kamper.api.Config
 import com.smellouk.kamper.api.EMPTY
 import com.smellouk.kamper.api.Info
 import com.smellouk.kamper.api.InfoListener
+import com.smellouk.kamper.api.IntegrationModule
+import com.smellouk.kamper.api.KamperEvent
 import com.smellouk.kamper.api.Logger
 import com.smellouk.kamper.api.Performance
 import com.smellouk.kamper.api.PerformanceModule
+import com.smellouk.kamper.api.currentPlatform
 import kotlin.reflect.KClass
 
 open class Engine {
@@ -15,6 +18,10 @@ open class Engine {
     // Visible for testing
     @PublishedApi
     internal val performanceList: MutableList<Performance<*, *, *>> = mutableListOf()
+
+    // Visible for testing
+    @PublishedApi
+    internal val integrationList: MutableList<IntegrationModule> = mutableListOf()
 
     // Visible for testing
     @PublishedApi
@@ -53,6 +60,20 @@ open class Engine {
     }
 
     open fun clear() {
+        // Clean integrations first so they can flush before metric modules stop.
+        // Each clean() is wrapped — a buggy integration must never block teardown.
+        integrationList.forEach { integration ->
+            try {
+                integration.clean()
+            } catch (t: Throwable) {
+                logger.log(
+                    "IntegrationModule.clean() threw during Engine.clear(): " +
+                        "${t::class.simpleName} ${t.message}"
+                )
+            }
+        }
+        integrationList.clear()
+
         performanceList.filterIsInstance<Cleanable>()
             .forEach { cleanable ->
                 cleanable.clean()
@@ -76,6 +97,54 @@ open class Engine {
         mapListeners[I::class]?.remove(listener)
     }
 
+    /**
+     * Register an [IntegrationModule] that receives a [KamperEvent] for every Info
+     * emitted by an installed metric module. Per Phase 16 D-02.
+     *
+     * Safe to call before or after `install(...)`. Integrations registered before
+     * any module is installed will start receiving events as soon as a module is
+     * installed and produces an Info update.
+     *
+     * Returns `this` to support fluent chaining: `kamper.addIntegration(a).addIntegration(b)`.
+     */
+    fun addIntegration(integration: IntegrationModule): Engine {
+        integrationList.add(integration)
+        return this
+    }
+
+    /**
+     * Remove a previously registered [IntegrationModule]. The integration's
+     * [IntegrationModule.clean] is called BEFORE removal so it can shut down its
+     * underlying SDK if needed. No-op if [integration] was never added.
+     */
+    fun removeIntegration(integration: IntegrationModule): Engine {
+        if (integrationList.remove(integration)) {
+            try {
+                integration.clean()
+            } catch (t: Throwable) {
+                logger.log("IntegrationModule.clean() threw: ${t::class.simpleName} ${t.message}")
+            }
+        }
+        return this
+    }
+
+    @PublishedApi
+    internal fun dispatchToIntegrations(event: KamperEvent) {
+        // Snapshot to avoid ConcurrentModificationException if an integration
+        // re-enters and calls removeIntegration during onEvent. Per threat T-16-02,
+        // a single integration's failure must never affect the others or Kamper core.
+        val snapshot = integrationList.toList()
+        for (integration in snapshot) {
+            try {
+                integration.onEvent(event)
+            } catch (t: Throwable) {
+                logger.log(
+                    "IntegrationModule.onEvent threw: ${t::class.simpleName} ${t.message}"
+                )
+            }
+        }
+    }
+
     @Suppress("UNCHECKED_CAST")
     inline fun <C : Config, reified I : Info> uninstall(module: PerformanceModule<C, I>) {
         val target = performanceList.find { it::class == module.performance::class } ?: return
@@ -95,6 +164,28 @@ open class Engine {
             if (!mapListeners.containsKey(I::class)) {
                 mapListeners[I::class] = mutableListOf()
             }
+
+            // Internal integration fan-out listener. Added FIRST so that user listeners
+            // registered later via addInfoListener still see Info updates after this one
+            // has dispatched the KamperEvent. The lowercase moduleName mirrors the
+            // existing Module class naming convention (e.g., CpuInfo -> "cpu").
+            val moduleName: String = I::class.simpleName
+                ?.removeSuffix("Info")
+                ?.lowercase()
+                ?: "unknown"
+            val integrationFanOut: InfoListener<I> = { info ->
+                if (integrationList.isNotEmpty()) {
+                    val event = KamperEvent(
+                        moduleName = moduleName,
+                        timestampMs = engineCurrentTimeMs(),
+                        platform = currentPlatform,
+                        info = info
+                    )
+                    dispatchToIntegrations(event)
+                }
+            }
+            (mapListeners[I::class] as MutableList<InfoListener<I>>).add(integrationFanOut)
+
             val isInitialized = config.isEnabled && performance.initialize(
                 config,
                 mapListeners[I::class] as List<InfoListener<I>>

@@ -75,10 +75,11 @@ class KamperPublishPlugin : Plugin<Project> {
                 }
 
                 publications.withType<MavenPublication>().configureEach {
-                    val projectName = if (project.projectDir.parent.contains("modules")) {
-                        "${project.name}-module"
-                    } else {
-                        project.name
+                    val parentDir = project.projectDir.parent
+                    val projectName = when {
+                        parentDir.contains("integrations") -> "${project.name}-integration"
+                        parentDir.contains("modules")      -> "${project.name}-module"
+                        else                                -> project.name
                     }
                     artifactId = projectName
 

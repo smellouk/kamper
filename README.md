@@ -362,6 +362,136 @@ Kamper.clear()   // uninstall all modules and remove all listeners
 
 ---
 
+## Service Integrations
+
+Kamper can forward metrics and crash events to third-party observability services. Each
+integration is a separate artifact — add only the ones you need. Nothing is forwarded unless
+you explicitly enable it in the DSL config (all forwarding flags default to `false`).
+
+Use `addIntegration()` on the `Kamper` engine instance to attach an integration module:
+
+```kotlin
+Kamper
+    .install(CpuModule)
+    .install(MemoryModule)
+    .addIntegration(SentryModule(dsn = "https://abc123@sentry.io/123456") {
+        forwardIssues      = true   // IssueInfo -> Sentry.captureException
+        forwardCpuAbove    = 80f    // CPU > 80 % -> Sentry breadcrumb
+        forwardMemoryAbove = 85f    // Memory > 85 % -> Sentry breadcrumb
+        forwardFps         = false
+    })
+```
+
+### Sentry
+
+Routes `IssueInfo` events as `Sentry.captureException` and CPU / Memory / FPS metrics as Sentry
+breadcrumbs (only when the configured threshold is exceeded).
+
+**Dependency:**
+
+```kotlin
+dependencies {
+    implementation("com.smellouk.kamper:sentry-integration:$kamperVersion")
+}
+```
+
+**Supported platforms:** Android, iOS, JVM, macOS (JS and WasmJS excluded — `sentry-kotlin-multiplatform:0.13.0` does not publish JS/WasmJS artifacts).
+
+**DSL options:**
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `dsn` | `String` | required | Your Sentry project DSN |
+| `forwardIssues` | `Boolean` | `false` | Send `IssueInfo` as `captureException` |
+| `forwardCpuAbove` | `Float?` | `null` | Send CPU breadcrumb when ratio exceeds this value (0–100) |
+| `forwardMemoryAbove` | `Float?` | `null` | Send memory breadcrumb when ratio exceeds this value (0–100) |
+| `forwardFps` | `Boolean` | `false` | Send FPS breadcrumb on every poll |
+
+---
+
+### Firebase Crashlytics
+
+Routes `IssueInfo` events as Firebase Crashlytics non-fatal exceptions. CPU, memory, and FPS
+are not forwarded — Crashlytics is for error tracking, not performance metrics.
+
+**Dependency:**
+
+```kotlin
+dependencies {
+    implementation("com.smellouk.kamper:firebase-integration:$kamperVersion")
+}
+```
+
+**Supported platforms:** Android (real Crashlytics SDK), iOS (NSError wrapping via CocoaPods).
+On JVM, macOS, JS, and WasmJS the integration is a no-op — no platform guard is needed in
+your code.
+
+> **Note:** Firebase must already be initialised by the host app before Kamper starts.
+> On Android this means a valid `google-services.json` and the `com.google.gms.google-services`
+> plugin. On iOS this means a valid `GoogleService-Info.plist` loaded at app launch.
+
+**DSL usage:**
+
+```kotlin
+Kamper
+    .install(IssuesModule())
+    .addIntegration(
+        FirebaseModule {
+            forwardIssues = true  // IssueInfo -> Crashlytics.recordException / recordError
+        }
+    )
+```
+
+---
+
+### OpenTelemetry (Grafana, Datadog, New Relic, Honeycomb, …)
+
+Exports CPU, memory, and FPS metrics as OpenTelemetry gauge measurements over OTLP HTTP.
+One OTLP endpoint covers all compatible backends — no need for separate `kamper-grafana`
+or `kamper-datadog` artifacts.
+
+**Dependency:**
+
+```kotlin
+dependencies {
+    implementation("com.smellouk.kamper:opentelemetry-integration:$kamperVersion")
+}
+```
+
+**Supported platforms:** Android and JVM (real OTLP gauge export via opentelemetry-java 1.51.0).
+On iOS, macOS, JS, and WasmJS the integration is a no-op — the opentelemetry-kotlin SDK
+has no Metrics API for those targets.
+
+**DSL usage:**
+
+```kotlin
+Kamper
+    .install(CpuModule)
+    .install(MemoryModule)
+    .addIntegration(
+        OpenTelemetryModule(
+            otlpEndpointUrl = "https://otlp-gateway-prod-us-central-0.grafana.net/otlp/v1/metrics"
+        ) {
+            otlpAuthToken         = "Bearer glc_eyJ..."
+            forwardCpu            = true
+            forwardMemory         = true
+            forwardFps            = false
+            exportIntervalSeconds = 30L
+        }
+    )
+```
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `otlpEndpointUrl` | `String` | required | OTLP HTTP metrics endpoint (`http://` or `https://` prefix required) |
+| `otlpAuthToken` | `String?` | `null` | Bearer token or API key for the endpoint |
+| `forwardCpu` | `Boolean` | `false` | Export CPU ratio as `kamper.cpu.usage` gauge |
+| `forwardMemory` | `Boolean` | `false` | Export heap usage as `kamper.memory.usage` gauge |
+| `forwardFps` | `Boolean` | `false` | Export FPS as `kamper.fps` gauge |
+| `exportIntervalSeconds` | `Long` | `30` | How often the OTLP reader flushes gauges to the backend |
+
+---
+
 ## Security Considerations
 
 Kamper is a developer-facing performance monitoring library. The following items are intentionally

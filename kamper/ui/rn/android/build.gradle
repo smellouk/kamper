@@ -41,7 +41,10 @@ android {
 }
 
 dependencies {
-    implementation 'com.facebook.react:react-android'
+    // react-android is only resolvable when com.facebook.react plugin is active (RN demo context).
+    if (project.plugins.hasPlugin('com.facebook.react')) {
+        implementation 'com.facebook.react:react-android'
+    }
 
     // Dual-context dependency strategy:
     //   Monorepo context  → project(':kamper:...') resolves directly within the same build.

@@ -87,7 +87,9 @@ class EngineTest {
 
         // ValidationInfo slot (1) + Info slot from install (1) = 2 total.
         assertEquals(2, classToTest.mapListeners.size)
-        assertEquals(0, classToTest.mapListeners[Info::class]?.size)
+        // The internal integration fan-out listener registered by install() remains; only
+        // the user listener was removed. Size is 1 (internal fan-out), not 0.
+        assertEquals(1, classToTest.mapListeners[Info::class]?.size)
     }
 
     @Test
@@ -99,7 +101,9 @@ class EngineTest {
 
         // ValidationInfo slot (1) + Info slot from install (1) = 2 total.
         assertEquals(2, classToTest.mapListeners.size)
-        assertEquals(0, classToTest.mapListeners[Info::class]?.size)
+        // The internal integration fan-out listener registered by install() is present.
+        // No user listener was added, so size is 1 (internal fan-out only).
+        assertEquals(1, classToTest.mapListeners[Info::class]?.size)
     }
 
     @Test

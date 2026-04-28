@@ -1,5 +1,7 @@
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.artifacts.VersionCatalogsExtension
+import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.kotlin
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinJsCompilerType
@@ -47,6 +49,10 @@ class KmpLibraryPlugin : Plugin<Project> {
         project.pluginManager.apply(AndroidConfigPlugin::class.java)
 
         // 3) Configure all 10 KMP targets + 5 test source-set dep blocks
+        val libs = project.extensions.getByType<VersionCatalogsExtension>().named("libs")
+        val coroutinesTest = libs.findLibrary("kotlinx-coroutines-test").get()
+        val mockk = libs.findLibrary("mockk").get()
+
         project.extensions.configure(KotlinMultiplatformExtension::class.java) {
             androidTarget()
             jvm()
@@ -63,9 +69,7 @@ class KmpLibraryPlugin : Plugin<Project> {
             sourceSets.getByName("commonTest").dependencies {
                 implementation(project.dependencies.kotlin("test-common"))
                 implementation(project.dependencies.kotlin("test-annotations-common"))
-                implementation(
-                    project.dependencies.create("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2")
-                )
+                implementation(coroutinesTest)
             }
 
             // androidUnitTest deps (root build.gradle.kts lines 81-83)
@@ -75,7 +79,7 @@ class KmpLibraryPlugin : Plugin<Project> {
 
             // androidInstrumentedTest deps (root build.gradle.kts lines 85-87)
             sourceSets.findByName("androidInstrumentedTest")?.dependencies {
-                implementation(project.dependencies.create("io.mockk:mockk:1.14.5"))
+                implementation(mockk)
             }
 
             // jvmTest deps (root build.gradle.kts lines 89-91)
