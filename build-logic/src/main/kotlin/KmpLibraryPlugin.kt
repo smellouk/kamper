@@ -4,6 +4,7 @@ import org.gradle.api.artifacts.VersionCatalogsExtension
 import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.kotlin
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.plugin.KotlinJsCompilerType
 
 /**
@@ -54,16 +55,20 @@ class KmpLibraryPlugin : Plugin<Project> {
         val mockk = libs.findLibrary("mockk").get()
 
         project.extensions.configure(KotlinMultiplatformExtension::class.java) {
+            compilerOptions {
+                freeCompilerArgs.add("-Xexpect-actual-classes")
+            }
+
             androidTarget()
             jvm()
-            macosX64()
+            @Suppress("DEPRECATION") macosX64()
             macosArm64()
             iosArm64()
             iosSimulatorArm64()
             tvosArm64()
             tvosSimulatorArm64()
             js(KotlinJsCompilerType.IR) { browser() }
-            wasmJs { browser() }
+            @OptIn(ExperimentalWasmDsl::class) wasmJs { browser() }
 
             // commonTest deps (root build.gradle.kts lines 74-78)
             sourceSets.getByName("commonTest").dependencies {

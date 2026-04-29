@@ -10,7 +10,7 @@ on:
 jobs:
   publish:
     # Only run for root-component releases (tag starts with v); skip RN releases.
-    if: ${{ !startsWith(github.event.release.tag_name, 'kamper/ui/rn-') }}
+    if: ${{ !startsWith(github.event.release.tag_name, 'libs/ui/rn-') }}
     runs-on: macos-latest
     permissions:
       contents: write
@@ -30,15 +30,15 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
 
       - name: Build XCFramework
-        run: ./gradlew :kamper:xcframework:assembleKamperReleaseXCFramework --no-configuration-cache
+        run: ./gradlew :libs:xcframework:assembleKamperReleaseXCFramework --no-configuration-cache
 
       - name: Verify XCFramework output
         run: |
-          test -d kamper/xcframework/build/XCFrameworks/release/Kamper.xcframework \
+          test -d libs/xcframework/build/XCFrameworks/release/Kamper.xcframework \
             || (echo "Kamper.xcframework directory missing" && exit 1)
 
       - name: Zip XCFramework
-        working-directory: kamper/xcframework/build/XCFrameworks/release
+        working-directory: libs/xcframework/build/XCFrameworks/release
         run: zip -r Kamper.xcframework.zip Kamper.xcframework
 
       - name: Upload XCFramework to GitHub Release
@@ -47,7 +47,7 @@ jobs:
           TAG: ${{ github.event.release.tag_name }}
         run: |
           gh release upload "$TAG" \
-            kamper/xcframework/build/XCFrameworks/release/Kamper.xcframework.zip \
+            libs/xcframework/build/XCFrameworks/release/Kamper.xcframework.zip \
             --clobber
 
       - name: Push to CocoaPods trunk

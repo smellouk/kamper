@@ -34,7 +34,8 @@ The monitoring must never crash or destabilize the host app — every metric col
 - [ ] React Native package — published RN wrapper for Kamper engine + UI (Phases 14-15)
 - [ ] Release automation — GitHub Releases, changelogs, multi-registry publishing (Phase 16)
 - ✓ Service integrations — kamper-sentry, kamper-firebase, kamper-opentelemetry shipped + README documented (INT-01) — v1.0/Phase 18
-- [ ] Open source readiness — contribution guidelines, Claude-friendly repo (Phases 19-20)
+- ✓ Open source readiness — contribution guidelines, Claude-friendly repo (Phases 19-20)
+- ✓ Monorepo structure — kamper/ renamed to libs/, all paths consistent, README renovated — v1.0/Phase 21
 
 ### Out of Scope
 
@@ -68,4 +69,4 @@ Kamper is a brownfield KMP library with 89 commits of history now aligned to Con
 | Engine.validate() single-call semantics | Per D-13 validate() is called from app code (not on a hot loop) — no need to synchronize performanceList iteration | ✓ Good |
 
 ---
-*Last updated: 2026-04-28 after Phase 18 completion — kamper-sentry, kamper-firebase, kamper-opentelemetry integration modules shipped; Engine fan-out wiring done; README Service Integrations section documented*
+*Last updated: 2026-04-29 after Phase 21 completion — kamper/ renamed to libs/ across filesystem, build scripts, CI, docs, and dev tooling; README renovated per D-12 11-section structure*

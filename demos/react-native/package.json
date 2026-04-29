@@ -7,13 +7,15 @@
     "ios": "react-native run-ios",
     "lint": "eslint .",
     "start": "react-native start",
-    "test": "jest"
+    "test": "jest",
+    "codegen": "cd android && ./gradlew generateCodegenArtifactsFromSchema",
+    "postinstall": "yarn codegen"
   },
   "dependencies": {
     "@react-native/new-app-screen": "0.85.2",
     "react": "19.2.3",
     "react-native": "0.85.2",
-    "react-native-kamper": "file:../../kamper/ui/rn",
+    "react-native-kamper": "file:../../libs/ui/rn",
     "react-native-safe-area-context": "^5.5.2"
   },
   "devDependencies": {

@@ -13,7 +13,7 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.ScrollableTabRow
+import androidx.compose.material3.PrimaryScrollableTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -102,7 +102,7 @@ private fun KamperContent(state: KamperState) {
     val tabs = listOf("CPU", "FPS", "Memory", "Network", "Issues", "Jank", "GC", "Thermal")
 
     Column(modifier = Modifier.fillMaxSize()) {
-        ScrollableTabRow(
+        PrimaryScrollableTabRow(
             selectedTabIndex = selectedTab,
             containerColor = KamperColors.mantle,
             contentColor = KamperColors.blue,

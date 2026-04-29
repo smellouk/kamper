@@ -29,7 +29,7 @@ Kamper v1.0 takes an existing KMP performance monitoring library from a rough br
 - [ ] **Phase 17: Medium Article Series** — Android performance bottlenecks series using Kamper
 - [x] **Phase 18: Service Integrations** — Kamper integration points for Sentry and similar services (completed 2026-04-28)
 - [x] **Phase 19: Claude-Friendly Repo** — Research and define Claude skill offerings for the project (completed 2026-04-28)
-- [ ] **Phase 20: Open Source Cleanup** — Contribution guidelines, open source readiness
+- [x] **Phase 20: Open Source Cleanup** — Contribution guidelines, open source readiness (completed 2026-04-29)
 
 ## Phase Details
 
@@ -298,17 +298,17 @@ Plans:
 **Depends on**: Phase 16
 **Requirements**: DOC-03
 **Success Criteria** (what must be TRUE):
-  1. At least 5 articles published covering CPU, FPS, memory, network, and crash monitoring
-  2. Each article includes working Kamper code samples
-  3. Articles cross-link to GitHub repo and npm package
+  1. 6 article outlines exist in `.planning/phases/17-…/outlines/` (foundation + cpu + fps-jank + memory-gc + thermal-network-anr + PERF-01 case study) per D-16
+  2. Companion demo app `kamper-demo/` builds and induces every bottleneck on demand per D-09
+  3. SETUP-DEMO-REPO.md provides the runbook to extract `kamper-demo/` to a standalone github.com/smellouk/kamper-demo repo per D-10/D-14
 **Plans**: 5 plans
 
 Plans:
-- [ ] 17-01: Article outline and series structure
-- [ ] 17-02: CPU + FPS articles
-- [ ] 17-03: Memory + network articles
-- [ ] 17-04: Crash/ANR/jank article
-- [ ] 17-05: Publication and promotion
+- [ ] 17-01-PLAN.md — All 6 article outlines (foundation incl. AI/Vibe Coding arc; cpu /proc/stat; fps+jank; memory+gc; thermal+network+ANR; PERF-01 case study)
+- [ ] 17-02-PLAN.md — kamper-demo Gradle scaffolding + central-install MainActivity (Wave 1, parallel with 17-01)
+- [ ] 17-03-PLAN.md — Real CpuScreen + FpsScreen + MemoryScreen + JankScreen (Wave 2)
+- [ ] 17-04-PLAN.md — Real NetworkScreen + GcScreen + ThermalScreen + IssuesScreen; delete NoopScreens.kt (Wave 3)
+- [ ] 17-05-PLAN.md — README + CONTRIBUTING + CI workflow + SETUP-DEMO-REPO.md + assembleDebug + human verification (Wave 4, includes checkpoint)
 
 ### Phase 18: Service Integrations
 **Goal**: Design and implement Kamper integration points for Sentry and similar observability services
@@ -349,7 +349,12 @@ Plans:
   1. CONTRIBUTING.md covers setup, coding standards, PR process
   2. GitHub issue and PR templates in place
   3. All TODOs and internal references removed from public-facing files
-**Plans**: TBD
+**Plans**: 3 plans
+
+Plans:
+- [x] 20-01-PLAN.md — GitHub templates (bug-report.yml, feature-request.yml, PULL_REQUEST_TEMPLATE.md replacement)
+- [x] 20-02-PLAN.md — CONTRIBUTING.md rewrite (standalone, CLAUDE.md-aligned, 9 D-01 sections)
+- [x] 20-03-PLAN.md — README.md refresh (Maven Central install, Versioning) + SECURITY.md deletion
 
 ## Progress
 
@@ -375,4 +380,33 @@ Plans:
 | 17. Medium Articles | 0/5 | Not started | - |
 | 18. Service Integrations | 6/6 | Complete    | 2026-04-28 |
 | 19. Claude-Friendly Repo | 3/3 | Complete    | 2026-04-28 |
-| 20. Open Source Cleanup | 0/TBD | Not started | - |
+| 20. Open Source Cleanup | 3/3 | Complete    | 2026-04-29 |
+
+### Phase 21: Monorepo structure and clean up (e.g. renaming kamper/ to libs/) is a structural refactor
+
+**Goal:** Rename the top-level `kamper/` directory to `libs/`, propagate the `:libs:*` Gradle project paths through every build script and CI/release-please/podspec reference, and sweep all docs and Claude skills so the contributor and Claude-agent experience matches the new layout. Maven artifact coordinates (`com.smellouk.kamper:*`) and plugin IDs (`kamper.kmp.library`, `kamper.publish`, `kamper.android.config`) remain unchanged — zero breaking change for library consumers (D-06, ADR-004).
+**Requirements**: TBD
+**Depends on:** Phase 20
+**Plans:** 4/4 plans complete
+
+Plans:
+- [x] 21-01-PLAN.md — Wave 1: Rename `kamper/` to `libs/` and update Gradle build files (settings.gradle.kts, 22 build scripts, RN composite settings) — atomic build-breaking commit
+- [x] 21-02-PLAN.md — Wave 2: Update CI workflows (4 files), release-please config + manifest, CocoaPods specs (3 files), and RN demo (Podfile, KamperNative.podspec, package.json)
+- [x] 21-03-PLAN.md — Wave 3: Sweep docs (CLAUDE.md, README.md, CAPACITY.md, .planning/codebase/*, ADRs, ROADMAP, milestones) + Claude skills + .claude/settings*.json allowlist
+
+### Phase 22: manual testing all demo platforms, one by one
+
+**Goal:** Validate that all 7 Kamper demo apps (jvm, android, compose-desktop, ios, macos, web, react-native) build and pass a 30-second smoke test on the post-Phase-21 monorepo (`:libs:*` paths). One plan per platform per D-06; Claude executes builds while the user installs/launches the app and reports observations per D-08; demos failing the smoke test block plan completion until inline-fixed per D-04. A passing smoke test means: BUILD SUCCESSFUL + app launches without crashing + `addInfoListener` callbacks deliver non-INVALID values for ≥CPU and Memory during 30 seconds of observation.
+**Requirements**: TBD
+**Depends on:** Phase 21
+**Plans:** 8 plans
+
+Plans:
+- [ ] 22-01-PLAN.md — Wave 1: JVM demo (`./gradlew :demos:jvm:run`) — fastest baseline; no emulator/Xcode needed
+- [ ] 22-02-PLAN.md — Wave 2: Android demo (`./gradlew :demos:android:assembleDebug` + user `installDebug` on device/emulator) — requires connected device per CLAUDE.md WARNING
+- [ ] 22-03-PLAN.md — Wave 3: Compose Multiplatform desktop (`./gradlew :demos:compose:run`) — desktop window via JVM target actuals
+- [ ] 22-04-PLAN.md — Wave 4: iOS simulator (`./gradlew :demos:ios:linkDebugExecutableIosSimulatorArm64`) — Claude links binary, user runs via Xcode/simctl
+- [ ] 22-05-PLAN.md — Wave 5: macOS native (`./gradlew :demos:macos:linkDebugExecutableMacos<arch>`) — arch-aware (arm64 vs x64); user runs binary
+- [ ] 22-06-PLAN.md — Wave 6: Web JS/WASM (`./gradlew :demos:web:jsBrowserDevelopmentRun`) — backgrounded dev server; user observes DevTools console
+- [ ] 22-07-PLAN.md — Wave 7: React Native (composite Android build + Metro) — INCLUDES KNOWN PRE-FIXES: metro.config.js stale `kamper/ui/rn` path → `libs/ui/rn`, and broken truncated `import com.smellouk.kamper.rn` line in MainApplication.kt
+- [ ] 22-08-PLAN.md — Wave 8: Aggregate 22-RESULTS.md — cross-platform module health matrix (8 modules × 7 platforms) + fixes inventory + Phase 21 validation conclusion (autonomous; depends on all 7 platform plans)

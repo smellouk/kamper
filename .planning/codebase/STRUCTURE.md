@@ -6,7 +6,7 @@
 
 ```
 kamper/                                 # Repository root
-├── kamper/                             # Library source (Gradle project)
+├── libs/                               # Library source (Gradle project)
 │   ├── api/                            # Layer 1: shared contracts (KMP)
 │   ├── engine/                         # Layer 2: orchestration (KMP)
 │   ├── modules/                        # Layer 3: metric implementations
@@ -20,8 +20,7 @@ kamper/                                 # Repository root
 │   │   └── thermal/                    # Thermal status (Android API 29+)
 │   ├── ui/
 │   │   └── android/                    # Layer 4: Compose overlay + chip (KMP source sets)
-│   ├── xcframework/                    # iOS/macOS XCFramework packaging
-│   └── publish.gradle.kts              # Shared Maven publishing config
+│   └── xcframework/                    # iOS/macOS XCFramework packaging
 ├── build-logic/                        # Gradle convention plugins (composite build)
 ├── demos/                              # Runnable sample apps
 │   ├── android/                        # Android demo app
@@ -52,7 +51,7 @@ kamper/                                 # Repository root
 Every KMP Gradle module follows this source set convention. The exact set of platforms varies per module.
 
 ```
-kamper/modules/<name>/src/
+libs/modules/<name>/src/
 ├── commonMain/kotlin/com/smellouk/kamper/<name>/
 │   ├── <Name>Info.kt               # data class : Info
 │   ├── <Name>Config.kt             # data class : Config  (+ Builder object)
@@ -83,7 +82,7 @@ kamper/modules/<name>/src/
 
 **Engine source sets:**
 ```
-kamper/engine/src/
+libs/engine/src/
 ├── commonMain/kotlin/com.smellouk.kamper/
 │   ├── Engine.kt
 │   └── KamperConfig.kt
@@ -103,7 +102,7 @@ kamper/engine/src/
 
 **API source sets:**
 ```
-kamper/api/src/
+libs/api/src/
 ├── commonMain/kotlin/com/smellouk/kamper/api/
 │   ├── Cleanable.kt
 │   ├── Config.kt
@@ -125,7 +124,7 @@ kamper/api/src/
 
 **UI source sets:**
 ```
-kamper/ui/android/src/
+libs/ui/android/src/
 ├── commonMain/kotlin/com/smellouk/kamper/ui/
 │   ├── KamperUi.kt             # expect object KamperUi
 │   ├── KamperUiConfig.kt
@@ -159,19 +158,19 @@ kamper/ui/android/src/
 
 ## Directory Purposes
 
-**`kamper/api/`:**
+**`libs/api/`:**
 - Purpose: Shared type contracts used by every other module. Zero platform dependencies.
 - Key files: `Performance.kt`, `Watcher.kt`, `InfoRepository.kt`, `Config.kt`, `Info.kt`
 
-**`kamper/engine/`:**
+**`libs/engine/`:**
 - Purpose: `Engine` class (module registry) and `Kamper` singleton per platform. Consumers import this to call `install`, `start`, `stop`, `clear`, `addInfoListener`.
 - Key files: `Engine.kt`, `KamperConfig.kt`, `{platform}Main/Kamper.kt`
 
-**`kamper/modules/`:**
+**`libs/modules/`:**
 - Purpose: One Gradle subproject per metric domain. Each is independently publishable and independently installable.
 - Key pattern: `commonMain/Module.kt` declares `expect val XxxModule`; each `{platform}Main/Module.kt` provides `actual val XxxModule`.
 
-**`kamper/ui/android/`:**
+**`libs/ui/android/`:**
 - Purpose: Opt-in visual overlay. Has its own private `Engine` instance. Consumers only call `KamperUi.configure { }` — no manual module installation needed.
 - Key files: `KamperUiRepository.kt` (state management), `KamperPanel.kt` (Compose UI), `AndroidOverlayManager.kt` (window management)
 
@@ -193,24 +192,24 @@ kamper/ui/android/src/
 ## Key File Locations
 
 **Entry Points:**
-- `kamper/engine/src/androidMain/kotlin/com/smellouk/kamper/Kamper.kt` — Android `Kamper` singleton with lifecycle hooks
-- `kamper/engine/src/jvmMain/kotlin/com/smellouk/kamper/Kamper.kt` — JVM `Kamper` singleton
-- `kamper/ui/android/src/androidMain/kotlin/com/smellouk/kamper/ui/KamperUiInitProvider.kt` — ContentProvider that auto-initialises UI overlay
+- `libs/engine/src/androidMain/kotlin/com/smellouk/kamper/Kamper.kt` — Android `Kamper` singleton with lifecycle hooks
+- `libs/engine/src/jvmMain/kotlin/com/smellouk/kamper/Kamper.kt` — JVM `Kamper` singleton
+- `libs/ui/android/src/androidMain/kotlin/com/smellouk/kamper/ui/KamperUiInitProvider.kt` — ContentProvider that auto-initialises UI overlay
 
 **Configuration:**
 - `settings.gradle.kts` — module include list
 - `gradle.properties` — Kotlin, AGP, Compose versions
-- `kamper/publish.gradle.kts` — Maven coordinate and publication settings
+- `build-logic/src/main/kotlin/KamperPublishPlugin.kt` — Maven coordinate and publication settings (Kotlin convention plugin, applied via `id("kamper.publish")`)
 
 **Core Logic:**
-- `kamper/api/src/commonMain/kotlin/com/smellouk/kamper/api/Watcher.kt` — the polling engine shared by all modules
-- `kamper/api/src/commonMain/kotlin/com/smellouk/kamper/api/Performance.kt` — lifecycle manager for a single module
-- `kamper/engine/src/commonMain/kotlin/com.smellouk.kamper/Engine.kt` — module registry
+- `libs/api/src/commonMain/kotlin/com/smellouk/kamper/api/Watcher.kt` — the polling engine shared by all modules
+- `libs/api/src/commonMain/kotlin/com/smellouk/kamper/api/Performance.kt` — lifecycle manager for a single module
+- `libs/engine/src/commonMain/kotlin/com.smellouk.kamper/Engine.kt` — module registry
 
 **Testing:**
-- `kamper/api/src/commonTest/` — pure KMP unit tests
-- `kamper/modules/{name}/src/commonTest/` — mapper + config builder tests (no platform code)
-- `kamper/modules/{name}/src/androidTest/` — instrumented tests for platform sources
+- `libs/api/src/commonTest/` — pure KMP unit tests
+- `libs/modules/{name}/src/commonTest/` — mapper + config builder tests (no platform code)
+- `libs/modules/{name}/src/androidTest/` — instrumented tests for platform sources
 
 ---
 
@@ -244,41 +243,41 @@ kamper/ui/android/src/
 
 ### Adding a new performance module
 
-1. Create `kamper/modules/xxx/` as a new Gradle subproject with a `build.gradle.kts` targeting the same KMP platform set as existing modules.
-2. Add `include(":kamper:modules:xxx")` to `settings.gradle.kts`.
-3. Add `commonMain` source set under `kamper/modules/xxx/src/commonMain/kotlin/com/smellouk/kamper/xxx/` with: `XxxInfo.kt`, `XxxConfig.kt`, `XxxWatcher.kt`, `XxxPerformance.kt`, `Module.kt` (expect), `repository/XxxInfoRepository.kt`, `repository/XxxInfoDto.kt`, `repository/XxxInfoMapper.kt`.
+1. Create `libs/modules/xxx/` as a new Gradle subproject with a `build.gradle.kts` targeting the same KMP platform set as existing modules.
+2. Add `include(":libs:modules:xxx")` to `settings.gradle.kts`.
+3. Add `commonMain` source set under `libs/modules/xxx/src/commonMain/kotlin/com/smellouk/kamper/xxx/` with: `XxxInfo.kt`, `XxxConfig.kt`, `XxxWatcher.kt`, `XxxPerformance.kt`, `Module.kt` (expect), `repository/XxxInfoRepository.kt`, `repository/XxxInfoDto.kt`, `repository/XxxInfoMapper.kt`.
 4. Add `{platform}Main` source sets for each target platform with: `Module.kt` (actual), `repository/XxxInfoRepositoryImpl.kt`, `repository/source/XxxInfoSource.kt`.
 5. Add `commonTest` with mapper and config builder tests.
-6. To expose in the UI overlay, add the module to `kamper/ui/android/src/androidMain/kotlin/com/smellouk/kamper/ui/KamperUiRepository.kt` following the existing install/uninstall helper pattern.
+6. To expose in the UI overlay, add the module to `libs/ui/android/src/androidMain/kotlin/com/smellouk/kamper/ui/KamperUiRepository.kt` following the existing install/uninstall helper pattern.
 
 ### Adding a new platform to an existing module
 
-1. Add a new source set directory: `kamper/modules/{name}/src/{newPlatform}Main/kotlin/com/smellouk/kamper/{name}/`.
+1. Add a new source set directory: `libs/modules/{name}/src/{newPlatform}Main/kotlin/com/smellouk/kamper/{name}/`.
 2. Create `Module.kt` with `actual val XxxModule`.
 3. Create `repository/XxxInfoRepositoryImpl.kt` and `repository/source/{Platform}XxxInfoSource.kt`.
 4. Register the new target in the module's `build.gradle.kts` KMP target block.
 
 ### Adding a new UI composable
 
-- Place in `kamper/ui/android/src/commonMain/kotlin/com/smellouk/kamper/ui/compose/`.
+- Place in `libs/ui/android/src/commonMain/kotlin/com/smellouk/kamper/ui/compose/`.
 - If it requires platform-specific implementation, create an `expect fun` in `commonMain` and `actual fun` in each platform source set (following `PlatformPerfetto.kt`).
 
 ### Adding a utility to the API layer
 
-- Pure computation utilities go in `kamper/api/src/commonMain/kotlin/com/smellouk/kamper/api/Extensions.kt`.
+- Pure computation utilities go in `libs/api/src/commonMain/kotlin/com/smellouk/kamper/api/Extensions.kt`.
 - New interfaces/types go in their own file in the same package.
 - Never introduce Android/JVM imports in `commonMain`.
 
 ### Adding tests
 
-- Pure logic (mapper, config, Extensions): `kamper/modules/{name}/src/commonTest/` or `kamper/api/src/commonTest/`
-- Platform-specific behaviour: `kamper/modules/{name}/src/androidTest/` (instrumented) or `kamper/modules/{name}/src/jvmTest/`
+- Pure logic (mapper, config, Extensions): `libs/modules/{name}/src/commonTest/` or `libs/api/src/commonTest/`
+- Platform-specific behaviour: `libs/modules/{name}/src/androidTest/` (instrumented) or `libs/modules/{name}/src/jvmTest/`
 
 ---
 
 ## Special Directories
 
-**`kamper/xcframework/`:**
+**`libs/xcframework/`:**
 - Purpose: Packages the compiled iOS/macOS targets into an XCFramework for Swift/Objective-C consumption.
 - Generated: Yes (output of Gradle `assembleXCFramework` task)
 - Committed: No

@@ -57,7 +57,7 @@ is module-internal and not exposed as a public configuration field at the time o
 
 | Property | Value |
 |----------|-------|
-| Buffer location | `kamper/modules/cpu/src/commonMain/kotlin/...` |
+| Buffer location | `libs/modules/cpu/src/commonMain/kotlin/...` |
 | Eviction policy | FIFO ring buffer |
 | Drop notification | None |
 

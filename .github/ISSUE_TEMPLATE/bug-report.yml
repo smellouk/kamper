@@ -1,0 +1,73 @@
+name: Bug Report
+description: Report a reproducible bug in Kamper
+title: "[Bug]: "
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug.
+        Before opening, please search existing issues.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: A clear description of what the bug is.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction steps
+      description: Minimal code or steps to reproduce the issue.
+      placeholder: |
+        1. Install CpuModule
+        2. Call Kamper.start()
+        3. ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform
+      options:
+        - Android
+        - iOS
+        - JVM
+        - macOS
+        - tvOS
+        - JS
+        - WasmJS
+    validations:
+      required: true
+
+  - type: input
+    id: kamper_version
+    attributes:
+      label: Kamper version
+      placeholder: "1.0.0"
+    validations:
+      required: true
+
+  - type: input
+    id: module
+    attributes:
+      label: Module(s) affected
+      placeholder: "cpu, fps, memory, ..."

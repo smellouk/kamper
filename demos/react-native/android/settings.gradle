@@ -28,15 +28,15 @@ includeBuild('../node_modules/@react-native/gradle-plugin')
 // enumerate each mapping explicitly.
 includeBuild('../../..') {
     dependencySubstitution {
-        substitute module('com.smellouk.kamper:engine') using project(':kamper:engine')
-        substitute module('com.smellouk.kamper:cpu-module') using project(':kamper:modules:cpu')
-        substitute module('com.smellouk.kamper:fps-module') using project(':kamper:modules:fps')
-        substitute module('com.smellouk.kamper:memory-module') using project(':kamper:modules:memory')
-        substitute module('com.smellouk.kamper:network-module') using project(':kamper:modules:network')
-        substitute module('com.smellouk.kamper:issues-module') using project(':kamper:modules:issues')
-        substitute module('com.smellouk.kamper:jank-module') using project(':kamper:modules:jank')
-        substitute module('com.smellouk.kamper:gc-module') using project(':kamper:modules:gc')
-        substitute module('com.smellouk.kamper:thermal-module') using project(':kamper:modules:thermal')
-        substitute module('com.smellouk.kamper:kmm') using project(':kamper:ui:kmm')
+        substitute module('com.smellouk.kamper:engine') using project(':libs:engine')
+        substitute module('com.smellouk.kamper:cpu-module') using project(':libs:modules:cpu')
+        substitute module('com.smellouk.kamper:fps-module') using project(':libs:modules:fps')
+        substitute module('com.smellouk.kamper:memory-module') using project(':libs:modules:memory')
+        substitute module('com.smellouk.kamper:network-module') using project(':libs:modules:network')
+        substitute module('com.smellouk.kamper:issues-module') using project(':libs:modules:issues')
+        substitute module('com.smellouk.kamper:jank-module') using project(':libs:modules:jank')
+        substitute module('com.smellouk.kamper:gc-module') using project(':libs:modules:gc')
+        substitute module('com.smellouk.kamper:thermal-module') using project(':libs:modules:thermal')
+        substitute module('com.smellouk.kamper:kmm') using project(':libs:ui:kmm')
     }
 }

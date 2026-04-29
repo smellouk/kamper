@@ -16,8 +16,8 @@ end
 
 pre_install do |installer|
   puts "Building Kamper XCFramework (this may take a moment on first run)..."
-  repo_root = File.expand_path('../../../../', __dir__)
-  system("cd '#{repo_root}' && ./gradlew :kamper:xcframework:assembleKamperReleaseXCFramework")
+  repo_root = File.expand_path('../../../', __dir__)
+  system("cd '#{repo_root}' && ./gradlew :libs:xcframework:assembleKamperReleaseXCFramework")
 end
 
 target 'KamperRn' do
@@ -29,7 +29,7 @@ target 'KamperRn' do
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
 
-  pod 'react-native-kamper', :path => '../../../kamper/ui/rn'
+  pod 'react-native-kamper', :path => '../../../libs/ui/rn'
 
   post_install do |installer|
     react_native_post_install(

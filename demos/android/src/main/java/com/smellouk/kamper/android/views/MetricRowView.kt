@@ -30,7 +30,7 @@ class MetricRowView @JvmOverloads constructor(
         set(value) { field = value; cachedGradient = null; invalidate() }
 
     private val density = resources.displayMetrics.density
-    private val sp = resources.displayMetrics.scaledDensity
+    private val sp = density * resources.configuration.fontScale
     private val labelWidth = 72 * density
     private val valueWidth = 60 * density
     private val barHeight = 12 * density

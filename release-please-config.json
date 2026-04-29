@@ -23,10 +23,10 @@
       ],
       "release-notes-body": "\n\n## Installation\n\n### Gradle (Maven Central) — via BOM\n\n```kotlin\nrepositories {\n    mavenCentral()\n}\n\ndependencies {\n    // Import the BOM — all module versions are managed automatically\n    implementation(platform(\"com.smellouk.kamper:bom:{{version}}\"))\n    implementation(\"com.smellouk.kamper:engine\")\n    // Optional metric modules (no version needed when using BOM):\n    implementation(\"com.smellouk.kamper:cpu-module\")\n    implementation(\"com.smellouk.kamper:fps-module\")\n    implementation(\"com.smellouk.kamper:memory-module\")\n    implementation(\"com.smellouk.kamper:network-module\")\n}\n```\n\n### Gradle (Maven Central) — without BOM\n\n```kotlin\ndependencies {\n    implementation(\"com.smellouk.kamper:engine:{{version}}\")\n    implementation(\"com.smellouk.kamper:cpu-module:{{version}}\")\n    implementation(\"com.smellouk.kamper:fps-module:{{version}}\")\n    implementation(\"com.smellouk.kamper:memory-module:{{version}}\")\n    implementation(\"com.smellouk.kamper:network-module:{{version}}\")\n}\n```\n\n### CocoaPods (iOS via XCFramework)\n\n```ruby\npod 'Kamper', '~> {{version}}'\n```\n\nThen run `pod install`.\n\n### Direct XCFramework download\n\n[Kamper.xcframework.zip](https://github.com/smellouk/kamper/releases/download/v{{version}}/Kamper.xcframework.zip)"
     },
-    "kamper/ui/rn": {
+    "libs/ui/rn": {
       "release-type": "node",
       "package-name": "react-native-kamper",
-      "changelog-path": "kamper/ui/rn/CHANGELOG.md",
+      "changelog-path": "libs/ui/rn/CHANGELOG.md",
       "release-notes-body": "\n\n## Installation\n\n### npm\n\n```bash\nnpm install react-native-kamper@{{version}}\n```\n\nor with yarn:\n\n```bash\nyarn add react-native-kamper@{{version}}\n```\n\n### iOS (CocoaPods)\n\nRun `pod install` from your `ios/` directory after installing the package. The native iOS bridge is bundled with the package.\n\n### Android\n\nThe native Android bridge is bundled with the package via the React Native autolinking mechanism — no manual `MainApplication.kt` changes required.\n\n### React Native New Architecture (TurboModule)\n\n`react-native-kamper` requires React Native ≥ 0.73 with the New Architecture enabled. See the package README for the imperative API (`Kamper.start/stop/on`) and the hooks API (`useCpu`, `useFps`, `useMemory`, `useNetwork`)."
     }
   }

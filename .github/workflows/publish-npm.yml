@@ -1,5 +1,5 @@
 # Publishes the react-native-kamper npm package on each
-# kamper/ui/rn-* GitHub Release. Skips root-component releases.
+# libs/ui/rn-* GitHub Release. Skips root-component releases.
 name: Publish npm
 
 on:
@@ -8,15 +8,15 @@ on:
 
 jobs:
   publish:
-    # Only run for RN-component releases (tag starts with kamper/ui/rn-).
-    if: ${{ startsWith(github.event.release.tag_name, 'kamper/ui/rn-') }}
+    # Only run for RN-component releases (tag starts with libs/ui/rn-).
+    if: ${{ startsWith(github.event.release.tag_name, 'libs/ui/rn-') }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
       id-token: write
     defaults:
       run:
-        working-directory: kamper/ui/rn
+        working-directory: libs/ui/rn
     steps:
       - name: Checkout
         uses: actions/checkout@v4

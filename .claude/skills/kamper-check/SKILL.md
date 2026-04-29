@@ -10,8 +10,8 @@ Documents the right Gradle command for any check scope (single module fast, sing
 - When the user asks "run the tests", "run check", or "verify this builds" — pick the narrowest scope first.
 - When the agent is unsure which Gradle task path is correct for a given change.
 - Select scope based on what was modified:
-  - Single module file then `./gradlew :kamper:modules:<name>:jvmTest`
-  - `api` or `engine` layer then `./gradlew :kamper:api:test` or `./gradlew :kamper:engine:test`
+  - Single module file then `./gradlew :libs:modules:<name>:jvmTest`
+  - `api` or `engine` layer then `./gradlew :libs:api:test` or `./gradlew :libs:engine:test`
   - Multiple modules or pre-commit then `./gradlew test`
   - Always run `./gradlew detekt` before committing
 
@@ -19,7 +19,7 @@ Documents the right Gradle command for any check scope (single module fast, sing
 
 1. **Identify the scope** — determine whether the change touches a single module, the api/engine layer, or multiple modules.
 
-2. **Pick the fast path first** — run `:kamper:modules:<name>:jvmTest` for a single module. This runs ONLY the JVM unit tests and typically completes in 1-3 seconds per module. Prefer this for fast feedback during iterative development.
+2. **Pick the fast path first** — run `:libs:modules:<name>:jvmTest` for a single module. This runs ONLY the JVM unit tests and typically completes in 1-3 seconds per module. Prefer this for fast feedback during iterative development.
 
 3. **Run the chosen command** from the project root: `./gradlew <task-path>`.
 
@@ -37,10 +37,10 @@ Documents the right Gradle command for any check scope (single module fast, sing
 
 | Command | Scope | Device needed? | When to use |
 |---------|-------|----------------|-------------|
-| `./gradlew :kamper:modules:<name>:jvmTest` | Single module, JVM only | No | Fast feedback — primary path for Claude sessions |
-| `./gradlew :kamper:modules:<name>:test` | Single module, all unit tests | No | Includes androidUnitTest via Robolectric/MockK |
-| `./gradlew :kamper:api:test` | API contracts | No | After modifying the `api` layer |
-| `./gradlew :kamper:engine:test` | Engine | No | After modifying the `engine` layer |
+| `./gradlew :libs:modules:<name>:jvmTest` | Single module, JVM only | No | Fast feedback — primary path for Claude sessions |
+| `./gradlew :libs:modules:<name>:test` | Single module, all unit tests | No | Includes androidUnitTest via Robolectric/MockK |
+| `./gradlew :libs:api:test` | API contracts | No | After modifying the `api` layer |
+| `./gradlew :libs:engine:test` | Engine | No | After modifying the `engine` layer |
 | `./gradlew test` | All modules, all unit tests | No | Full pre-commit sweep |
 | `./gradlew detekt` | Static analysis | No | Before every commit (zero-tolerance) |
 | `./gradlew connectedAndroidTest` | Instrumented on-device | **YES — emulator or physical device** | **NEVER in autonomous Claude sessions** |
@@ -63,8 +63,8 @@ The following commands are pre-approved in `.claude/settings.json` (no permissio
 
 - `./gradlew *:jvmTest:*`
 - `./gradlew *:test:*`
-- `./gradlew :kamper:api:test`
-- `./gradlew :kamper:engine:test`
+- `./gradlew :libs:api:test`
+- `./gradlew :libs:engine:test`
 - `./gradlew test`
 - `./gradlew detekt`
 
@@ -75,7 +75,7 @@ Anything else (e.g. `connectedAndroidTest`, `assembleXCFramework`, `publish`) wi
 The 8 existing modules (for task path substitution):
 `cpu`, `fps`, `memory`, `network`, `issues`, `jank`, `gc`, `thermal`
 
-Example: `./gradlew :kamper:modules:cpu:jvmTest`
+Example: `./gradlew :libs:modules:cpu:jvmTest`
 
 ### Detekt zero-tolerance policy
 

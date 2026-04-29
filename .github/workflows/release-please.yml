@@ -5,7 +5,7 @@ name: Release Please
 on:
   push:
     branches:
-      - develop
+      - main
 
 permissions:
   contents: write
@@ -19,8 +19,8 @@ jobs:
       releases_created: ${{ steps.release.outputs.releases_created }}
       tag_name: ${{ steps.release.outputs.tag_name }}
       upload_url: ${{ steps.release.outputs.upload_url }}
-      rn_release_created: ${{ steps.release.outputs['kamper/ui/rn--release_created'] }}
-      rn_tag_name: ${{ steps.release.outputs['kamper/ui/rn--tag_name'] }}
+      rn_release_created: ${{ steps.release.outputs['libs/ui/rn--release_created'] }}
+      rn_tag_name: ${{ steps.release.outputs['libs/ui/rn--tag_name'] }}
     steps:
       - name: Run Release Please
         id: release
@@ -29,4 +29,4 @@ jobs:
           token: ${{ secrets.RELEASE_PLEASE_TOKEN }}
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
-          target-branch: develop
+          target-branch: main

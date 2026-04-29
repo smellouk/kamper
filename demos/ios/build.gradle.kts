@@ -21,16 +21,16 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation(project(":kamper:engine"))
-                implementation(project(":kamper:modules:cpu"))
-                implementation(project(":kamper:modules:fps"))
-                implementation(project(":kamper:modules:memory"))
-                implementation(project(":kamper:modules:network"))
-                implementation(project(":kamper:modules:issues"))
-                implementation(project(":kamper:modules:jank"))
-                implementation(project(":kamper:modules:gc"))
-                implementation(project(":kamper:modules:thermal"))
-                implementation(project(":kamper:ui:kmm"))
+                implementation(project(":libs:engine"))
+                implementation(project(":libs:modules:cpu"))
+                implementation(project(":libs:modules:fps"))
+                implementation(project(":libs:modules:memory"))
+                implementation(project(":libs:modules:network"))
+                implementation(project(":libs:modules:issues"))
+                implementation(project(":libs:modules:jank"))
+                implementation(project(":libs:modules:gc"))
+                implementation(project(":libs:modules:thermal"))
+                implementation(project(":libs:ui:kmm"))
             }
         }
     }

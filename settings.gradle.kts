@@ -44,26 +44,26 @@ dependencyResolutionManagement {
 
 rootProject.name = "Kamper"
 
-include(":kamper:api")
-include(":kamper:bom")
-include(":kamper:engine")
-include(":kamper:xcframework")
+include(":libs:api")
+include(":libs:bom")
+include(":libs:engine")
+include(":libs:xcframework")
 
-include(":kamper:modules:cpu")
-include(":kamper:modules:fps")
-include(":kamper:modules:memory")
-include(":kamper:modules:network")
-include(":kamper:modules:issues")
-include(":kamper:modules:jank")
-include(":kamper:modules:gc")
-include(":kamper:modules:thermal")
+include(":libs:modules:cpu")
+include(":libs:modules:fps")
+include(":libs:modules:memory")
+include(":libs:modules:network")
+include(":libs:modules:issues")
+include(":libs:modules:jank")
+include(":libs:modules:gc")
+include(":libs:modules:thermal")
 
-include(":kamper:integrations:sentry")
-include(":kamper:integrations:firebase")
-include(":kamper:integrations:opentelemetry")
+include(":libs:integrations:sentry")
+include(":libs:integrations:firebase")
+include(":libs:integrations:opentelemetry")
 
-include(":kamper:ui:kmm")
-// :kamper:ui:rn is NOT included here: it imports com.facebook.react.* which requires
+include(":libs:ui:kmm")
+// :libs:ui:rn is NOT included here: it imports com.facebook.react.* which requires
 // react-android (only resolvable in the RN demo context via com.facebook.react.settings).
 // It is compiled when building from demos/react-native/android, which composite-includes
 // this root build and discovers the module via autolink.

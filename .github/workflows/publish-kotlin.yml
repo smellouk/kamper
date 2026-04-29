@@ -10,7 +10,7 @@ on:
 jobs:
   publish:
     # Only run for root-component releases (tag starts with v); skip RN releases.
-    if: ${{ !startsWith(github.event.release.tag_name, 'kamper/ui/rn-') }}
+    if: ${{ !startsWith(github.event.release.tag_name, 'libs/ui/rn-') }}
     runs-on: ubuntu-latest
     permissions:
       contents: read

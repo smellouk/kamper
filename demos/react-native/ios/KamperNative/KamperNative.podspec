@@ -10,7 +10,7 @@ Pod::Spec.new do |s|
   s.source_files = '*.{h,m,mm}'
 
   # Kamper XCFramework (built by Gradle — see pre_install in Podfile)
-  s.vendored_frameworks = '../../../../kamper/xcframework/build/XCFrameworks/release/Kamper.xcframework'
+  s.vendored_frameworks = '../../../../libs/xcframework/build/XCFrameworks/release/Kamper.xcframework'
 
   s.dependency 'React-Core'
 
@@ -18,9 +18,9 @@ Pod::Spec.new do |s|
   s.script_phases = [{
     :name              => 'Build Kamper XCFramework',
     :script            => %q{
-cd "$PODS_ROOT/../../../.." && ./gradlew :kamper:xcframework:assembleKamperReleaseXCFramework
+cd "$PODS_ROOT/../../../.." && ./gradlew :libs:xcframework:assembleKamperReleaseXCFramework
 },
     :execution_position => :before_compile,
-    :output_files       => ['$(PODS_ROOT)/../../../../kamper/xcframework/build/XCFrameworks/release/Kamper.xcframework/Info.plist']
+    :output_files       => ['$(PODS_ROOT)/../../../../libs/xcframework/build/XCFrameworks/release/Kamper.xcframework/Info.plist']
   }]
 end

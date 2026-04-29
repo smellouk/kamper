@@ -8,19 +8,19 @@ Scaffolds a complete Kamper KMP performance module skeleton — all 8 platform s
 
 - User invokes `/kamper-new-module <name>` where `<name>` is the module name in lowercase letters and digits (e.g. `thermal2`, `battery`, `gpu`).
 - The new module follows the standard Info/Config/Watcher/Performance 4-class structure.
-- The module name does not already exist under `kamper/modules/`.
+- The module name does not already exist under `libs/modules/`.
 
 ## Steps
 
-1. **Validate the name argument** — must be lowercase letters/digits only. Check that `kamper/modules/{name}/` does not already exist. If it does, abort with a clear error.
+1. **Validate the name argument** — must be lowercase letters/digits only. Check that `libs/modules/{name}/` does not already exist. If it does, abort with a clear error.
 
 2. **Compute names:**
    - `{name}` = the lowercase argument (e.g. `thermal2`)
    - `{Name}` = PascalCase form (e.g. `Thermal2`) — capitalize first letter and each letter after a digit
 
-3. **Create the directory tree** under `kamper/modules/{name}/src/`. Full structure:
+3. **Create the directory tree** under `libs/modules/{name}/src/`. Full structure:
    ```
-   kamper/modules/{name}/
+   libs/modules/{name}/
    ├── build.gradle.kts
    └── src/
        ├── commonMain/kotlin/com/smellouk/kamper/{name}/
@@ -75,14 +75,14 @@ Scaffolds a complete Kamper KMP performance module skeleton — all 8 platform s
 8. **Write androidTest stub:**
    - `repository/{Name}InfoRepositoryImplTest.kt` — placeholder test referencing `{Name}InfoRepositoryImpl`
 
-9. **Update `settings.gradle.kts`** by inserting `include(":kamper:modules:{name}")` in alphabetical order within the kamper modules block. If the line already exists, abort with a clear error.
+9. **Update `settings.gradle.kts`** by inserting `include(":libs:modules:{name}")` in alphabetical order within the kamper modules block. If the line already exists, abort with a clear error.
 
-10. **Verification step:** Run `./gradlew :kamper:modules:{name}:compileCommonMainKotlinMetadata` to confirm the scaffold compiles. If `./gradlew` commands are not yet in the `.claude/settings.json` allowlist (they are added by Plan 19-03), Claude Code will prompt for permission — accept the prompt for this task.
+10. **Verification step:** Run `./gradlew :libs:modules:{name}:compileCommonMainKotlinMetadata` to confirm the scaffold compiles. If `./gradlew` commands are not yet in the `.claude/settings.json` allowlist (they are added by Plan 19-03), Claude Code will prompt for permission — accept the prompt for this task.
 
 11. **Report back** to the user:
     - List of all files created (full paths)
     - The `settings.gradle.kts` diff (one new `include` line)
-    - Next steps: implement the `{Name}Watcher` polling logic and the `Android{Name}InfoSource` platform read. Mirror `kamper/modules/cpu/` for patterns.
+    - Next steps: implement the `{Name}Watcher` polling logic and the `Android{Name}InfoSource` platform read. Mirror `libs/modules/cpu/` for patterns.
 
 ## Reference
 
@@ -107,7 +107,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                api(project(":kamper:api"))
+                api(project(":libs:api"))
                 implementation(libs.kotlinx.coroutines.core)
             }
         }
@@ -201,12 +201,12 @@ actual val {Name}Module: PerformanceModule<{Name}Config, {Name}Info>
 Insert this line in alphabetical order within the kamper modules include block:
 
 ```kotlin
-include(":kamper:modules:{name}")
+include(":libs:modules:{name}")
 ```
 
 ### Canonical reference module
 
-`kamper/modules/cpu/` is the most complete and well-tested module. When in doubt about a file or pattern, mirror what CPU does. The CPU module has all 8 platform main source sets and complete test coverage.
+`libs/modules/cpu/` is the most complete and well-tested module. When in doubt about a file or pattern, mirror what CPU does. The CPU module has all 8 platform main source sets and complete test coverage.
 
 ### Convention reminders
 

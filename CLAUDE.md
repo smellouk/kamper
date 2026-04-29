@@ -8,7 +8,7 @@ Kamper is a Kotlin Multiplatform (KMP) performance monitoring library for Androi
 
 - Clone: `git clone https://github.com/smellouk/kamper.git`
 - Required: JDK 17. No Android device is needed for the default development workflow.
-- Smoke test: `./gradlew :kamper:api:test :kamper:engine:test`
+- Smoke test: `./gradlew :libs:api:test :libs:engine:test`
 - Read the four sections below before opening a PR.
 
 ---
@@ -19,10 +19,10 @@ Prefer the fast JVM path (`jvmTest`) for iterative development — it runs in se
 
 | Command | Scope | Device needed? | When to use |
 |---------|-------|----------------|-------------|
-| `./gradlew :kamper:modules:<name>:jvmTest` | Single module, JVM only | No | Fast feedback — primary path for Claude sessions |
-| `./gradlew :kamper:modules:<name>:test` | Single module, all unit tests | No | Includes androidUnitTest via Robolectric/MockK |
-| `./gradlew :kamper:api:test` | API contracts | No | After modifying the `api` layer |
-| `./gradlew :kamper:engine:test` | Engine | No | After modifying the `engine` layer |
+| `./gradlew :libs:modules:<name>:jvmTest` | Single module, JVM only | No | Fast feedback — primary path for Claude sessions |
+| `./gradlew :libs:modules:<name>:test` | Single module, all unit tests | No | Includes androidUnitTest via Robolectric/MockK |
+| `./gradlew :libs:api:test` | API contracts | No | After modifying the `api` layer |
+| `./gradlew :libs:engine:test` | Engine | No | After modifying the `engine` layer |
 | `./gradlew test` | All modules, all unit tests | No | Full pre-commit sweep |
 | `./gradlew detekt` | Static analysis | No | Before every commit (zero-tolerance, `maxIssues: 0`) |
 | `./gradlew connectedAndroidTest` | Instrumented on-device | **YES — emulator or physical device** | **DO NOT run in autonomous Claude sessions** |
@@ -33,6 +33,8 @@ Prefer the fast JVM path (`jvmTest`) for iterative development — it runs in se
 > instrumented tests, confirm a device is attached first.
 
 **Note:** Common Gradle commands (`jvmTest`, `test`, `detekt`) are pre-approved in `.claude/settings.json` — Claude Code will not prompt for these. See `.claude/skills/kamper-check/SKILL.md` for the full approved command list. Device-requiring tasks like `connectedAndroidTest` are deliberately excluded.
+
+**Module path prefix:** All library Gradle projects live under `:libs:` (e.g., `:libs:modules:cpu`, `:libs:api`, `:libs:engine`). The top-level directory is `libs/`. Maven artifact coordinates remain `com.smellouk.kamper:*` — unchanged for library consumers.
 
 **Detekt** runs with `autoCorrect: true` — it auto-fixes formatting violations on check. The config lives in `quality/code/detekt.yml`. Forbidden patterns include `TODO:`, `FIXME:`, `println(` in production code, and re-throwing caught exceptions.
 
@@ -126,7 +128,7 @@ Additional safety rules:
 
 ### Canonical Reference Module
 
-`kamper/modules/cpu/` is the most complete and well-tested module. When in doubt, mirror what CPU does. Its `build.gradle.kts` is the reference for new modules:
+`libs/modules/cpu/` is the most complete and well-tested module. When in doubt, mirror what CPU does. Its `build.gradle.kts` is the reference for new modules:
 
 ```kotlin
 plugins {
@@ -147,7 +149,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                api(project(":kamper:api"))
+                api(project(":libs:api"))
                 implementation(libs.kotlinx.coroutines.core)
             }
         }
@@ -165,7 +167,7 @@ kotlin {
 New modules must also be registered in `settings.gradle.kts`:
 
 ```kotlin
-include(":kamper:modules:{name}")
+include(":libs:modules:{name}")
 ```
 
 Use the `/kamper-new-module` project skill to scaffold a complete module skeleton automatically.
@@ -220,7 +222,7 @@ refactor(memory): extract MemoryInfoMapper
 Before opening a pull request:
 
 - [ ] `./gradlew detekt` passes (zero issues)
-- [ ] `./gradlew :kamper:modules:<name>:jvmTest` passes for every touched module
+- [ ] `./gradlew :libs:modules:<name>:jvmTest` passes for every touched module
 - [ ] No `TODO:` or `FIXME:` comments in changed files
 
 ---
@@ -232,28 +234,28 @@ Before opening a pull request:
 ```
 ┌──────────────────────────────────────────────────────────────────┐
 │  Layer 1 — API Contracts                                         │
-│  kamper/api/src/commonMain/                                      │
+│  libs/api/src/commonMain/                                        │
 │  Info, Config, InfoRepository, IWatcher, Performance,            │
 │  PerformanceModule, Logger, Cleanable                            │
 └────────────────────────┬─────────────────────────────────────────┘
                          │ depends on
 ┌────────────────────────▼─────────────────────────────────────────┐
 │  Layer 2 — Engine (Orchestration)                                │
-│  kamper/engine/src/                                              │
+│  libs/engine/src/                                                │
 │  Engine (install/uninstall/start/stop/clear)                     │
 │  Kamper object (platform actuals with lifecycle integration)     │
 └────────────────────────┬─────────────────────────────────────────┘
                          │ depends on
 ┌────────────────────────▼─────────────────────────────────────────┐
 │  Layer 3 — Modules (Implementations)                             │
-│  kamper/modules/{cpu,fps,memory,network,issues,jank,gc,thermal}/ │
+│  libs/modules/{cpu,fps,memory,network,issues,jank,gc,thermal}/   │
 │  {Name}Info, {Name}Config, {Name}Performance, {Name}Watcher,     │
 │  {Name}InfoRepository, {Name}InfoRepositoryImpl, {Name}InfoSource │
 └────────────────────────┬─────────────────────────────────────────┘
                          │ depends on
 ┌────────────────────────▼─────────────────────────────────────────┐
 │  Layer 4 — UI (Presentation)                                     │
-│  kamper/ui/android/src/                                          │
+│  libs/ui/android/src/                                            │
 │  KamperUi (expect/actual attach/detach)                          │
 │  KamperPanel / KamperChip (Compose overlay)                      │
 └──────────────────────────────────────────────────────────────────┘
@@ -265,9 +267,9 @@ Before opening a pull request:
 
 | File | Purpose |
 |------|---------|
-| `kamper/api/src/commonMain/kotlin/com/smellouk/kamper/api/Watcher.kt` | Core coroutine polling loop — the heart of all modules |
-| `kamper/engine/src/commonMain/kotlin/com.smellouk.kamper/Engine.kt` | Module registry; install/uninstall/start/stop |
-| `kamper/modules/cpu/` | Canonical reference module — most complete implementation |
+| `libs/api/src/commonMain/kotlin/com/smellouk/kamper/api/Watcher.kt` | Core coroutine polling loop — the heart of all modules |
+| `libs/engine/src/commonMain/kotlin/com.smellouk.kamper/Engine.kt` | Module registry; install/uninstall/start/stop |
+| `libs/modules/cpu/` | Canonical reference module — most complete implementation |
 | `build-logic/src/main/kotlin/KmpLibraryPlugin.kt` | Convention plugin applied by every KMP module |
 | `settings.gradle.kts` | New modules must be registered here |
 | `.planning/` | GSD planning artifacts (planning docs, phase plans, ADRs) — not shipped in the published library |
