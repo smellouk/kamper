@@ -41,7 +41,7 @@ class GcView : NSView {
         translatesAutoresizingMaskIntoConstraints = false
         wantsLayer = true
 
-        val sep = NSBox(NSMakeRect(0.0, 0.0, 0.0, 1.0)).apply {
+        val sep = NSBox(NSMakeRect(0.0, 0.0, 0.0, 0.0)).apply {
             boxType = NSBoxSeparator
             translatesAutoresizingMaskIntoConstraints = false
         }
@@ -68,7 +68,6 @@ class GcView : NSView {
 
         c += sep.leadingAnchor.constraintEqualToAnchor(leadingAnchor)
         c += sep.trailingAnchor.constraintEqualToAnchor(trailingAnchor)
-        c += sep.heightAnchor.constraintEqualToConstant(1.0)
         c += sep.bottomAnchor.constraintEqualToAnchor(simulateButton.topAnchor, constant = -10.0)
 
         c += simulateButton.trailingAnchor.constraintEqualToAnchor(trailingAnchor, constant = -pad)
@@ -78,8 +77,20 @@ class GcView : NSView {
         NSLayoutConstraint.activateConstraints(c)
     }
 
+    private var notSupportedShown = false
+
     fun update(info: GcInfo) {
-        if (info == GcInfo.INVALID) return
+        if (info == GcInfo.INVALID) {
+            if (!notSupportedShown) {
+                notSupportedShown = true
+                bigLabel.stringValue        = "—"
+                unitLabel.stringValue       = "Not supported (uses ARC)"
+                pauseDeltaLabel.stringValue = "GC pause delta:  N/A"
+                totalCountLabel.stringValue = "Total GC count:  N/A"
+                simulateButton.setEnabled(false)
+            }
+            return
+        }
         bigLabel.stringValue        = info.gcCountDelta.toString()
         pauseDeltaLabel.stringValue = "GC pause delta:  ${info.gcPauseMsDelta} ms"
         totalCountLabel.stringValue = "Total GC count:  ${info.gcCount}"

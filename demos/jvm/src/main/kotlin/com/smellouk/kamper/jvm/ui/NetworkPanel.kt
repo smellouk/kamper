@@ -95,11 +95,11 @@ class NetworkPanel : JPanel(BorderLayout(0, 0)) {
     }
 
     private fun triggerDownload() {
-        statusLabel.text = "Fetching 5 MB…"
+        statusLabel.text = "Fetching 20 MB…"
         downloadButton.isEnabled = false
         Executors.newSingleThreadExecutor().submit {
             runCatching {
-                URL("https://speed.cloudflare.com/__down?bytes=5000000")
+                URL("https://speed.cloudflare.com/__down?bytes=20000000")
                     .openStream().use { it.readBytes() }
             }
             SwingUtilities.invokeLater {

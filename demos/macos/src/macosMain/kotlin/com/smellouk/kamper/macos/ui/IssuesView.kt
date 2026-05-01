@@ -41,18 +41,17 @@ class IssuesView : NSView {
             translatesAutoresizingMaskIntoConstraints = false
         }
 
-        val clipView = NSClipView().apply {
-            documentView = stackView
-            translatesAutoresizingMaskIntoConstraints = false
-        }
-
         scrollView = NSScrollView().apply {
-            setContentView(clipView)
+            setContentView(FlippedClipView(NSMakeRect(0.0, 0.0, 0.0, 0.0)))
+            documentView = stackView
             hasVerticalScroller = true
             hasHorizontalScroller = false
             translatesAutoresizingMaskIntoConstraints = false
             backgroundColor = Theme.BASE
         }
+        NSLayoutConstraint.activateConstraints(listOf(
+            stackView.widthAnchor.constraintEqualToAnchor(scrollView.contentView().widthAnchor)
+        ))
 
         val slowSpanBtn = makeButton("Slow Span", slowSpanTarget)
         val crashBtn    = makeButton("Crash",     crashTarget)
@@ -67,7 +66,7 @@ class IssuesView : NSView {
             addArrangedSubview(clearBtn)
         }
 
-        val sep = NSBox(NSMakeRect(0.0, 0.0, 0.0, 1.0)).apply {
+        val sep = NSBox(NSMakeRect(0.0, 0.0, 0.0, 0.0)).apply {
             boxType = NSBoxSeparator
             translatesAutoresizingMaskIntoConstraints = false
         }
@@ -83,15 +82,12 @@ class IssuesView : NSView {
 
         c += sep.leadingAnchor.constraintEqualToAnchor(leadingAnchor)
         c += sep.trailingAnchor.constraintEqualToAnchor(trailingAnchor)
-        c += sep.heightAnchor.constraintEqualToConstant(1.0)
         c += sep.bottomAnchor.constraintEqualToAnchor(btnStack.topAnchor, constant = -10.0)
 
         c += scrollView.topAnchor.constraintEqualToAnchor(topAnchor)
         c += scrollView.leadingAnchor.constraintEqualToAnchor(leadingAnchor)
         c += scrollView.trailingAnchor.constraintEqualToAnchor(trailingAnchor)
         c += scrollView.bottomAnchor.constraintEqualToAnchor(sep.topAnchor)
-
-        c += stackView.widthAnchor.constraintEqualToAnchor(scrollView.widthAnchor)
 
         c += emptyLabel.centerXAnchor.constraintEqualToAnchor(scrollView.centerXAnchor)
         c += emptyLabel.centerYAnchor.constraintEqualToAnchor(scrollView.centerYAnchor)
@@ -113,7 +109,13 @@ class IssuesView : NSView {
 
     private fun refresh() {
         stackView.arrangedSubviews.forEach { (it as? NSView)?.removeFromSuperview() }
-        issues.forEach { stackView.addArrangedSubview(issueRowView(it)) }
+        issues.forEach { issue ->
+            val row = issueRowView(issue)
+            stackView.addArrangedSubview(row)
+            NSLayoutConstraint.activateConstraints(listOf(
+                row.widthAnchor.constraintEqualToAnchor(stackView.widthAnchor)
+            ))
+        }
         updateEmpty()
     }
 
@@ -132,9 +134,16 @@ class IssuesView : NSView {
     }
 
     private fun triggerCrash() {
-        CoroutineScope(Dispatchers.Default).launch {
-            throw RuntimeException("Demo crash from K|macOS")
-        }
+        val issue = Issue(
+            id = "CRASH_demo_${(NSDate.date().timeIntervalSince1970 * 1000).toLong()}",
+            type = IssueType.CRASH,
+            severity = Severity.CRITICAL,
+            message = "NSInternalInconsistencyException: Demo crash from K|macOS",
+            timestampMs = (NSDate.date().timeIntervalSince1970 * 1000).toLong(),
+            stackTrace = "com.smellouk.kamper.macos.ui.IssuesView.triggerCrash(IssuesView.kt:0)",
+            details = mapOf("exceptionName" to "NSInternalInconsistencyException", "source" to "demo")
+        )
+        addIssue(issue)
     }
 
     override fun drawRect(dirtyRect: CValue<CGRect>) {
@@ -281,4 +290,9 @@ private fun fmtTimeMacos(ms: Long): String {
     val sec = (ms / 1000) % 86400
     val h = sec / 3600; val m = (sec % 3600) / 60; val s = sec % 60
     return "${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}"
+}
+
+private class FlippedClipView : NSClipView {
+    @OverrideInit constructor(frame: CValue<CGRect>) : super(frame) {}
+    override fun isFlipped(): Boolean = true
 }

@@ -19,7 +19,7 @@ object Theme {
     val TEAL   = uiColor(0x94E2D5)
     val RED    = uiColor(0xF38BA8)
 
-    val HEADER_FONT = UIFont.boldSystemFontOfSize(15.0)!!
+    val HEADER_FONT = UIFont.boldSystemFontOfSize(18.0)!!
     val LABEL_FONT  = UIFont.systemFontOfSize(13.0)!!
     val MONO_FONT   = UIFont.monospacedSystemFontOfSize(13.0, weight = 0.0)!!
     val MONO_SMALL  = UIFont.monospacedSystemFontOfSize(11.0, weight = 0.0)!!

@@ -33,7 +33,7 @@ class MainApplication : Application(), ReactApplication {
         // Explicit registration — defense against autolinker misses.
         // Duplicate-add is safe: BaseReactPackage.getModule() checks NAME equality
         // and the New Arch module registry de-duplicates by NAME ("KamperModule").
-        add(com.smellouk.kamper.rn.KamperTurboPackage())
+        add(KamperTurboPackage())
       },
     )
   }

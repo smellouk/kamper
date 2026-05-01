@@ -37,7 +37,7 @@ class FpsView : NSView {
         translatesAutoresizingMaskIntoConstraints = false
         wantsLayer = true
 
-        val sep = NSBox(NSMakeRect(0.0, 0.0, 0.0, 1.0)).apply {
+        val sep = NSBox(NSMakeRect(0.0, 0.0, 0.0, 0.0)).apply {
             boxType = NSBoxSeparator
             translatesAutoresizingMaskIntoConstraints = false
         }
@@ -61,7 +61,6 @@ class FpsView : NSView {
 
         c += sep.leadingAnchor.constraintEqualToAnchor(leadingAnchor)
         c += sep.trailingAnchor.constraintEqualToAnchor(trailingAnchor)
-        c += sep.heightAnchor.constraintEqualToConstant(1.0)
         c += sep.topAnchor.constraintEqualToAnchor(animView.bottomAnchor, constant = 8.0)
 
         c += hintLabel.topAnchor.constraintEqualToAnchor(sep.bottomAnchor, constant = 8.0)

@@ -31,7 +31,7 @@ class NetworkView : NSView {
 
         val title   = sectionLbl("System Traffic  (per interval)")
         val appHint = NSTextField.labelWithString("Per-app traffic is Android-only.").apply { font = Theme.HINT_FONT; textColor = Theme.MUTED; translatesAutoresizingMaskIntoConstraints = false }
-        val sep = NSBox(NSMakeRect(0.0, 0.0, 0.0, 1.0)).apply { boxType = NSBoxSeparator; translatesAutoresizingMaskIntoConstraints = false }
+        val sep = NSBox(NSMakeRect(0.0, 0.0, 0.0, 0.0)).apply { boxType = NSBoxSeparator; translatesAutoresizingMaskIntoConstraints = false }
 
         listOf(title, rxRow, rxDetail, txRow, txDetail, appHint, sep, statusLabel, downloadButton).forEach { addSubview(it) }
 
@@ -63,7 +63,6 @@ class NetworkView : NSView {
 
         c += sep.leadingAnchor.constraintEqualToAnchor(leadingAnchor)
         c += sep.trailingAnchor.constraintEqualToAnchor(trailingAnchor)
-        c += sep.heightAnchor.constraintEqualToConstant(1.0)
         c += sep.bottomAnchor.constraintEqualToAnchor(downloadButton.topAnchor, constant = -10.0)
 
         c += statusLabel.centerYAnchor.constraintEqualToAnchor(downloadButton.centerYAnchor)
@@ -97,11 +96,11 @@ class NetworkView : NSView {
     }
 
     private fun triggerDownload() {
-        statusLabel.stringValue = "Fetching 5 MB…"
+        statusLabel.stringValue = "Fetching 20 MB…"
         downloadButton.setEnabled(false)
-        val url = NSURL.URLWithString("https://speed.cloudflare.com/__down?bytes=5000000") ?: return
+        val url = NSURL.URLWithString("https://speed.cloudflare.com/__down?bytes=20000000") ?: return
         NSURLSession.sharedSession.dataTaskWithURL(url) { _, _, _ ->
-            CoroutineScope(Dispatchers.Default).launch {
+            CoroutineScope(Dispatchers.Main).launch {
                 statusLabel.stringValue = "Done"
                 downloadButton.setEnabled(true)
             }

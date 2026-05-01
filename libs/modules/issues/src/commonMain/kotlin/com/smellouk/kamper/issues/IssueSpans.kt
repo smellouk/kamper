@@ -5,10 +5,14 @@ interface ActiveSpan {
 }
 
 object IssueSpans {
-    internal var detector: SlowSpanDetectorApi? = null
+    internal val detectors = mutableListOf<SlowSpanDetectorApi>()
 
-    fun begin(label: String, thresholdMs: Long? = null): ActiveSpan =
-        detector?.begin(label, thresholdMs) ?: NoopSpan
+    fun begin(label: String, thresholdMs: Long? = null): ActiveSpan {
+        if (detectors.isEmpty()) return NoopSpan
+        val spans = detectors.map { it.begin(label, thresholdMs) }
+        return if (spans.size == 1) spans[0]
+        else object : ActiveSpan { override fun end() = spans.forEach { it.end() } }
+    }
 
     fun <T> measure(label: String, thresholdMs: Long? = null, block: () -> T): T {
         val span = begin(label, thresholdMs)

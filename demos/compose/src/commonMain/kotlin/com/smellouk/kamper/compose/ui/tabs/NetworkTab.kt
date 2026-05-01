@@ -30,7 +30,11 @@ import com.smellouk.kamper.compose.ui.MetricRow
 import kotlinx.coroutines.launch
 
 @Composable
-fun NetworkTab(info: NetworkInfo, modifier: Modifier = Modifier) {
+fun NetworkTab(
+    info: NetworkInfo,
+    modifier: Modifier = Modifier,
+    showAppTrafficSection: Boolean = true
+) {
     val scope = rememberCoroutineScope()
     var isDownloading by remember { mutableStateOf(false) }
     var downloadStatus by remember { mutableStateOf("") }
@@ -80,40 +84,42 @@ fun NetworkTab(info: NetworkInfo, modifier: Modifier = Modifier) {
             )
         }
 
-        Spacer(Modifier.height(16.dp))
-        SectionTitle("App Traffic  (Android)")
+        if (showAppTrafficSection) {
+            Spacer(Modifier.height(16.dp))
+            SectionTitle("App Traffic  (Android)")
 
-        val appRxMb = if (isValid) info.rxAppInMb.coerceAtLeast(0f) else 0f
-        val appTxMb = if (isValid) info.txAppInMb.coerceAtLeast(0f) else 0f
-        val appScale = maxOf(appRxMb, appTxMb, 0.1f)
-        MetricRow(
-            label = "Rx App",
-            fraction = (appRxMb / appScale).coerceIn(0f, 1f),
-            valueText = if (isValid) appRxMb.formatSpeed() else "—",
-            barColor = KamperColors.teal
-        )
-        if (isValid) {
-            Text(
-                text = "${appRxMb.fmt3()} MB/interval",
-                fontSize = 11.sp,
-                color = KamperColors.overlay1,
-                modifier = Modifier.padding(start = 4.dp, bottom = 4.dp)
+            val appRxMb = if (isValid) info.rxAppInMb.coerceAtLeast(0f) else 0f
+            val appTxMb = if (isValid) info.txAppInMb.coerceAtLeast(0f) else 0f
+            val appScale = maxOf(appRxMb, appTxMb, 0.1f)
+            MetricRow(
+                label = "Rx App",
+                fraction = (appRxMb / appScale).coerceIn(0f, 1f),
+                valueText = if (isValid) appRxMb.formatSpeed() else "—",
+                barColor = KamperColors.teal
             )
-        }
-        Spacer(Modifier.height(12.dp))
-        MetricRow(
-            label = "Tx App",
-            fraction = (appTxMb / appScale).coerceIn(0f, 1f),
-            valueText = if (isValid) appTxMb.formatSpeed() else "—",
-            barColor = KamperColors.mauve
-        )
-        if (isValid) {
-            Text(
-                text = "${appTxMb.fmt3()} MB/interval",
-                fontSize = 11.sp,
-                color = KamperColors.overlay1,
-                modifier = Modifier.padding(start = 4.dp, bottom = 4.dp)
+            if (isValid) {
+                Text(
+                    text = "${appRxMb.fmt3()} MB/interval",
+                    fontSize = 11.sp,
+                    color = KamperColors.overlay1,
+                    modifier = Modifier.padding(start = 4.dp, bottom = 4.dp)
+                )
+            }
+            Spacer(Modifier.height(12.dp))
+            MetricRow(
+                label = "Tx App",
+                fraction = (appTxMb / appScale).coerceIn(0f, 1f),
+                valueText = if (isValid) appTxMb.formatSpeed() else "—",
+                barColor = KamperColors.mauve
             )
+            if (isValid) {
+                Text(
+                    text = "${appTxMb.fmt3()} MB/interval",
+                    fontSize = 11.sp,
+                    color = KamperColors.overlay1,
+                    modifier = Modifier.padding(start = 4.dp, bottom = 4.dp)
+                )
+            }
         }
 
         if (downloadStatus.isNotEmpty()) {
@@ -141,7 +147,7 @@ fun NetworkTab(info: NetworkInfo, modifier: Modifier = Modifier) {
                 modifier = Modifier.wrapContentWidth()
             ) {
                 Text(
-                    text = if (isDownloading) "FETCHING 5 MB…" else "TEST DOWNLOAD",
+                    text = if (isDownloading) "FETCHING 20 MB…" else "TEST DOWNLOAD",
                     color = KamperColors.text,
                     fontSize = 13.sp
                 )

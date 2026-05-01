@@ -4,7 +4,7 @@ import kotlinx.coroutines.delay
 
 @JsFun("""() => {
     window.__kamperDl = null;
-    fetch('https://speed.cloudflare.com/__down?bytes=5000000')
+    fetch('https://speed.cloudflare.com/__down?bytes=20000000')
         .then(function(r) { return r.arrayBuffer(); })
         .then(function(b) { window.__kamperDl = b.byteLength; })
         .catch(function() { window.__kamperDl = -1; });
@@ -16,7 +16,7 @@ private external fun jsGetNetworkTestResult(): Double
 
 actual suspend fun performNetworkTest(onStatus: (String) -> Unit) {
     jsStartNetworkTest()
-    onStatus("Downloading 5 MB…")
+    onStatus("Downloading 20 MB…")
     repeat(600) {
         delay(100)
         val result = jsGetNetworkTestResult()

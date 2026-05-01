@@ -24,7 +24,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.smellouk.kamper.jank.JankInfo
 import com.smellouk.kamper.compose.ui.KamperColors
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.TimeSource
@@ -32,6 +31,8 @@ import kotlin.time.TimeSource
 @Composable
 fun JankTab(info: JankInfo, modifier: Modifier = Modifier) {
     val scope = rememberCoroutineScope()
+    val isUnsupported = info == JankInfo.UNSUPPORTED
+    val isValid = info != JankInfo.INVALID && !isUnsupported
 
     Column(modifier = modifier.fillMaxSize()) {
         Column(
@@ -42,16 +43,20 @@ fun JankTab(info: JankInfo, modifier: Modifier = Modifier) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = if (info == JankInfo.INVALID) "—" else info.droppedFrames.toString(),
+                text = when {
+                    isUnsupported -> "N/A"
+                    isValid -> info.droppedFrames.toString()
+                    else -> "—"
+                },
                 fontSize = 80.sp,
                 fontWeight = FontWeight.Bold,
                 fontFamily = FontFamily.Monospace,
-                color = KamperColors.mauve,
+                color = if (isUnsupported) KamperColors.overlay1 else KamperColors.mauve,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth()
             )
             Text(
-                text = "dropped frames / window",
+                text = if (isUnsupported) "not supported on this platform" else "dropped frames / window",
                 fontSize = 16.sp,
                 color = KamperColors.overlay1,
                 textAlign = TextAlign.Center,
@@ -67,12 +72,20 @@ fun JankTab(info: JankInfo, modifier: Modifier = Modifier) {
         ) {
             StatRow(
                 label = "Janky ratio",
-                value = if (info == JankInfo.INVALID) "—" else "${(info.jankyFrameRatio * 100f * 10).toInt() / 10.0}%"
+                value = when {
+                    isUnsupported -> "N/A"
+                    isValid -> "${(info.jankyFrameRatio * 100f * 10).toInt() / 10.0}%"
+                    else -> "—"
+                }
             )
             HorizontalDivider(color = KamperColors.surface0, thickness = 1.dp)
             StatRow(
                 label = "Worst frame",
-                value = if (info == JankInfo.INVALID) "—" else "${info.worstFrameMs} ms"
+                value = when {
+                    isUnsupported -> "N/A"
+                    isValid -> "${info.worstFrameMs} ms"
+                    else -> "—"
+                }
             )
         }
 
@@ -86,11 +99,12 @@ fun JankTab(info: JankInfo, modifier: Modifier = Modifier) {
             Spacer(Modifier.weight(1f))
             Button(
                 onClick = {
-                    scope.launch(Dispatchers.Main) {
+                    scope.launch {
                         val end = TimeSource.Monotonic.markNow() + 200.milliseconds
                         while (end.hasNotPassedNow()) {}
                     }
                 },
+                enabled = !isUnsupported,
                 colors = ButtonDefaults.buttonColors(containerColor = KamperColors.surface1),
                 shape = RoundedCornerShape(8.dp),
                 modifier = Modifier.wrapContentWidth()

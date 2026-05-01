@@ -28,7 +28,7 @@ class MemoryView : NSView {
         val heapLabel = sectionLbl("Heap Memory")
         val ramLabel  = sectionLbl("System RAM")
         val pssHint   = NSTextField.labelWithString("PSS metrics: Android only").apply { font = Theme.HINT_FONT; textColor = Theme.MUTED; translatesAutoresizingMaskIntoConstraints = false }
-        val sep = NSBox(NSMakeRect(0.0, 0.0, 0.0, 1.0)).apply { boxType = NSBoxSeparator; translatesAutoresizingMaskIntoConstraints = false }
+        val sep = NSBox(NSMakeRect(0.0, 0.0, 0.0, 0.0)).apply { boxType = NSBoxSeparator; translatesAutoresizingMaskIntoConstraints = false }
 
         listOf(heapLabel, heapRow, heapDetail, ramLabel, ramRow, ramDetail, pssHint, sep, lowMemLabel, allocButton, freeButton).forEach { addSubview(it) }
 
@@ -63,7 +63,6 @@ class MemoryView : NSView {
 
         c += sep.leadingAnchor.constraintEqualToAnchor(leadingAnchor)
         c += sep.trailingAnchor.constraintEqualToAnchor(trailingAnchor)
-        c += sep.heightAnchor.constraintEqualToConstant(1.0)
         c += sep.bottomAnchor.constraintEqualToAnchor(allocButton.topAnchor, constant = -10.0)
 
         c += lowMemLabel.centerYAnchor.constraintEqualToAnchor(allocButton.centerYAnchor)

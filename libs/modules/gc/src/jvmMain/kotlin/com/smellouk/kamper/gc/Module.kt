@@ -15,7 +15,7 @@ private fun createPerformance(logger: Logger) = GcPerformance(
     watcher = GcWatcher(
         defaultDispatcher = Dispatchers.Default,
         mainDispatcher = Dispatchers.Default,
-        repository = GcInfoRepositoryImpl(),
+        repository = GcInfoRepositoryImpl(logger),
         logger = logger
     ),
     logger = logger

@@ -82,6 +82,12 @@ class JankViewController : UIViewController(nibName = null, bundle = null) {
 
     fun update(info: JankInfo) {
         if (info == JankInfo.INVALID) return
+        if (info == JankInfo.UNSUPPORTED) {
+            bigLabel.text   = "N/A"
+            ratioLabel.text = "Not supported on iOS"
+            worstLabel.text = ""
+            return
+        }
         bigLabel.text   = info.droppedFrames.toString()
         val ratio = info.jankyFrameRatio * 100.0
         val ri = ratio.toInt(); val rd = ((ratio - ri) * 10).toInt()

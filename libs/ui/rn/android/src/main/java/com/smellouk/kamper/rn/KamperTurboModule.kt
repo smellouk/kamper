@@ -13,8 +13,10 @@ import com.smellouk.kamper.fps.FpsInfo
 import com.smellouk.kamper.fps.FpsModule
 import com.smellouk.kamper.gc.GcInfo
 import com.smellouk.kamper.gc.GcModule
+import com.smellouk.kamper.issues.ActiveSpan
 import com.smellouk.kamper.issues.AnrConfig
 import com.smellouk.kamper.issues.IssueInfo
+import com.smellouk.kamper.issues.IssueSpans
 import com.smellouk.kamper.issues.IssuesModule
 import com.smellouk.kamper.jank.JankInfo
 import com.smellouk.kamper.jank.JankModule
@@ -24,6 +26,13 @@ import com.smellouk.kamper.network.NetworkInfo
 import com.smellouk.kamper.network.NetworkModule
 import com.smellouk.kamper.thermal.ThermalInfo
 import com.smellouk.kamper.thermal.ThermalModule
+import com.smellouk.kamper.rn.JsGcInfo
+import com.smellouk.kamper.rn.JsGcModule
+import com.smellouk.kamper.rn.JsIssueInfo
+import com.smellouk.kamper.rn.JsIssueModule
+import com.smellouk.kamper.rn.JsMemoryInfo
+import com.smellouk.kamper.rn.JsMemoryModule
+import com.smellouk.kamper.rn.JsRuntimeBridge
 import com.smellouk.kamper.ui.KamperUi
 
 /**
@@ -78,9 +87,12 @@ class KamperTurboModule(reactContext: ReactApplicationContext) :
                     crash { chainToPreviousHandler = false }
                 })
             }
-            if (config.flag("jank"))    install(JankModule(reactApplicationContext.applicationContext as android.app.Application))
-            if (config.flag("gc"))      install(GcModule)
-            if (config.flag("thermal")) install(ThermalModule(reactApplicationContext))
+            if (config.flag("jank"))    install(JankModule(reactApplicationContext.applicationContext as android.app.Application, reactApplicationContext.currentActivity))
+            if (config.flag("gc"))       install(GcModule)
+            if (config.flag("thermal"))  install(ThermalModule(reactApplicationContext))
+            if (config.flag("jsMemory")) install(JsMemoryModule)
+            if (config.flag("jsGc"))     install(JsGcModule)
+            if (config.flag("jsCrash"))  install(JsIssueModule)
 
             // ─── 8 metric listeners ──────────────────────────────────────
             // INVALID guard preserved on every metric (established codebase pattern).
@@ -158,8 +170,39 @@ class KamperTurboModule(reactContext: ReactApplicationContext) :
             addInfoListener<ThermalInfo> { info ->
                 if (info == ThermalInfo.INVALID) return@addInfoListener
                 emitOnThermal(Arguments.createMap().apply {
-                    putString("state",         info.state.name)
-                    putBoolean("isThrottling", info.isThrottling)
+                    putString("state",          info.state.name)
+                    putBoolean("isThrottling",  info.isThrottling)
+                    putDouble("temperatureC",   info.temperatureC)
+                })
+            }
+
+            addInfoListener<JsMemoryInfo> { info ->
+                if (info == JsMemoryInfo.INVALID) return@addInfoListener
+                emitOnJsMemory(Arguments.createMap().apply {
+                    putDouble("usedMb",  info.usedMb)
+                    putDouble("totalMb", info.totalMb)
+                })
+            }
+
+            addInfoListener<JsGcInfo> { info ->
+                if (info == JsGcInfo.INVALID) return@addInfoListener
+                emitOnJsGc(Arguments.createMap().apply {
+                    putDouble("gcCount",        info.gcCount.toDouble())
+                    putDouble("gcPauseMs",      info.gcPauseMs)
+                    putDouble("gcCountDelta",   info.gcCountDelta.toDouble())
+                    putDouble("gcPauseMsDelta", info.gcPauseMsDelta)
+                })
+            }
+
+            addInfoListener<JsIssueInfo> { info ->
+                if (info == JsIssueInfo.INVALID) return@addInfoListener
+                emitOnIssue(Arguments.createMap().apply {
+                    putString("id",        info.id)
+                    putString("type",      "CRASH")
+                    putString("severity",  if (info.isFatal) "CRITICAL" else "ERROR")
+                    putString("message",   info.message)
+                    putDouble("timestamp", info.timestampMs.toDouble())
+                    putString("threadName", "js")
                 })
             }
         }
@@ -187,6 +230,27 @@ class KamperTurboModule(reactContext: ReactApplicationContext) :
         UiThreadUtil.runOnUiThread {
             KamperUi.hide()
         }
+    }
+
+    // ─── JS bridge write methods ──────────────────────────────────────────
+    override fun reportJsMemory(usedMb: Double, totalMb: Double) =
+        JsRuntimeBridge.updateMemory(usedMb, totalMb)
+
+    override fun reportJsGc(count: Double, pauseMs: Double) =
+        JsRuntimeBridge.updateGc(count.toLong(), pauseMs)
+
+    override fun reportCrash(message: String, stack: String, isFatal: Boolean) =
+        JsRuntimeBridge.enqueueCrash(message, stack, isFatal)
+
+    // ─── Span tracking — routes JS spans into IssueSpans ─────────────────
+    private val activeSpans = java.util.concurrent.ConcurrentHashMap<String, ActiveSpan>()
+
+    override fun beginSpan(label: String, thresholdMs: Double) {
+        activeSpans[label] = IssueSpans.begin(label, thresholdMs.toLong())
+    }
+
+    override fun endSpan(label: String) {
+        activeSpans.remove(label)?.end()
     }
 
     companion object {

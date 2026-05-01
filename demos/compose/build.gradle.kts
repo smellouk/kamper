@@ -71,6 +71,9 @@ kotlin {
             }
         }
 
+        val iosArm64Main by getting { dependsOn(iosMain) }
+        val iosSimulatorArm64Main by getting { dependsOn(iosMain) }
+
         val desktopMain by getting {
             dependencies {
                 implementation(compose.desktop.currentOs)
@@ -85,7 +88,7 @@ compose {
             mainClass = "com.smellouk.kamper.compose.MainKt"
             nativeDistributions {
                 targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-                packageName = "Kamper"
+                packageName = "K|Compose"
                 packageVersion = "1.0.0"
             }
         }

@@ -62,6 +62,19 @@ export type GcPayload = {
 export type ThermalPayload = {
   state: string;
   isThrottling: boolean;
+  temperatureC: number;
+};
+
+export type JsMemoryPayload = {
+  usedMb: number;
+  totalMb: number;
+};
+
+export type JsGcPayload = {
+  gcCount: number;
+  gcPauseMs: number;
+  gcCountDelta: number;
+  gcPauseMsDelta: number;
 };
 
 // ─── TurboModule Spec ─────────────────────────────────────────────────────────
@@ -72,6 +85,15 @@ export interface Spec extends TurboModule {
   stop(): void;
   showOverlay(): void;
   hideOverlay(): void;
+
+  // JS bridge write methods — push data from Hermes into Kamper
+  reportJsMemory(usedMb: number, totalMb: number): void;
+  reportJsGc(count: number, pauseMs: number): void;
+  reportCrash(message: string, stack: string, isFatal: boolean): void;
+
+  // Span tracking — routes JS spans through IssueSpans so SlowSpanDetector fires
+  beginSpan(label: string, thresholdMs: number): void;
+  endSpan(label: string): void;
 
   // Codegen emitter properties — generate `emitOnCpu(WritableMap)` style
   // methods on the spec base class for both Android (Kotlin) and iOS (ObjC++).
@@ -84,6 +106,8 @@ export interface Spec extends TurboModule {
   readonly onJank: EventEmitter<JankPayload>;
   readonly onGc: EventEmitter<GcPayload>;
   readonly onThermal: EventEmitter<ThermalPayload>;
+  readonly onJsMemory: EventEmitter<JsMemoryPayload>;
+  readonly onJsGc: EventEmitter<JsGcPayload>;
 }
 
 // Module name 'KamperModule' MUST match Android `KamperTurboModule.NAME`,

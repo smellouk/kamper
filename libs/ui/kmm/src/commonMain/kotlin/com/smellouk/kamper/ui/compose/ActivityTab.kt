@@ -42,6 +42,8 @@ internal fun ActivityTab(
     val isThrottling        by remember { derivedStateOf { s.isThrottling } }
     val cpuUnsupported      by remember { derivedStateOf { s.cpuUnsupported } }
     val thermalUnsupported  by remember { derivedStateOf { s.thermalUnsupported } }
+    val jankUnsupported     by remember { derivedStateOf { s.jankUnsupported } }
+    val gcUnsupported       by remember { derivedStateOf { s.gcUnsupported } }
 
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         if (cfg.cpuEnabled) {
@@ -98,25 +100,29 @@ internal fun ActivityTab(
             )
         }
         if (cfg.jankEnabled) {
+            val isJankUnsupported = jankUnsupported
             MetricCard(
-                title    = "Jank",
-                current  = "$jankDropped dropped",
-                fraction = jankRatio.coerceIn(0f, 1f),
-                color    = KamperTheme.MAUVE,
-                history  = emptyList(),
-                extra    = "ratio ${(jankRatio * 100).formatDp(1)}%",
-                dimmed   = !cfg.showJank
+                title       = "Jank",
+                current     = if (isJankUnsupported) "Unsupported" else "$jankDropped dropped",
+                fraction    = if (isJankUnsupported) 0f else jankRatio.coerceIn(0f, 1f),
+                color       = KamperTheme.MAUVE,
+                history     = emptyList(),
+                extra       = if (isJankUnsupported) null else "ratio ${(jankRatio * 100).formatDp(1)}%",
+                dimmed      = !cfg.showJank,
+                unsupported = isJankUnsupported
             )
         }
         if (cfg.gcEnabled) {
+            val isGcUnsupported = gcUnsupported
             MetricCard(
-                title    = "GC",
-                current  = "+$gcCountDelta runs",
-                fraction = (gcCountDelta / 10f).coerceIn(0f, 1f),
-                color    = KamperTheme.YELLOW,
-                history  = emptyList(),
-                extra    = "+$gcPauseDelta ms pause",
-                dimmed   = !cfg.showGc
+                title       = "GC",
+                current     = if (isGcUnsupported) "Unsupported" else "+$gcCountDelta runs",
+                fraction    = if (isGcUnsupported) 0f else (gcCountDelta / 10f).coerceIn(0f, 1f),
+                color       = KamperTheme.YELLOW,
+                history     = emptyList(),
+                extra       = if (isGcUnsupported) null else "+$gcPauseDelta ms pause",
+                dimmed      = !cfg.showGc,
+                unsupported = isGcUnsupported
             )
         }
         if (cfg.thermalEnabled) {

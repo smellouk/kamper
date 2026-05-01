@@ -51,6 +51,19 @@ export interface GcInfo {
 export interface ThermalInfo {
   state: string;
   isThrottling: boolean;
+  temperatureC: number;
+}
+
+export interface JsMemoryInfo {
+  usedMb: number;
+  totalMb: number;
+}
+
+export interface JsGcInfo {
+  gcCount: number;
+  gcPauseMs: number;
+  gcCountDelta: number;
+  gcPauseMsDelta: number;
 }
 
 /**
@@ -68,4 +81,7 @@ export interface KamperConfig {
   jank?: boolean;
   gc?: boolean;
   thermal?: boolean;
+  jsMemory?: boolean;
+  jsGc?: boolean;
+  jsCrash?: boolean;
 }

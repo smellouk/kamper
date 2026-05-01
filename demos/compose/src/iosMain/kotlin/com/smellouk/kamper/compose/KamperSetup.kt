@@ -1,6 +1,7 @@
 package com.smellouk.kamper.compose
 
 import com.smellouk.kamper.Kamper
+import com.smellouk.kamper.ui.KamperUi
 import com.smellouk.kamper.cpu.CpuInfo
 import com.smellouk.kamper.cpu.CpuModule
 import com.smellouk.kamper.fps.FpsInfo
@@ -33,19 +34,27 @@ actual fun KamperState.initialize(scope: CoroutineScope) {
     Kamper.install(GcModule)
     Kamper.install(ThermalModule)
 
-    Kamper.addInfoListener<CpuInfo>     { info -> scope.launch { cpuInfo = info } }
-    Kamper.addInfoListener<FpsInfo>     { info -> scope.launch { fpsInfo = info } }
-    Kamper.addInfoListener<MemoryInfo>  { info -> scope.launch { memoryInfo = info } }
-    Kamper.addInfoListener<NetworkInfo> { info -> scope.launch { networkInfo = info } }
+    Kamper.addInfoListener<CpuInfo>     { info -> if (info != CpuInfo.INVALID) scope.launch { cpuInfo = info } }
+    Kamper.addInfoListener<FpsInfo>     { info -> if (info != FpsInfo.INVALID) scope.launch { fpsInfo = info } }
+    Kamper.addInfoListener<MemoryInfo>  { info -> if (info != MemoryInfo.INVALID) scope.launch { memoryInfo = info } }
+    Kamper.addInfoListener<NetworkInfo> { info -> if (info != NetworkInfo.INVALID) scope.launch { networkInfo = info } }
     Kamper.addInfoListener<IssueInfo>   { info -> scope.launch { addIssue(info.issue) } }
-    Kamper.addInfoListener<JankInfo>    { info -> scope.launch { jankInfo = info } }
-    Kamper.addInfoListener<GcInfo>      { info -> scope.launch { gcInfo = info } }
-    Kamper.addInfoListener<ThermalInfo> { info -> scope.launch { thermalInfo = info } }
+    Kamper.addInfoListener<JankInfo>    { info -> if (info != JankInfo.INVALID) scope.launch { jankInfo = info } }
+    Kamper.addInfoListener<GcInfo>      { info -> if (info != GcInfo.INVALID) scope.launch { gcInfo = info } }
+    Kamper.addInfoListener<ThermalInfo> { info -> if (info != ThermalInfo.INVALID) scope.launch { thermalInfo = info } }
+
+    IosCrashBridge.onCrash = { issue -> scope.launch { addIssue(issue) } }
 }
 
-actual fun startKamper() = Kamper.start()
+actual fun startKamper() {
+    Kamper.start()
+    KamperUi.attach()
+}
 actual fun stopKamper() = Kamper.stop()
 actual fun disposeKamper() {
+    KamperUi.detach()
     Kamper.stop()
     Kamper.clear()
 }
+
+actual fun platformSupportsAppTraffic(): Boolean = false

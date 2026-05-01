@@ -40,7 +40,11 @@ fun GcTab(info: GcInfo, modifier: Modifier = Modifier) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = if (info == GcInfo.INVALID) "—" else info.gcCountDelta.toString(),
+                text = when {
+                    info == GcInfo.UNSUPPORTED -> "N/A"
+                    info == GcInfo.INVALID     -> "—"
+                    else                       -> info.gcCountDelta.toString()
+                },
                 fontSize = 80.sp,
                 fontWeight = FontWeight.Bold,
                 fontFamily = FontFamily.Monospace,
@@ -65,12 +69,12 @@ fun GcTab(info: GcInfo, modifier: Modifier = Modifier) {
         ) {
             GcStatRow(
                 label = "GC pause delta",
-                value = if (info == GcInfo.INVALID) "—" else "${info.gcPauseMsDelta} ms"
+                value = if (info == GcInfo.INVALID || info == GcInfo.UNSUPPORTED) "—" else "${info.gcPauseMsDelta} ms"
             )
             HorizontalDivider(color = KamperColors.surface0, thickness = 1.dp)
             GcStatRow(
                 label = "Total GC count",
-                value = if (info == GcInfo.INVALID) "—" else info.gcCount.toString()
+                value = if (info == GcInfo.INVALID || info == GcInfo.UNSUPPORTED) "—" else info.gcCount.toString()
             )
         }
 

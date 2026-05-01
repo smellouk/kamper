@@ -33,6 +33,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlin.math.roundToInt
 import kotlin.math.sqrt
 
 @Composable
@@ -84,6 +85,12 @@ fun ThermalTab(info: ThermalInfo, modifier: Modifier = Modifier) {
                 .fillMaxWidth()
                 .padding(horizontal = 20.dp, vertical = 16.dp)
         ) {
+            ThermalStatRow(
+                label = "Temperature",
+                value = if (info == ThermalInfo.INVALID || info.temperatureC < 0) "—"
+                        else (info.temperatureC * 10).roundToInt().let { "${it / 10}.${it % 10} °C" }
+            )
+            HorizontalDivider(color = KamperColors.surface0, thickness = 1.dp)
             ThermalStatRow(
                 label = "Throttling",
                 value = if (info == ThermalInfo.INVALID) "—" else if (info.isThrottling) "YES" else "NO"

@@ -79,7 +79,7 @@ private fun Header(isRunning: Boolean) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Kamper Performance Monitor",
+                text = "K|Compose",
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
                 color = KamperColors.lavender
@@ -135,7 +135,7 @@ private fun KamperContent(state: KamperState) {
                 0 -> CpuTab(info = state.cpuInfo)
                 1 -> FpsTab(info = state.fpsInfo)
                 2 -> MemoryTab(info = state.memoryInfo)
-                3 -> NetworkTab(info = state.networkInfo)
+                3 -> NetworkTab(info = state.networkInfo, showAppTrafficSection = platformSupportsAppTraffic())
                 4 -> IssuesTab(issues = state.issues, onClear = { state.clearIssues() })
                 5 -> JankTab(info = state.jankInfo)
                 6 -> GcTab(info = state.gcInfo)

@@ -18,7 +18,7 @@ internal class FpsInfoSource {
     }
 
     init {
-        IosFpsTimer.setFrameListener(frameListener)
+        IosFpsTimer.addFrameListener(frameListener)
     }
 
     fun getFpsInfoDto(): FpsInfoDto = if (currentFrameCount == 0) {

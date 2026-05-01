@@ -1,6 +1,5 @@
 package com.smellouk.kamper.gc
 
-import com.smellouk.kamper.api.KamperDslMarker
 import com.smellouk.kamper.api.Logger
 import com.smellouk.kamper.api.PerformanceModule
 import com.smellouk.kamper.gc.repository.GcInfoRepositoryImpl

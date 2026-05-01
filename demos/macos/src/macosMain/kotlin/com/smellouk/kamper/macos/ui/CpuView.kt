@@ -32,7 +32,7 @@ class CpuView : NSView {
         val rows = listOf(totalRow, appRow, userRow, systemRow, ioRow)
         rows.forEach { addSubview(it) }
 
-        val sep = NSBox(NSMakeRect(0.0, 0.0, 0.0, 1.0)).apply {
+        val sep = NSBox(NSMakeRect(0.0, 0.0, 0.0, 0.0)).apply {
             boxType = NSBoxSeparator
             translatesAutoresizingMaskIntoConstraints = false
         }
@@ -55,7 +55,6 @@ class CpuView : NSView {
 
         c += sep.leadingAnchor.constraintEqualToAnchor(leadingAnchor)
         c += sep.trailingAnchor.constraintEqualToAnchor(trailingAnchor)
-        c += sep.heightAnchor.constraintEqualToConstant(1.0)
         c += sep.bottomAnchor.constraintEqualToAnchor(loadButton.topAnchor, constant = -10.0)
 
         c += loadButton.trailingAnchor.constraintEqualToAnchor(trailingAnchor, constant = -pad)

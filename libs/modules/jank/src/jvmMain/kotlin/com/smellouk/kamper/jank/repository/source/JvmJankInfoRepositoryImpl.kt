@@ -4,5 +4,5 @@ import com.smellouk.kamper.jank.JankInfo
 import com.smellouk.kamper.jank.repository.JankInfoRepository
 
 internal class JvmJankInfoRepositoryImpl : JankInfoRepository {
-    override fun getInfo(): JankInfo = JankInfo.INVALID
+    override fun getInfo(): JankInfo = JankInfo.UNSUPPORTED
 }

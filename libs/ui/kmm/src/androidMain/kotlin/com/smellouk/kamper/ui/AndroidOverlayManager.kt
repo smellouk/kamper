@@ -31,6 +31,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.unit.Density
 import androidx.core.view.doOnLayout
+import androidx.core.view.doOnNextLayout
 import com.smellouk.kamper.ui.KamperUiSettings
 import com.smellouk.kamper.ui.compose.KamperChip
 import kotlinx.coroutines.flow.StateFlow
@@ -212,7 +213,7 @@ internal class AndroidOverlayManager(
                     it.topMargin = chipY
                 }
                 v.requestLayout()
-                v.post { v.alpha = 1f }
+                v.doOnNextLayout { v.alpha = 1f }
             }
             // Restore visual position via translationX (no layout squeezing)
             v.translationX = peekTranslationX()

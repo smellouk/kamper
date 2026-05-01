@@ -2,12 +2,14 @@ package com.smellouk.kamper.web.ui
 
 import com.smellouk.kamper.jank.JankInfo
 import kotlinx.browser.document
+import org.w3c.dom.HTMLButtonElement
 import org.w3c.dom.HTMLElement
 
 internal object JankSection {
     private lateinit var droppedSpan:  HTMLElement
     private lateinit var ratioSpan:    HTMLElement
     private lateinit var worstSpan:    HTMLElement
+    private var simulateBtn: HTMLButtonElement? = null
 
     fun build(container: HTMLElement) {
         container.div("card") {
@@ -33,7 +35,7 @@ internal object JankSection {
             }
 
             div("card-footer") {
-                button("btn btn-action") {
+                simulateBtn = button("btn btn-action") {
                     textContent = "Simulate Jank"
                     onclick = {
                         val end = kotlin.js.Date().getTime() + 200
@@ -47,6 +49,13 @@ internal object JankSection {
 
     fun update(info: JankInfo) {
         if (info == JankInfo.INVALID) return
+        if (info == JankInfo.UNSUPPORTED) {
+            droppedSpan.textContent = "N/A"
+            ratioSpan.textContent   = "—"
+            worstSpan.textContent   = "—"
+            simulateBtn?.let { it.disabled = true; it.textContent = "Not supported in browser" }
+            return
+        }
         droppedSpan.textContent = info.droppedFrames.toString()
         ratioSpan.textContent   = "${(info.jankyFrameRatio * 100f * 10).toInt() / 10.0}%"
         worstSpan.textContent   = "${info.worstFrameMs} ms"

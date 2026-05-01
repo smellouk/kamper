@@ -1,5 +1,6 @@
 package com.smellouk.kamper.jank
 
+import android.app.Activity
 import android.app.Application
 import com.smellouk.kamper.api.KamperDslMarker
 import com.smellouk.kamper.api.Logger
@@ -14,6 +15,7 @@ actual val JankModule: PerformanceModule<JankConfig, JankInfo>
 @Suppress("FunctionNaming")
 fun JankModule(
     application: Application,
+    initialActivity: Activity? = null,
     builder: JankConfig.Builder.() -> Unit = {}
 ): PerformanceModule<JankConfig, JankInfo> = with(JankConfig.Builder().apply(builder).build()) {
     val tracker = JankFrameTracker()
@@ -28,7 +30,8 @@ fun JankModule(
             ),
             logger = logger,
             application = application,
-            frameTracker = tracker
+            frameTracker = tracker,
+            initialActivity = initialActivity
         )
     )
 }

@@ -50,7 +50,7 @@ class AppDelegate : NSObject, UIApplicationDelegateProtocol {
     }
 }
 
-class RootViewController : UITabBarController(nibName = null, bundle = null) {
+class RootViewController : UIViewController(nibName = null, bundle = null) {
     private lateinit var cpuVC:     CpuViewController
     private lateinit var fpsVC:     FpsViewController
     private lateinit var memoryVC:  MemoryViewController
@@ -59,9 +59,11 @@ class RootViewController : UITabBarController(nibName = null, bundle = null) {
     private lateinit var jankVC:    JankViewController
     private lateinit var gcVC:      GcViewController
     private lateinit var thermalVC: ThermalViewController
+    private lateinit var tabVC:     UITabBarController
 
     override fun viewDidLoad() {
         super.viewDidLoad()
+        view.backgroundColor = Theme.BASE
 
         cpuVC     = CpuViewController()
         fpsVC     = FpsViewController()
@@ -79,17 +81,42 @@ class RootViewController : UITabBarController(nibName = null, bundle = null) {
         issuesVC.tabBarItem  = UITabBarItem(title = "Issues",  image = UIImage.systemImageNamed("exclamationmark.triangle"),       tag = 4)
         jankVC.tabBarItem    = UITabBarItem(title = "Jank",    image = UIImage.systemImageNamed("chart.line.uptrend.xyaxis"),      tag = 5)
         gcVC.tabBarItem      = UITabBarItem(title = "GC",      image = UIImage.systemImageNamed("arrow.triangle.2.circlepath"),    tag = 6)
-        thermalVC.tabBarItem = UITabBarItem(title = "Thermal", image = UIImage.systemImageNamed("thermometer.medium"),             tag = 7)
+        thermalVC.tabBarItem = UITabBarItem(title = "Thermal", image = UIImage.systemImageNamed("thermometer"),                    tag = 7)
 
-        setViewControllers(listOf(cpuVC, fpsVC, memoryVC, networkVC, issuesVC, jankVC, gcVC, thermalVC), animated = false)
+        tabVC = UITabBarController()
+        tabVC.setViewControllers(listOf(cpuVC, fpsVC, memoryVC, networkVC, issuesVC, jankVC, gcVC, thermalVC), animated = false)
 
         val appearance = UITabBarAppearance()
         appearance.configureWithOpaqueBackground()
         appearance.backgroundColor = Theme.MANTLE
-        tabBar.standardAppearance   = appearance
-        tabBar.scrollEdgeAppearance = appearance
-        tabBar.tintColor              = Theme.BLUE
-        tabBar.unselectedItemTintColor = Theme.MUTED
+        tabVC.tabBar.standardAppearance   = appearance
+        tabVC.tabBar.scrollEdgeAppearance = appearance
+        tabVC.tabBar.tintColor              = Theme.BLUE
+        tabVC.tabBar.unselectedItemTintColor = Theme.MUTED
+
+        // Header view pinned to safe area top
+        val headerH = 56.0
+        val header = HeaderView(frame = CGRectMake(0.0, 0.0, 0.0, 0.0))
+        header.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(header)
+
+        // Tab bar controller embedded as child below header
+        addChildViewController(tabVC)
+        tabVC.view.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(tabVC.view)
+        tabVC.didMoveToParentViewController(this)
+
+        NSLayoutConstraint.activateConstraints(listOf(
+            header.topAnchor.constraintEqualToAnchor(view.safeAreaLayoutGuide.topAnchor),
+            header.leadingAnchor.constraintEqualToAnchor(view.leadingAnchor),
+            header.trailingAnchor.constraintEqualToAnchor(view.trailingAnchor),
+            header.heightAnchor.constraintEqualToConstant(headerH),
+
+            tabVC.view.topAnchor.constraintEqualToAnchor(header.bottomAnchor),
+            tabVC.view.leadingAnchor.constraintEqualToAnchor(view.leadingAnchor),
+            tabVC.view.trailingAnchor.constraintEqualToAnchor(view.trailingAnchor),
+            tabVC.view.bottomAnchor.constraintEqualToAnchor(view.bottomAnchor)
+        ))
 
         setupKamper()
     }
@@ -109,7 +136,7 @@ class RootViewController : UITabBarController(nibName = null, bundle = null) {
             addInfoListener<FpsInfo>     { info -> dispatch_async(dispatch_get_main_queue()) { if (fpsVC.isViewLoaded())     fpsVC.update(info) } }
             addInfoListener<MemoryInfo>  { info -> dispatch_async(dispatch_get_main_queue()) { if (memoryVC.isViewLoaded()) memoryVC.update(info) } }
             addInfoListener<NetworkInfo> { info -> dispatch_async(dispatch_get_main_queue()) { if (networkVC.isViewLoaded()) networkVC.update(info) } }
-            addInfoListener<IssueInfo>   { info -> if (issuesVC.isViewLoaded()) issuesVC.addIssue(info.issue) }
+            addInfoListener<IssueInfo>   { info -> dispatch_async(dispatch_get_main_queue()) { if (issuesVC.isViewLoaded()) issuesVC.addIssue(info.issue) } }
             addInfoListener<JankInfo>    { info -> dispatch_async(dispatch_get_main_queue()) { if (jankVC.isViewLoaded())    jankVC.update(info) } }
             addInfoListener<GcInfo>      { info -> dispatch_async(dispatch_get_main_queue()) { if (gcVC.isViewLoaded())      gcVC.update(info) } }
             addInfoListener<ThermalInfo> { info -> dispatch_async(dispatch_get_main_queue()) { if (thermalVC.isViewLoaded()) thermalVC.update(info) } }
@@ -135,22 +162,23 @@ class HeaderView : UIView {
         Theme.SURFACE0.setFill()
         UIBezierPath.bezierPathWithRect(CGRectMake(0.0, h - 1.0, w, 1.0)).fill()
 
-        // Title
+        val pad = 16.0
+
+        // Title — left-aligned
         val title = "K|iOS"
         val attrs = mapOf<Any?, Any?>(
             NSFontAttributeName            to Theme.HEADER_FONT,
             NSForegroundColorAttributeName to Theme.BLUE
         )
         val sz = (title as NSString).sizeWithAttributes(attrs)
-        val tx = (w - sz.useContents { width  }) / 2
         val ty = (h - sz.useContents { height }) / 2
-        (title as NSString).drawAtPoint(CGPointMake(tx, ty), withAttributes = attrs)
+        (title as NSString).drawAtPoint(CGPointMake(pad, ty), withAttributes = attrs)
 
-        // Green dot
-        val strW = sz.useContents { width }
-        val dotX = (w + strW) / 2 + 8.0
-        val dotY = (h - 8.0) / 2.0
+        // Green dot — right-aligned
+        val dotSize = 10.0
+        val dotX = w - pad - dotSize
+        val dotY = (h - dotSize) / 2.0
         Theme.GREEN.setFill()
-        UIBezierPath.bezierPathWithOvalInRect(CGRectMake(dotX, dotY, 8.0, 8.0)).fill()
+        UIBezierPath.bezierPathWithOvalInRect(CGRectMake(dotX, dotY, dotSize, dotSize)).fill()
     }
 }

@@ -5,6 +5,8 @@ import com.smellouk.kamper.network.NetworkInfo
 import kotlinx.cinterop.*
 import platform.Foundation.*
 import platform.UIKit.*
+import platform.darwin.dispatch_async
+import platform.darwin.dispatch_get_main_queue
 
 class NetworkViewController : UIViewController(nibName = null, bundle = null) {
     private val rxRow = metricRow("Download", Theme.TEAL,  Theme.SURFACE0)
@@ -96,7 +98,15 @@ class NetworkViewController : UIViewController(nibName = null, bundle = null) {
     }
 
     private fun triggerTest() {
-        statusLabel.text = "Browse or stream to generate traffic…"
+        statusLabel.text = "Fetching…"
+        val url = NSURL.URLWithString("https://connectivitycheck.gstatic.com/generate_204") ?: return
+        NSURLSession.sharedSession.dataTaskWithURL(url) { _, response, error ->
+            val text = when {
+                error != null -> "Error: ${error.localizedDescription}"
+                else -> "HTTP ${(response as? NSHTTPURLResponse)?.statusCode ?: "?"}"
+            }
+            dispatch_async(dispatch_get_main_queue()!!) { statusLabel.text = text }
+        }.resume()
     }
 }
 

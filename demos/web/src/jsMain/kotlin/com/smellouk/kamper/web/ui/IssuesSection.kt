@@ -34,6 +34,15 @@ internal object IssuesSection {
             onclick = { clearIssues(); null }
         }
 
+        // Crash detection requires window.onerror — not wired in the JS Issues actual.
+        val crashNote = (document.createElement("div") as HTMLElement).also {
+            it.style.fontSize = "12px"
+            it.style.color = "#7f849c"
+            it.style.marginTop = "8px"
+            it.textContent = "Crash detection: not supported in browser (JS actual has no window.onerror hook). Use Slow Span to trigger an issue."
+            parent.appendChild(it)
+        }
+
 
         emptyEl = (document.createElement("p") as HTMLElement).also {
             it.className = "issue-empty"
@@ -67,12 +76,11 @@ internal object IssuesSection {
                 it.className = "issue-row"
                 listEl.appendChild(it)
             }
-            val bar = (document.createElement("div") as HTMLElement).also {
+            (document.createElement("div") as HTMLElement).also {
                 it.className = "issue-bar"
                 it.style.backgroundColor = severityColor(issue.severity)
                 row.appendChild(it)
             }
-            bar.className = "issue-bar"
 
             val content = (document.createElement("div") as HTMLElement).also {
                 it.className = "issue-content"

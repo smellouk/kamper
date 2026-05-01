@@ -1,0 +1,110 @@
+language = Objective-C
+headers = Foundation/Foundation.h IOKit/IOKitLib.h sys/sysctl.h string.h
+linkerOpts = -framework IOKit
+
+---
+
+/* ── Apple Silicon CPU temperature via SMC ─────────────────────────────────
+ * Returns the CPU die temperature in °C, or -1.0 on any failure.
+ * On Intel (x86_64) always returns -1.0 — use only on arm64.
+ * SMC key "Tp09" is the CPU proximity sensor on M-series chips.
+ * Falls back through a list of known keys if the first is absent.      */
+
+#define KAMPER_SMC_INDEX        2
+#define KAMPER_SMC_GET_KEY_INFO 9
+#define KAMPER_SMC_READ_BYTES   5
+
+typedef struct {
+    char    major; char minor; char build; char reserved[1]; UInt16 release;
+} KamperSMCVersion;
+
+typedef struct {
+    UInt16 version; UInt16 length;
+    UInt32 cpuPLimit; UInt32 gpuPLimit; UInt32 memPLimit;
+} KamperSMCPLimit;
+
+typedef struct {
+    UInt32 dataSize; UInt32 dataType; char dataAttributes;
+} KamperSMCKeyInfo;
+
+typedef struct {
+    UInt32          key;
+    KamperSMCVersion vers;
+    KamperSMCPLimit  pLimitData;
+    KamperSMCKeyInfo keyInfo;
+    char            result;
+    char            status;
+    char            data8;
+    UInt32          data32;
+    UInt8           bytes[32];
+} KamperSMCParam;
+
+static UInt32 kamper_smc_encode_key(const char *k) {
+    return ((UInt32)(UInt8)k[0] << 24) | ((UInt32)(UInt8)k[1] << 16)
+         | ((UInt32)(UInt8)k[2] <<  8) |  (UInt32)(UInt8)k[3];
+}
+
+static double kamper_smc_read_key(io_connect_t conn, const char *key) {
+    KamperSMCParam in = {0}, out = {0};
+    size_t outSize = sizeof(KamperSMCParam);
+
+    in.key   = kamper_smc_encode_key(key);
+    in.data8 = KAMPER_SMC_GET_KEY_INFO;
+    if (IOConnectCallStructMethod(conn, KAMPER_SMC_INDEX,
+            &in, sizeof(in), &out, &outSize) != KERN_SUCCESS) return -1.0;
+
+    UInt32 dataSize = out.keyInfo.dataSize;
+    UInt32 dataType = out.keyInfo.dataType;
+
+    memset(&in, 0, sizeof(in));
+    in.key              = kamper_smc_encode_key(key);
+    in.keyInfo.dataSize = dataSize;
+    in.data8            = KAMPER_SMC_READ_BYTES;
+    memset(&out, 0, sizeof(out));
+    outSize = sizeof(KamperSMCParam);
+    if (IOConnectCallStructMethod(conn, KAMPER_SMC_INDEX,
+            &in, sizeof(in), &out, &outSize) != KERN_SUCCESS) return -1.0;
+
+    /* "sp78" — signed fixed-point 7.8 (most common for temperature) */
+    if (dataType == (UInt32)(('s'<<24)|('p'<<16)|('7'<<8)|'8')) {
+        int16_t raw = (int16_t)(((UInt16)out.bytes[0] << 8) | out.bytes[1]);
+        return raw / 256.0;
+    }
+    /* "flt " — 32-bit IEEE 754 float */
+    if (dataType == (UInt32)(('f'<<24)|('l'<<16)|('t'<<8)|' ')) {
+        float f; memcpy(&f, out.bytes, 4); return (double)f;
+    }
+    /* "ui8 " — unsigned 8-bit */
+    if (dataType == (UInt32)(('u'<<24)|('i'<<16)|('8'<<8)|' ')) {
+        return (double)out.bytes[0];
+    }
+    return -1.0;
+}
+
+static double kamper_get_cpu_temperature(void) {
+    /* Only supported on Apple Silicon */
+    int is_arm64 = 0;
+    size_t sz = sizeof(is_arm64);
+    sysctlbyname("hw.optional.arm64", &is_arm64, &sz, NULL, 0);
+    if (!is_arm64) return -1.0;
+
+    io_service_t svc = IOServiceGetMatchingService(0 /* kIOMasterPortDefault */,
+                           IOServiceMatching("AppleSMC"));
+    if (!svc) return -1.0;
+
+    io_connect_t conn = 0;
+    kern_return_t kr = IOServiceOpen(svc, mach_task_self(), 0, &conn);
+    IOObjectRelease(svc);
+    if (kr != KERN_SUCCESS || !conn) return -1.0;
+
+    /* Try known M-series CPU temperature keys in order */
+    const char *keys[] = { "Tp09", "Tp0P", "TC0P", "TC0D", NULL };
+    double temp = -1.0;
+    for (int i = 0; keys[i] && temp <= 0.0; i++) {
+        double t = kamper_smc_read_key(conn, keys[i]);
+        if (t > 0.0 && t < 150.0) temp = t;
+    }
+
+    IOServiceClose(conn);
+    return temp;
+}

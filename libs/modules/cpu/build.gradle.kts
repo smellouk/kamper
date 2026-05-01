@@ -28,4 +28,14 @@ kotlin {
             }
         }
     }
+
+    // Mach host_statistics for direct CPU tick counters — no subprocess overhead.
+    listOf(macosArm64(), @Suppress("DEPRECATION") macosX64()).forEach { target ->
+        target.compilations.getByName("main") {
+            cinterops.create("cpuInfo") {
+                defFile(project.file("src/nativeInterop/cinterop/cpuInfo.def"))
+                packageName("com.smellouk.kamper.cpu.cinterop")
+            }
+        }
+    }
 }

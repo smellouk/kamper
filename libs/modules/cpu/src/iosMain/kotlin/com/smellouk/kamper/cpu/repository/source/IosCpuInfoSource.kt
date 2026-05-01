@@ -19,10 +19,16 @@ import platform.darwin.CPU_STATE_SYSTEM
 import platform.darwin.CPU_STATE_USER
 import platform.darwin.KERN_SUCCESS
 import platform.darwin.PROCESSOR_CPU_LOAD_INFO
+import platform.darwin.THREAD_BASIC_INFO
+import platform.darwin.THREAD_BASIC_INFO_COUNT
+import platform.darwin.TH_USAGE_SCALE
 import platform.darwin.host_processor_info
 import platform.darwin.mach_host_self
 import platform.darwin.mach_task_self_
 import platform.darwin.natural_tVar
+import platform.darwin.task_threads
+import platform.darwin.thread_basic_info
+import platform.darwin.thread_info
 import platform.darwin.vm_deallocate
 
 @OptIn(ExperimentalForeignApi::class)
@@ -32,6 +38,7 @@ internal class IosCpuInfoSource : CpuInfoSource {
     private var prevIdle = 0L
     private var prevNice = 0L
     private var initialized = false
+    private var coreCount = 1
 
     override fun getCpuInfoDto(): CpuInfoDto {
         val ticks = readCpuTicks() ?: return CpuInfoDto.INVALID
@@ -56,15 +63,55 @@ internal class IosCpuInfoSource : CpuInfoSource {
             prevNice = ticks.nice
 
             if (total <= 0) CpuInfoDto.INVALID
-            else CpuInfoDto(
-                totalTime = total,
-                userTime = dUser + dNice,
-                systemTime = dSystem,
-                idleTime = dIdle,
-                ioWaitTime = 0.0,
-                appTime = 0.0
-            )
+            else {
+                val appRatio = readAppCpuRatio()
+                CpuInfoDto(
+                    totalTime = total,
+                    userTime = dUser + dNice,
+                    systemTime = dSystem,
+                    idleTime = dIdle,
+                    ioWaitTime = 0.0,
+                    appTime = appRatio * total
+                )
+            }
         }
+    }
+
+    private fun readAppCpuRatio(): Double = memScoped {
+        val threadList = alloc<CPointerVar<UIntVar>>()
+        val threadCount = alloc<UIntVar>()
+
+        val kr = task_threads(
+            mach_task_self_,
+            threadList.ptr.reinterpret(),
+            threadCount.ptr
+        )
+        if (kr != KERN_SUCCESS) return@memScoped 0.0
+
+        val count = threadCount.value.toInt()
+        val threads = threadList.value ?: return@memScoped 0.0
+
+        var totalUsage = 0L
+        for (i in 0 until count) {
+            val info = alloc<thread_basic_info>()
+            val infoCount = alloc<UIntVar>()
+            infoCount.value = THREAD_BASIC_INFO_COUNT
+            val r = thread_info(
+                threads[i],
+                THREAD_BASIC_INFO.toUInt(),
+                info.ptr.reinterpret(),
+                infoCount.ptr
+            )
+            if (r == KERN_SUCCESS && info.cpu_usage > 0) {
+                totalUsage += info.cpu_usage
+            }
+        }
+
+        val listAddr = threadList.reinterpret<ULongVar>().value
+        val listSize = (count.toLong() * INT_SIZE_BYTES).toULong()
+        vm_deallocate(mach_task_self_, listAddr, listSize)
+
+        totalUsage.toDouble() / (TH_USAGE_SCALE.toDouble() * coreCount.coerceAtLeast(1))
     }
 
     private companion object {
@@ -94,6 +141,7 @@ internal class IosCpuInfoSource : CpuInfoSource {
         if (kr != KERN_SUCCESS) return@memScoped null
 
         val count = processorCount.value.toInt()
+        coreCount = count
         val info = processorInfo.value ?: return@memScoped null
 
         var user = 0L; var sys = 0L; var idle = 0L; var nice = 0L

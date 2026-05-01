@@ -32,6 +32,11 @@ class ThermalView : NSView {
         textColor = Theme.TEXT
         translatesAutoresizingMaskIntoConstraints = false
     }
+    private val temperatureLabel = NSTextField.labelWithString("Temperature:  N/A °C").apply {
+        font = Theme.LABEL_FONT
+        textColor = Theme.TEXT
+        translatesAutoresizingMaskIntoConstraints = false
+    }
     private var stressJobs = listOf<Job>()
     private var stressActive = false
     private val stressTarget = ActionTarget { toggleStress() }
@@ -41,12 +46,12 @@ class ThermalView : NSView {
         translatesAutoresizingMaskIntoConstraints = false
         wantsLayer = true
 
-        val sep = NSBox(NSMakeRect(0.0, 0.0, 0.0, 1.0)).apply {
+        val sep = NSBox(NSMakeRect(0.0, 0.0, 0.0, 0.0)).apply {
             boxType = NSBoxSeparator
             translatesAutoresizingMaskIntoConstraints = false
         }
 
-        listOf(bigLabel, unitLabel, throttlingLabel, sep, stressButton).forEach { addSubview(it) }
+        listOf(bigLabel, unitLabel, throttlingLabel, temperatureLabel, sep, stressButton).forEach { addSubview(it) }
 
         val pad = 20.0
         val c = mutableListOf<NSLayoutConstraint>()
@@ -62,9 +67,12 @@ class ThermalView : NSView {
         c += throttlingLabel.leadingAnchor.constraintEqualToAnchor(leadingAnchor, constant = pad)
         c += throttlingLabel.trailingAnchor.constraintEqualToAnchor(trailingAnchor, constant = -pad)
 
+        c += temperatureLabel.topAnchor.constraintEqualToAnchor(throttlingLabel.bottomAnchor, constant = 8.0)
+        c += temperatureLabel.leadingAnchor.constraintEqualToAnchor(leadingAnchor, constant = pad)
+        c += temperatureLabel.trailingAnchor.constraintEqualToAnchor(trailingAnchor, constant = -pad)
+
         c += sep.leadingAnchor.constraintEqualToAnchor(leadingAnchor)
         c += sep.trailingAnchor.constraintEqualToAnchor(trailingAnchor)
-        c += sep.heightAnchor.constraintEqualToConstant(1.0)
         c += sep.bottomAnchor.constraintEqualToAnchor(stressButton.topAnchor, constant = -10.0)
 
         c += stressButton.trailingAnchor.constraintEqualToAnchor(trailingAnchor, constant = -pad)
@@ -76,9 +84,14 @@ class ThermalView : NSView {
 
     fun update(info: ThermalInfo) {
         if (info == ThermalInfo.INVALID) return
-        bigLabel.stringValue       = info.state.name
-        bigLabel.textColor         = stateColor(info.state)
+        bigLabel.stringValue        = info.state.name
+        bigLabel.textColor          = stateColor(info.state)
         throttlingLabel.stringValue = "Throttling:  ${if (info.isThrottling) "YES" else "NO"}"
+        temperatureLabel.stringValue = if (info.temperatureC >= 0.0) {
+            "Temperature:  ${(info.temperatureC * 10).toLong() / 10.0} °C"
+        } else {
+            "Temperature:  N/A °C"
+        }
     }
 
     private fun stateColor(state: ThermalState): NSColor = when (state) {

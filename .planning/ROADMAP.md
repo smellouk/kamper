@@ -399,14 +399,58 @@ Plans:
 **Goal:** Validate that all 7 Kamper demo apps (jvm, android, compose-desktop, ios, macos, web, react-native) build and pass a 30-second smoke test on the post-Phase-21 monorepo (`:libs:*` paths). One plan per platform per D-06; Claude executes builds while the user installs/launches the app and reports observations per D-08; demos failing the smoke test block plan completion until inline-fixed per D-04. A passing smoke test means: BUILD SUCCESSFUL + app launches without crashing + `addInfoListener` callbacks deliver non-INVALID values for ≥CPU and Memory during 30 seconds of observation.
 **Requirements**: TBD
 **Depends on:** Phase 21
-**Plans:** 8 plans
+**Plans:** 8/8 plans complete
 
 Plans:
-- [ ] 22-01-PLAN.md — Wave 1: JVM demo (`./gradlew :demos:jvm:run`) — fastest baseline; no emulator/Xcode needed
-- [ ] 22-02-PLAN.md — Wave 2: Android demo (`./gradlew :demos:android:assembleDebug` + user `installDebug` on device/emulator) — requires connected device per CLAUDE.md WARNING
-- [ ] 22-03-PLAN.md — Wave 3: Compose Multiplatform desktop (`./gradlew :demos:compose:run`) — desktop window via JVM target actuals
-- [ ] 22-04-PLAN.md — Wave 4: iOS simulator (`./gradlew :demos:ios:linkDebugExecutableIosSimulatorArm64`) — Claude links binary, user runs via Xcode/simctl
-- [ ] 22-05-PLAN.md — Wave 5: macOS native (`./gradlew :demos:macos:linkDebugExecutableMacos<arch>`) — arch-aware (arm64 vs x64); user runs binary
-- [ ] 22-06-PLAN.md — Wave 6: Web JS/WASM (`./gradlew :demos:web:jsBrowserDevelopmentRun`) — backgrounded dev server; user observes DevTools console
-- [ ] 22-07-PLAN.md — Wave 7: React Native (composite Android build + Metro) — INCLUDES KNOWN PRE-FIXES: metro.config.js stale `kamper/ui/rn` path → `libs/ui/rn`, and broken truncated `import com.smellouk.kamper.rn` line in MainApplication.kt
-- [ ] 22-08-PLAN.md — Wave 8: Aggregate 22-RESULTS.md — cross-platform module health matrix (8 modules × 7 platforms) + fixes inventory + Phase 21 validation conclusion (autonomous; depends on all 7 platform plans)
+- [x] 22-01-PLAN.md — Wave 1: JVM demo (`./gradlew :demos:jvm:run`) — fastest baseline; no emulator/Xcode needed
+- [x] 22-02-PLAN.md — Wave 2: Android demo (`./gradlew :demos:android:assembleDebug` + user `installDebug` on device/emulator) — requires connected device per CLAUDE.md WARNING
+- [x] 22-03-PLAN.md — Wave 3: Compose Multiplatform desktop (`./gradlew :demos:compose:run`) — desktop window via JVM target actuals
+- [x] 22-04-PLAN.md — Wave 4: iOS simulator (`./gradlew :demos:ios:linkDebugExecutableIosSimulatorArm64`) — Claude links binary, user runs via Xcode/simctl
+- [x] 22-05-PLAN.md — Wave 5: macOS native (`./gradlew :demos:macos:linkDebugExecutableMacos<arch>`) — arch-aware (arm64 vs x64); user runs binary
+- [x] 22-06-PLAN.md — Wave 6: Web JS/WASM (`./gradlew :demos:web:jsBrowserDevelopmentRun`) — backgrounded dev server; user observes DevTools console
+- [x] 22-07-PLAN.md — Wave 7: React Native (composite Android build + Metro) — INCLUDES KNOWN PRE-FIXES: metro.config.js stale `kamper/ui/rn` path → `libs/ui/rn`, and broken truncated `import com.smellouk.kamper.rn` line in MainApplication.kt
+- [x] 22-08-PLAN.md — Wave 8: Aggregate 22-RESULTS.md — cross-platform module health matrix (8 modules × 7 platforms) + fixes inventory + Phase 21 validation conclusion (autonomous; depends on all 7 platform plans)
+
+### Phase 23: implement GPU module for all platforms
+
+**Goal:** Deliver a fully idiomatic Kamper `GpuModule` (4-class structure: GpuInfo, GpuConfig, GpuWatcher, GpuPerformance) with seven platform actuals and KamperPanel UI integration. GpuInfo carries utilization %, used/total VRAM in MB, and two distinct sentinels (INVALID = -1.0 for transient read failure, UNSUPPORTED = -2.0 for platform capability gap) per D-03/D-04/D-13. Android probes /sys/class/kgsl/kgsl-3d0/gpu_busy_percentage with a /sys/class/devfreq Mali fallback (D-05); JVM uses OSHI 7.0.0 returning partial data per D-02 because OSHI exposes no GPU utilization API; macOS uses an IOKit IOAccelerator cinterop scoped to macosArm64/macosX64 only (D-07); iOS/tvOS/JS/wasmJs return UNSUPPORTED unconditionally for App Store safety and lack of public APIs (D-07/D-08). The KamperPanel adds a GPU MetricCard between CPU and FPS (D-10) showing utilization % primary + memory secondary (D-11), grayed-out when UNSUPPORTED (D-12).
+**Requirements**: D-01, D-02, D-03, D-04, D-05, D-06, D-07, D-08, D-09, D-10, D-11, D-12, D-13
+**Depends on:** Phase 22
+**Plans:** 6 plans
+
+Plans:
+- [ ] 23-01-PLAN.md — Wave 1: register :libs:modules:gpu, declare OSHI 7.0.0 in catalog, write build.gradle.kts + gpuInfo.def IOKit cinterop, scaffold 5 @Ignore-marked test files
+- [ ] 23-02-PLAN.md — Wave 2: commonMain layer (GpuInfo + GpuConfig + GpuWatcher + GpuPerformance + Module.kt expect + repository interfaces) with TDD activation of 3 commonTest files
+- [ ] 23-03-PLAN.md — Wave 3: Android + JVM actuals (kgsl probe-before-read, devfreq Mali fallback, OSHI partial data) + 2 activated tests
+- [ ] 23-04-PLAN.md — Wave 3: macOS IOKit cinterop actual + iOS/tvOS UNSUPPORTED stubs (D-07 App Store safety)
+- [ ] 23-05-PLAN.md — Wave 3: JS + wasmJs UNSUPPORTED stubs (D-08 no public browser GPU API)
+- [ ] 23-06-PLAN.md — Wave 4: UI integration (KamperUiState/Settings, Tracks.GPU=8, ChipIcons, ActivityTab, SettingsTab, ModuleLifecycleManager android+apple, KamperUiRepository normalize) + human-verify checkpoint
+
+### Phase 24: add the option log events which will allow to see them in perfetto UI
+
+**Goal:** Deliver a first-class custom event logging API (`logEvent`, `startEvent`/`endEvent`, `measureEvent`) on the `Engine`/`Kamper` layer — buffered (1000-record cap), opt-out via `KamperConfig.eventsEnabled`, multi-platform — with four integration points: Perfetto trace export (TYPE_INSTANT + TYPE_SLICE_BEGIN/END on a "Custom Events" named track), `dumpEvents()` via Logger, and fan-out to Sentry breadcrumbs, Firebase Crashlytics log, and OpenTelemetry duration spans. Add an "Events" demo tab in `demos/android/` and remove the duplicate Phase 25 ROADMAP entry.
+**Requirements**: TBD (no mapped REQUIREMENTS.md IDs)
+**Depends on:** Phase 23
+**Plans:** 10 plans
+
+Plans:
+- [ ] 24-01-PLAN.md — Wave 0: Test scaffolds for EngineEventTest, UserEventInfoTest, PerfettoExporterEventTest (3 @Ignore'd files)
+- [ ] 24-02-PLAN.md — Wave 1: UserEventInfo data class in libs/api commonMain (D-13, D-14)
+- [ ] 24-03-PLAN.md — Wave 1: EngineEventLock + engineCurrentTimeNs expect/actuals across 8 KMP source sets (D-08, D-11)
+- [ ] 24-04-PLAN.md — Wave 2: Engine event API (logEvent/startEvent/endEvent/measureEvent/dumpEvents/drainEvents) + KamperConfig.eventsEnabled + EventRecord/EventToken (D-01..D-12)
+- [ ] 24-05-PLAN.md — Wave 3: Sentry integration — forwardEvents + "event" branch (D-25, D-26)
+- [ ] 24-06-PLAN.md — Wave 3: Firebase integration — forwardEvents + RecordLog expect/actuals + "event" branch (D-27, D-28)
+- [ ] 24-07-PLAN.md — Wave 3: OpenTelemetry integration — forwardEvents + RecordSpan expect/actuals + "event" branch + clean() shutdownSpanProvider (D-29, D-30, D-31, D-32)
+- [ ] 24-08-PLAN.md — Wave 3: Perfetto export — Tracks.EVENTS=8, PerfettoExporter named-event-track encoding, RecordingManager + KamperUiRepository wiring (D-16..D-21)
+- [ ] 24-09-PLAN.md — Wave 4: Android demo — EventsFragment + fragment_events.xml + item_event.xml + MainActivity (D-22, D-23, D-24); includes human-verify checkpoint
+- [ ] 24-10-PLAN.md — Wave 4: Phase 25 ROADMAP cleanup — remove duplicate entry + sync STATE.md (D-33)
+
+### Phase 25: add the option log events which will allow to see them in perfetto UI
+
+**Goal:** [To be planned]
+**Requirements**: TBD
+**Depends on:** Phase 24
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (run /gsd-plan-phase 25 to break down)

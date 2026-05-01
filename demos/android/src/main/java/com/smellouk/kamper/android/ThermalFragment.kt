@@ -14,6 +14,7 @@ class ThermalFragment : Fragment() {
 
     private var stateLabel: TextView? = null
     private var throttlingValue: TextView? = null
+    private var temperatureValue: TextView? = null
     private var simulateButton: MaterialButton? = null
 
     @Volatile private var isStressing = false
@@ -23,15 +24,16 @@ class ThermalFragment : Fragment() {
     ): View = inflater.inflate(R.layout.fragment_thermal, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        stateLabel      = view.findViewById(R.id.thermalStateLabel)
-        throttlingValue = view.findViewById(R.id.thermalThrottlingValue)
-        simulateButton  = view.findViewById(R.id.thermalSimulateButton)
+        stateLabel        = view.findViewById(R.id.thermalStateLabel)
+        throttlingValue   = view.findViewById(R.id.thermalThrottlingValue)
+        temperatureValue  = view.findViewById(R.id.thermalTemperatureValue)
+        simulateButton    = view.findViewById(R.id.thermalSimulateButton)
         simulateButton?.setOnClickListener { toggleStress() }
     }
 
     override fun onDestroyView() {
         isStressing = false
-        stateLabel = null; throttlingValue = null; simulateButton = null
+        stateLabel = null; throttlingValue = null; temperatureValue = null; simulateButton = null
         super.onDestroyView()
     }
 
@@ -42,11 +44,21 @@ class ThermalFragment : Fragment() {
                 setTextColor(colorForState(info.state))
             }
             throttlingValue?.apply {
-                text = if (info.isThrottling) "YES" else "NO"
+                val unsupported = info == ThermalInfo.UNSUPPORTED
+                text = when {
+                    unsupported      -> "N/A"
+                    info.isThrottling -> "YES"
+                    else             -> "NO"
+                }
                 setTextColor(
-                    if (info.isThrottling) 0xFFFAB387.toInt() else 0xFFA6E3A1.toInt()
+                    when {
+                        unsupported       -> 0xFFA6ADC8.toInt()
+                        info.isThrottling -> 0xFFFAB387.toInt()
+                        else              -> 0xFFA6E3A1.toInt()
+                    }
                 )
             }
+            temperatureValue?.text = if (info.temperatureC >= 0) "%.1f °C".format(info.temperatureC) else "—"
         }
     }
 

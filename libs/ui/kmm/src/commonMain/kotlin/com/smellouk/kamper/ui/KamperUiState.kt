@@ -24,7 +24,10 @@ data class KamperUiState(
     val thermalState: ThermalState = ThermalState.NONE,
     val isThrottling: Boolean = false,
     val cpuUnsupported: Boolean = false,
-    val thermalUnsupported: Boolean = false
+    val thermalUnsupported: Boolean = false,
+    val jankUnsupported: Boolean = false,
+    val networkUnsupported: Boolean = false,
+    val gcUnsupported: Boolean = false
 ) {
     companion object {
         val EMPTY = KamperUiState(

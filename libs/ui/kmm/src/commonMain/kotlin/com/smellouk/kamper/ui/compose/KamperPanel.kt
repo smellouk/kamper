@@ -105,7 +105,7 @@ internal fun KamperPanel(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
-                        "Kamper",
+                        "Konitor",
                         color = KamperTheme.TEXT,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,

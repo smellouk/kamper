@@ -133,18 +133,24 @@ internal fun KamperChip(
                 bottom = 6.dp
             )
     ) {
-        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-            if (settings.cpuEnabled && settings.showCpu)       MetricRow("⚙", KamperTheme.BLUE,  "CPU", "${state.cpuPercent.formatDp(1)}%", mirrorLayout, fontSize)
-            if (settings.fpsEnabled && settings.showFps)       MetricRow("◎", KamperTheme.GREEN, "FPS", "${state.fps} fps", mirrorLayout, fontSize)
-            if (settings.memoryEnabled && settings.showMemory) MetricRow("▦", KamperTheme.PEACH, "MEM", "${state.memoryUsedMb.formatDp(0)} MB", mirrorLayout, fontSize)
-            if (settings.networkEnabled && settings.showNetwork) MetricRow("↓", KamperTheme.TEAL, "NET", netDisplay, mirrorLayout, fontSize)
+        val showCpu     = settings.cpuEnabled     && settings.showCpu     && !state.cpuUnsupported
+        val showNetwork = settings.networkEnabled && settings.showNetwork && !state.networkUnsupported
+        val showJank    = settings.jankEnabled    && settings.showJank    && !state.jankUnsupported
+        val showThermal = settings.thermalEnabled && settings.showThermal && !state.thermalUnsupported
+        val showGc      = settings.gcEnabled      && settings.showGc      && !state.gcUnsupported
 
-            if (settings.jankEnabled && settings.showJank && state.jankDroppedFrames >= 0)
-                MetricRow("⚡", KamperTheme.MAUVE, "JANK", "${state.jankDroppedFrames} fr", mirrorLayout, fontSize)
-            if (settings.gcEnabled && settings.showGc && state.gcCountDelta >= 0)
-                MetricRow("♻", KamperTheme.YELLOW, "GC", "+${state.gcCountDelta}", mirrorLayout, fontSize)
-            if (settings.thermalEnabled && settings.showThermal)
-                MetricRow("🌡", KamperTheme.PEACH, "THRM", state.thermalState.name, mirrorLayout, fontSize)
+        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            if (showCpu) MetricRow(ChipIcons.cpu, KamperTheme.BLUE, "CPU", "${state.cpuPercent.formatDp(1)}%", mirrorLayout, fontSize)
+            if (settings.fpsEnabled && settings.showFps) MetricRow(ChipIcons.fps, KamperTheme.GREEN, "FPS", "${state.fps} fps", mirrorLayout, fontSize)
+            if (settings.memoryEnabled && settings.showMemory) MetricRow(ChipIcons.mem, KamperTheme.PEACH, "MEM", "${state.memoryUsedMb.formatDp(0)} MB", mirrorLayout, fontSize)
+            if (showNetwork) MetricRow(ChipIcons.net, KamperTheme.TEAL, "NET", netDisplay, mirrorLayout, fontSize)
+
+            if (showJank && state.jankDroppedFrames >= 0)
+                MetricRow(ChipIcons.jank, KamperTheme.MAUVE, "JANK", "${state.jankDroppedFrames} fr", mirrorLayout, fontSize)
+            if (showGc && state.gcCountDelta >= 0)
+                MetricRow(ChipIcons.gc, KamperTheme.YELLOW, "GC", "+${state.gcCountDelta}", mirrorLayout, fontSize)
+            if (showThermal)
+                MetricRow(ChipIcons.thermal, KamperTheme.PEACH, "THRM", state.thermalState.name, mirrorLayout, fontSize)
 
             if (settings.issuesEnabled && settings.showIssues) {
                 Box(
@@ -166,7 +172,7 @@ internal fun KamperChip(
                         unread > 0 -> "$count (+$unread)"
                         else       -> "$count"
                     }
-                    MetricRow("⚠", badgeColor, "ISSUES", value, mirrorLayout, fontSize)
+                    MetricRow(ChipIcons.issues, badgeColor, "ISSUES", value, mirrorLayout, fontSize)
                 }
             }
         }
@@ -181,7 +187,7 @@ private fun IssueBadgeRow(count: Int, color: Color, mirror: Boolean, fontSize: a
         modifier = Modifier.width(ROW_WIDTH_DP.dp)
     ) {
         if (!mirror) {
-            Text("⚠", color = color, fontSize = fontSize, fontWeight = FontWeight.Bold, modifier = Modifier.width(14.dp))
+            Text(ChipIcons.issues, color = color, fontSize = fontSize, fontWeight = FontWeight.Bold, modifier = Modifier.width(14.dp))
             if (count > 0) {
                 Text(
                     "$count",
@@ -203,7 +209,7 @@ private fun IssueBadgeRow(count: Int, color: Color, mirror: Boolean, fontSize: a
                 )
                 Spacer(Modifier.width(2.dp))
             }
-            Text("⚠", color = color, fontSize = fontSize, fontWeight = FontWeight.Bold, modifier = Modifier.width(14.dp))
+            Text(ChipIcons.issues, color = color, fontSize = fontSize, fontWeight = FontWeight.Bold, modifier = Modifier.width(14.dp))
         }
     }
 }

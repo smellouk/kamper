@@ -47,7 +47,7 @@ internal fun SettingsTab(
         SectionLabel("MODULES")
 
         ModuleCard(
-            icon = "⚙",
+            icon = ChipIcons.cpu,
             name = "CPU",
             color = KamperTheme.BLUE,
             enabled = cfg.cpuEnabled,
@@ -56,11 +56,12 @@ internal fun SettingsTab(
             intervalOptions = INTERVAL_OPTIONS,
             onEnabledChange = { onSettingsChange(cfg.copy(cpuEnabled = it)) },
             onShowInChipChange = { onSettingsChange(cfg.copy(showCpu = it)) },
-            onIntervalChange = { onSettingsChange(cfg.copy(cpuIntervalMs = it)) }
+            onIntervalChange = { onSettingsChange(cfg.copy(cpuIntervalMs = it)) },
+            unsupported = s.cpuUnsupported
         )
 
         ModuleCard(
-            icon = "◎",
+            icon = ChipIcons.fps,
             name = "FPS",
             color = KamperTheme.GREEN,
             enabled = cfg.fpsEnabled,
@@ -73,7 +74,7 @@ internal fun SettingsTab(
         )
 
         ModuleCard(
-            icon = "▦",
+            icon = ChipIcons.mem,
             name = "Memory",
             color = KamperTheme.PEACH,
             enabled = cfg.memoryEnabled,
@@ -86,7 +87,7 @@ internal fun SettingsTab(
         )
 
         ModuleCard(
-            icon = "↓",
+            icon = ChipIcons.net,
             name = "Network",
             color = KamperTheme.TEAL,
             enabled = cfg.networkEnabled,
@@ -95,11 +96,12 @@ internal fun SettingsTab(
             intervalOptions = INTERVAL_OPTIONS,
             onEnabledChange = { onSettingsChange(cfg.copy(networkEnabled = it)) },
             onShowInChipChange = { onSettingsChange(cfg.copy(showNetwork = it)) },
-            onIntervalChange = { onSettingsChange(cfg.copy(networkIntervalMs = it)) }
+            onIntervalChange = { onSettingsChange(cfg.copy(networkIntervalMs = it)) },
+            unsupported = s.networkUnsupported
         )
 
         ModuleCard(
-            icon = "⚠",
+            icon = ChipIcons.issues,
             name = "Issues",
             color = KamperTheme.RED,
             enabled = cfg.issuesEnabled,
@@ -113,7 +115,7 @@ internal fun SettingsTab(
         )
 
         ModuleCard(
-            icon = "⚡",
+            icon = ChipIcons.jank,
             name = "Jank",
             color = KamperTheme.MAUVE,
             enabled = cfg.jankEnabled,
@@ -122,11 +124,12 @@ internal fun SettingsTab(
             intervalOptions = emptyList(),
             onEnabledChange = { onSettingsChange(cfg.copy(jankEnabled = it)) },
             onShowInChipChange = { onSettingsChange(cfg.copy(showJank = it)) },
-            onIntervalChange = {}
+            onIntervalChange = {},
+            unsupported = s.jankUnsupported
         )
 
         ModuleCard(
-            icon = "♻",
+            icon = ChipIcons.gc,
             name = "GC",
             color = KamperTheme.YELLOW,
             enabled = cfg.gcEnabled,
@@ -135,11 +138,12 @@ internal fun SettingsTab(
             intervalOptions = emptyList(),
             onEnabledChange = { onSettingsChange(cfg.copy(gcEnabled = it)) },
             onShowInChipChange = { onSettingsChange(cfg.copy(showGc = it)) },
-            onIntervalChange = {}
+            onIntervalChange = {},
+            unsupported = s.gcUnsupported
         )
 
         ModuleCard(
-            icon = "🌡",
+            icon = ChipIcons.thermal,
             name = "Thermal",
             color = KamperTheme.PEACH,
             enabled = cfg.thermalEnabled,
@@ -148,7 +152,8 @@ internal fun SettingsTab(
             intervalOptions = emptyList(),
             onEnabledChange = { onSettingsChange(cfg.copy(thermalEnabled = it)) },
             onShowInChipChange = { onSettingsChange(cfg.copy(showThermal = it)) },
-            onIntervalChange = {}
+            onIntervalChange = {},
+            unsupported = s.thermalUnsupported
         )
     }
 }

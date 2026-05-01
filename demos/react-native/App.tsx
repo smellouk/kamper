@@ -25,6 +25,8 @@ import type {
   JankInfo,
   GcInfo,
   ThermalInfo,
+  JsMemoryInfo,
+  JsGcInfo,
 } from 'react-native-kamper';
 
 // ─── D-12 verification: __DEV__-only overlay sample ─────────────────────
@@ -75,6 +77,8 @@ type IssueData = IssueInfo;
 type JankData = JankInfo;
 type GcData = GcInfo;
 type ThermalData = ThermalInfo;
+type JsMemoryData = JsMemoryInfo;
+type JsGcData = JsGcInfo;
 
 // ── Format helpers ─────────────────────────────────────────────────────────────
 const pct = (v: number) => `${(v * 100).toFixed(1)}%`;
@@ -255,26 +259,32 @@ function FpsAnimation() {
 // ── CPU Tab ────────────────────────────────────────────────────────────────────
 function CpuTab({cpu, running}: {cpu: CpuData | null; running: boolean}) {
   const [stressing, setStressing] = useState(false);
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const activeRef = useRef(false);
+
+  const runLoop = useCallback(() => {
+    if (!activeRef.current) return;
+    const end = Date.now() + 30;
+    while (Date.now() < end) {}
+    setTimeout(runLoop, 0);
+  }, []);
 
   const toggleStress = useCallback(() => {
     if (stressing) {
-      if (timerRef.current) clearInterval(timerRef.current);
+      activeRef.current = false;
       setStressing(false);
     } else {
+      activeRef.current = true;
       setStressing(true);
-      timerRef.current = setInterval(() => {
-        const end = Date.now() + 40;
-        while (Date.now() < end) {}
-      }, 60);
+      setTimeout(runLoop, 50);
     }
-  }, [stressing]);
+  }, [stressing, runLoop]);
 
-  useEffect(() => () => {if (timerRef.current) clearInterval(timerRef.current);}, []);
+  useEffect(() => () => { activeRef.current = false; }, []);
 
   return (
     <View style={s.tabContent}>
       <ScrollView
+        style={s.tabScroll}
         contentContainerStyle={s.scrollContent}
         showsVerticalScrollIndicator={false}>
         <SectionTitle label="CPU USAGE" first />
@@ -313,6 +323,7 @@ function FpsTab({fps}: {fps: FpsData | null}) {
   return (
     <View style={s.tabContent}>
       <ScrollView
+        style={s.tabScroll}
         contentContainerStyle={[s.scrollContent, {alignItems: 'center'}]}
         showsVerticalScrollIndicator={false}>
         <View style={s.fpsBig}>
@@ -329,15 +340,30 @@ function FpsTab({fps}: {fps: FpsData | null}) {
 }
 
 // ── Memory Tab ─────────────────────────────────────────────────────────────────
-function MemoryTab({mem, running}: {mem: MemoryData | null; running: boolean}) {
+function MemoryTab({mem, jsMem, running}: {mem: MemoryData | null; jsMem: JsMemoryData | null; running: boolean}) {
+  const allocRef = useRef<Uint8Array | null>(null);
+  const [allocMsg, setAllocMsg] = useState('');
+
+  const alloc32Mb = useCallback(() => {
+    allocRef.current = new Uint8Array(32 * 1024 * 1024).fill(0xAA);
+    setAllocMsg('Allocated 32 MB in JS heap');
+  }, []);
+
+  const releaseJsMem = useCallback(() => {
+    allocRef.current = null;
+    setAllocMsg('Released — awaiting Hermes GC');
+    setTimeout(() => setAllocMsg(''), 3000);
+  }, []);
+
   return (
     <View style={s.tabContent}>
       <ScrollView
+        style={s.tabScroll}
         contentContainerStyle={s.scrollContent}
         showsVerticalScrollIndicator={false}>
         {mem ? (
           <>
-            <SectionTitle label="HEAP MEMORY" first />
+            <SectionTitle label="NATIVE — HEAP" first />
             <MetricRow
               label="Heap"
               ratio={mem.heapMaxMb > 0 ? mem.heapAllocatedMb / mem.heapMaxMb : 0}
@@ -345,7 +371,7 @@ function MemoryTab({mem, running}: {mem: MemoryData | null; running: boolean}) {
               color={C.green}
               detail={`${mb1(mem.heapAllocatedMb)} / ${mb1(mem.heapMaxMb)} max`}
             />
-            <SectionTitle label="SYSTEM RAM" />
+            <SectionTitle label="NATIVE — SYSTEM RAM" />
             <MetricRow
               label="RAM"
               ratio={mem.ramTotalMb > 0 ? mem.ramUsedMb / mem.ramTotalMb : 0}
@@ -353,17 +379,28 @@ function MemoryTab({mem, running}: {mem: MemoryData | null; running: boolean}) {
               color={C.blue}
               detail={`${mb1(mem.ramUsedMb)} / ${mb1(mem.ramTotalMb)} total`}
             />
-            {mem.isLowMemory ? (
-              <Text style={s.lowMem}>⚠ Low Memory</Text>
-            ) : null}
+            {mem.isLowMemory ? <Text style={s.lowMem}>⚠ Low Memory</Text> : null}
           </>
         ) : (
           <Placeholder running={running} />
         )}
+        <SectionTitle label="JS — HEAP (HERMES)" first={!mem} />
+        {jsMem ? (
+          <MetricRow
+            label="JS Used"
+            ratio={jsMem.totalMb > 0 ? jsMem.usedMb / jsMem.totalMb : 0}
+            value={mb1(jsMem.usedMb)}
+            color={C.mauve}
+            detail={`${mb1(jsMem.usedMb)} / ${mb1(jsMem.totalMb)} capacity`}
+          />
+        ) : (
+          <Placeholder running={running} />
+        )}
+        {allocMsg ? <Text style={s.dlStatus}>{allocMsg}</Text> : null}
       </ScrollView>
       <View style={[s.footer, s.footerRow]}>
-        <Btn label="ALLOC 32 MB" onPress={() => {}} />
-        <Btn label="FORCE GC"    onPress={() => {}} />
+        <Btn label="ALLOC 32 MB (JS)" onPress={alloc32Mb} />
+        <Btn label="RELEASE (JS)"     onPress={releaseJsMem} />
       </View>
     </View>
   );
@@ -397,6 +434,7 @@ function NetworkTab({
   return (
     <View style={s.tabContent}>
       <ScrollView
+        style={s.tabScroll}
         contentContainerStyle={s.scrollContent}
         showsVerticalScrollIndicator={false}>
         {net ? (
@@ -484,19 +522,37 @@ function IssueRow({issue}: {issue: IssueData}) {
 }
 
 function IssuesTab({issues, onClear}: {issues: IssueData[]; onClear: () => void}) {
+  const [spanStatus, setSpanStatus] = useState('');
+
+  const triggerSlowSpan = useCallback(() => {
+    setSpanStatus('Blocking JS thread 800 ms…');
+    setTimeout(() => {
+      Kamper.beginSpan('js-slow-span', 500);
+      const start = Date.now();
+      while (Date.now() - start < 800) {}
+      Kamper.endSpan('js-slow-span');
+      setSpanStatus('Done — SLOW_SPAN event fired');
+      setTimeout(() => setSpanStatus(''), 5000);
+    }, 200);
+  }, []);
+
+  const triggerCrash = useCallback(() => {
+    setTimeout(() => { throw new Error('Demo crash: test crash triggered by user'); }, 0);
+  }, []);
+
   return (
     <View style={s.tabContent}>
       {issues.length === 0
         ? <View style={s.issueEmpty}><Text style={s.issueEmptyText}>No issues detected</Text></View>
-        : <ScrollView showsVerticalScrollIndicator={false}>
+        : <ScrollView style={s.tabScroll} showsVerticalScrollIndicator={false}>
             {issues.map(issue => <IssueRow key={issue.id} issue={issue} />)}
           </ScrollView>
       }
+      {spanStatus ? <Text style={s.spanStatus}>{spanStatus}</Text> : null}
       <View style={[s.footer, {justifyContent: 'flex-start', gap: 8}]}>
-        <Btn label="SLOW SPAN" onPress={() => {
-          const start = Date.now(); while(Date.now() - start < 800) {}
-        }} />
-        <Btn label="CLEAR" onPress={onClear} />
+        <Btn label="SLOW SPAN (JS)" onPress={triggerSlowSpan} />
+        <Btn label="CRASH"     onPress={triggerCrash} />
+        <Btn label="CLEAR"     onPress={onClear} />
       </View>
     </View>
   );
@@ -504,9 +560,21 @@ function IssuesTab({issues, onClear}: {issues: IssueData[]; onClear: () => void}
 
 // ── Jank Tab ───────────────────────────────────────────────────────────────────
 function JankTab({jank, running}: {jank: JankData | null; running: boolean}) {
+  const [jankMsg, setJankMsg] = useState('');
+
+  const simulateJank = useCallback(() => {
+    setJankMsg('Blocking 200 ms (Native)…');
+    setTimeout(() => {
+      const end = Date.now() + 200;
+      while (Date.now() < end) {}
+      setJankMsg('Done — check dropped frames');
+      setTimeout(() => setJankMsg(''), 5000);
+    }, 200);
+  }, []);
+
   return (
     <View style={s.tabContent}>
-      <ScrollView contentContainerStyle={[s.scrollContent, {alignItems: 'center'}]} showsVerticalScrollIndicator={false}>
+      <ScrollView style={s.tabScroll} contentContainerStyle={[s.scrollContent, {alignItems: 'center'}]} showsVerticalScrollIndicator={false}>
         <View style={s.fpsBig}>
           <Text style={[s.fpsNum, {color: C.mauve}]}>{jank ? jank.droppedFrames : '—'}</Text>
         </View>
@@ -517,7 +585,7 @@ function JankTab({jank, running}: {jank: JankData | null; running: boolean}) {
             <View style={s.metricWrap}>
               <View style={s.metricRow}>
                 <Text style={s.metricLabel}>Janky ratio</Text>
-                <Text style={[s.metricValue, {color: C.mauve}]}>{(jank.jankyRatio * 100).toFixed(1)}%</Text>
+                <Text style={[s.metricValue, {color: C.mauve}]}>{(jank.jankyFrameRatio * 100).toFixed(1)}%</Text>
               </View>
             </View>
             <View style={s.metricWrap}>
@@ -531,28 +599,41 @@ function JankTab({jank, running}: {jank: JankData | null; running: boolean}) {
           <Placeholder running={running} />
         )}
       </ScrollView>
+      {jankMsg ? <Text style={s.spanStatus}>{jankMsg}</Text> : null}
       <View style={s.footer}>
-        <Btn label="SIMULATE JANK" onPress={() => {
-          const end = Date.now() + 200;
-          while (Date.now() < end) {}
-        }} />
+        <Btn label="SIMULATE JANK (Native)" onPress={simulateJank} />
       </View>
     </View>
   );
 }
 
 // ── GC Tab ─────────────────────────────────────────────────────────────────────
-function GcTab({gc, running}: {gc: GcData | null; running: boolean}) {
+function GcTab({gc, jsGc, running}: {gc: GcData | null; jsGc: JsGcData | null; running: boolean}) {
+  const [gcMsg, setGcMsg] = useState('');
+
+  const simulateGc = useCallback(() => {
+    setGcMsg('Allocating…');
+    setTimeout(() => {
+      const bufs: Uint8Array[] = [];
+      for (let i = 0; i < 30; i++) bufs.push(new Uint8Array(1024 * 1024).fill(i));
+      bufs.length = 0;
+      setGcMsg('Released 30 MB — GC triggered');
+      setTimeout(() => setGcMsg(''), 3000);
+    }, 50);
+  }, []);
+
   return (
     <View style={s.tabContent}>
-      <ScrollView contentContainerStyle={[s.scrollContent, {alignItems: 'center'}]} showsVerticalScrollIndicator={false}>
-        <View style={s.fpsBig}>
-          <Text style={[s.fpsNum, {color: C.yellow}]}>{gc ? gc.gcCountDelta : '—'}</Text>
-        </View>
-        <Text style={[s.fpsUnit, {marginBottom: 20}]}>GC events / interval</Text>
+      <ScrollView style={s.tabScroll} contentContainerStyle={s.scrollContent} showsVerticalScrollIndicator={false}>
+        <SectionTitle label="NATIVE — GC (ART)" first />
         {gc ? (
           <>
-            <SectionTitle label="STATS" first />
+            <View style={s.metricWrap}>
+              <View style={s.metricRow}>
+                <Text style={s.metricLabel}>Events/interval</Text>
+                <Text style={[s.metricValue, {color: C.yellow}]}>{gc.gcCountDelta.toFixed(0)}</Text>
+              </View>
+            </View>
             <View style={s.metricWrap}>
               <View style={s.metricRow}>
                 <Text style={s.metricLabel}>Pause delta</Text>
@@ -569,13 +650,35 @@ function GcTab({gc, running}: {gc: GcData | null; running: boolean}) {
         ) : (
           <Placeholder running={running} />
         )}
+        <SectionTitle label="JS — GC (HERMES)" />
+        {jsGc ? (
+          <>
+            <View style={s.metricWrap}>
+              <View style={s.metricRow}>
+                <Text style={s.metricLabel}>Events/interval</Text>
+                <Text style={[s.metricValue, {color: C.mauve}]}>{jsGc.gcCountDelta.toFixed(0)}</Text>
+              </View>
+            </View>
+            <View style={s.metricWrap}>
+              <View style={s.metricRow}>
+                <Text style={s.metricLabel}>Pause delta</Text>
+                <Text style={[s.metricValue, {color: C.mauve}]}>{jsGc.gcPauseMsDelta.toFixed(1)} ms</Text>
+              </View>
+            </View>
+            <View style={s.metricWrap}>
+              <View style={s.metricRow}>
+                <Text style={s.metricLabel}>Total pause</Text>
+                <Text style={[s.metricValue, {color: C.text}]}>{jsGc.gcPauseMs.toFixed(1)} ms</Text>
+              </View>
+            </View>
+          </>
+        ) : (
+          <Placeholder running={running} />
+        )}
       </ScrollView>
+      {gcMsg ? <Text style={s.spanStatus}>{gcMsg}</Text> : null}
       <View style={s.footer}>
-        <Btn label="SIMULATE GC" onPress={() => {
-          const arr: object[] = [];
-          for (let i = 0; i < 200_000; i++) arr.push({i});
-          arr.length = 0;
-        }} />
+        <Btn label="SIMULATE GC (JS)" onPress={simulateGc} />
       </View>
     </View>
   );
@@ -590,34 +693,49 @@ const THERMAL_COLORS: Record<string, string> = {
 
 function ThermalTab({thermal, running}: {thermal: ThermalData | null; running: boolean}) {
   const [stressing, setStressing] = useState(false);
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const activeRef = useRef(false);
+  const [unavailable, setUnavailable] = useState(false);
+
+  const runLoop = useCallback(() => {
+    if (!activeRef.current) return;
+    const end = Date.now() + 30;
+    while (Date.now() < end) {}
+    setTimeout(runLoop, 0);
+  }, []);
 
   const toggleStress = useCallback(() => {
     if (stressing) {
-      if (timerRef.current) clearInterval(timerRef.current);
+      activeRef.current = false;
       setStressing(false);
     } else {
+      activeRef.current = true;
       setStressing(true);
-      timerRef.current = setInterval(() => {
-        const end = Date.now() + 40;
-        while (Date.now() < end) {}
-      }, 60);
+      setTimeout(runLoop, 50);
     }
-  }, [stressing]);
+  }, [stressing, runLoop]);
 
-  useEffect(() => () => {if (timerRef.current) clearInterval(timerRef.current);}, []);
+  useEffect(() => () => { activeRef.current = false; }, []);
 
-  const stateLabel = thermal ? thermal.state : 'UNKNOWN';
-  const stateColor = THERMAL_COLORS[stateLabel] ?? C.overlay1;
+  useEffect(() => {
+    if (thermal) { setUnavailable(false); return; }
+    const t = setTimeout(() => setUnavailable(true), 5000);
+    return () => clearTimeout(t);
+  }, [thermal]);
+
+  const isUnsupported = thermal?.state === 'UNSUPPORTED';
+  const stateLabel = thermal && !isUnsupported ? thermal.state : unavailable || isUnsupported ? 'N/A' : 'UNKNOWN';
+  const stateColor = thermal && !isUnsupported
+    ? (THERMAL_COLORS[thermal.state] ?? C.overlay1)
+    : unavailable || isUnsupported ? C.red : C.overlay1;
 
   return (
     <View style={s.tabContent}>
-      <ScrollView contentContainerStyle={[s.scrollContent, {alignItems: 'center'}]} showsVerticalScrollIndicator={false}>
+      <ScrollView style={s.tabScroll} contentContainerStyle={[s.scrollContent, {alignItems: 'center'}]} showsVerticalScrollIndicator={false}>
         <View style={s.fpsBig}>
           <Text style={[s.fpsNum, {color: stateColor, fontSize: 48}]}>{stateLabel}</Text>
         </View>
         <Text style={[s.fpsUnit, {marginBottom: 20}]}>thermal state</Text>
-        {thermal ? (
+        {thermal && !isUnsupported ? (
           <>
             <SectionTitle label="STATUS" first />
             <View style={s.metricWrap}>
@@ -628,7 +746,19 @@ function ThermalTab({thermal, running}: {thermal: ThermalData | null; running: b
                 </Text>
               </View>
             </View>
+            {thermal.temperatureC >= 0 ? (
+              <View style={s.metricWrap}>
+                <View style={s.metricRow}>
+                  <Text style={s.metricLabel}>Battery temp</Text>
+                  <Text style={[s.metricValue, {color: thermal.temperatureC > 40 ? C.peach : C.text}]}>
+                    {thermal.temperatureC.toFixed(1)} °C
+                  </Text>
+                </View>
+              </View>
+            ) : null}
           </>
+        ) : unavailable || isUnsupported ? (
+          <Text style={[s.placeholder, {color: C.red}]}>Not available on this device</Text>
         ) : (
           <Placeholder running={running} />
         )}
@@ -657,10 +787,14 @@ export default function App() {
   const [jank, setJank]           = useState<JankData | null>(null);
   const [gc, setGc]               = useState<GcData | null>(null);
   const [thermal, setThermal]     = useState<ThermalData | null>(null);
+  const [jsMem, setJsMem]         = useState<JsMemoryData | null>(null);
+  const [jsGc, setJsGc]           = useState<JsGcData | null>(null);
   const peakRxRef                 = useRef(0);
   const peakTxRef                 = useRef(0);
 
   useEffect(() => {
+    Kamper.start();
+    setRunning(true);
     const subs = [
       Kamper.on('cpu',     (d: CpuData)     => setCpu(d)),
       Kamper.on('fps',     (d: FpsData)     => setFps(d)),
@@ -674,10 +808,15 @@ export default function App() {
         setIssues(prev => [d, ...prev].slice(0, 100));
       }),
       Kamper.on('jank',    (d: JankData)    => setJank(d)),
-      Kamper.on('gc',      (d: GcData)      => setGc(d)),
-      Kamper.on('thermal', (d: ThermalData) => setThermal(d)),
+      Kamper.on('gc',       (d: GcData)       => setGc(d)),
+      Kamper.on('thermal',  (d: ThermalData)  => setThermal(d)),
+      Kamper.on('jsMemory', (d: JsMemoryData) => setJsMem(d)),
+      Kamper.on('jsGc',     (d: JsGcData)     => setJsGc(d)),
     ];
-    return () => subs.forEach(sub => sub.remove());
+    return () => {
+      subs.forEach(sub => sub.remove());
+      Kamper.stop();
+    };
   }, []);
 
   const toggle = useCallback(() => {
@@ -685,7 +824,7 @@ export default function App() {
       Kamper.stop();
       setRunning(false);
       setCpu(null); setFps(null); setMem(null); setNet(null); setIssues([]);
-      setJank(null); setGc(null); setThermal(null);
+      setJank(null); setGc(null); setThermal(null); setJsMem(null); setJsGc(null);
       peakRxRef.current = 0; peakTxRef.current = 0;
     } else {
       Kamper.start();
@@ -713,28 +852,30 @@ export default function App() {
       <View style={s.divider} />
 
       {/* Tab bar */}
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        style={s.tabBar}
-        contentContainerStyle={s.tabBarContent}>
-        {TABS.map((name, i) => (
-          <Pressable
-            key={name}
-            style={[s.tab, activeTab === i && s.tabActive]}
-            onPress={() => setActiveTab(i)}>
-            <Text style={[s.tabText, activeTab === i && s.tabTextActive]}>
-              {name}
-            </Text>
-          </Pressable>
-        ))}
-      </ScrollView>
+      <View style={s.tabBar}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={s.tabBarContent}>
+          {TABS.map((name, i) => (
+            <Pressable
+              key={name}
+              style={s.tab}
+              onPress={() => setActiveTab(i)}>
+              <Text style={[s.tabText, activeTab === i && s.tabTextActive]}>
+                {name}
+              </Text>
+              {activeTab === i && <View style={s.tabIndicator} />}
+            </Pressable>
+          ))}
+        </ScrollView>
+      </View>
       <View style={s.divider} />
 
       {/* Tab content */}
       {activeTab === 0 && <CpuTab     cpu={cpu} running={running} />}
       {activeTab === 1 && <FpsTab     fps={fps} />}
-      {activeTab === 2 && <MemoryTab  mem={mem} running={running} />}
+      {activeTab === 2 && <MemoryTab  mem={mem} jsMem={jsMem} running={running} />}
       {activeTab === 3 && (
         <NetworkTab
           net={net}
@@ -745,7 +886,7 @@ export default function App() {
       )}
       {activeTab === 4 && <IssuesTab  issues={issues} onClear={() => setIssues([])} />}
       {activeTab === 5 && <JankTab    jank={jank}    running={running} />}
-      {activeTab === 6 && <GcTab      gc={gc}        running={running} />}
+      {activeTab === 6 && <GcTab      gc={gc}        jsGc={jsGc}  running={running} />}
       {activeTab === 7 && <ThermalTab thermal={thermal} running={running} />}
     </SafeAreaView>
     </SafeAreaProvider>
@@ -775,22 +916,29 @@ const s = StyleSheet.create({
   divider: {height: 1, backgroundColor: C.surface0},
 
   // Tab bar
-  tabBar:        {backgroundColor: C.mantle},
-  tabBarContent: {flexDirection: 'row'},
+  tabBar:        {backgroundColor: C.mantle, height: 44, flexShrink: 0},
+  tabBarContent: {flexDirection: 'row', height: 44},
   tab: {
     alignItems: 'center',
+    justifyContent: 'center',
     paddingHorizontal: 14,
-    paddingVertical: 12,
-    borderBottomWidth: 2,
-    borderBottomColor: 'transparent',
+    height: 44,
   },
-  tabActive:     {borderBottomColor: C.blue},
+  tabIndicator: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: 2,
+    backgroundColor: C.blue,
+  },
   tabText:       {fontSize: 12, fontWeight: '600', letterSpacing: 0.5, color: C.muted},
   tabTextActive: {color: C.blue, fontWeight: '700'},
 
   // Tab layout
   tabContent:    {flex: 1},
-  scrollContent: {paddingHorizontal: 20, paddingTop: 20, paddingBottom: 12},
+  tabScroll:     {flex: 1},
+  scrollContent: {paddingHorizontal: 20, paddingTop: 20, paddingBottom: 12, flexGrow: 1},
 
   // Section
   sectionTitle:       {fontSize: 14, fontWeight: '700', color: C.text, marginBottom: 10},
@@ -839,6 +987,7 @@ const s = StyleSheet.create({
   placeholder: {fontSize: 13, color: C.muted, marginTop: 4},
   lowMem:      {fontSize: 13, color: C.red, marginTop: 8},
   dlStatus:    {fontSize: 12, color: C.overlay1, marginTop: 8, fontFamily: MONO},
+  spanStatus:  {fontSize: 12, color: C.yellow, paddingHorizontal: 20, paddingVertical: 6, fontFamily: MONO},
 
   // Issues tab
   issueEmpty:     {flex: 1, alignItems: 'center', justifyContent: 'center'},

@@ -1,47 +1,59 @@
+@file:OptIn(kotlinx.cinterop.ExperimentalForeignApi::class, kotlinx.cinterop.BetaInteropApi::class)
 package com.smellouk.kamper.fps.repository.source
 
 import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.cinterop.ObjCAction
 import kotlinx.cinterop.alloc
 import kotlinx.cinterop.memScoped
 import kotlinx.cinterop.ptr
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
-import kotlinx.coroutines.launch
+import platform.darwin.NSObject
+import platform.Foundation.NSDefaultRunLoopMode
+import platform.Foundation.NSRunLoop
+import platform.Foundation.NSSelectorFromString
+import platform.QuartzCore.CADisplayLink
 import platform.posix.CLOCK_MONOTONIC
 import platform.posix.clock_gettime
 import platform.posix.timespec
 
+@OptIn(kotlin.experimental.ExperimentalObjCName::class)
+@ObjCName("KamperFpsDisplayLinkTarget")
+internal class DisplayLinkTarget(val callback: () -> Unit) : NSObject() {
+    @ObjCAction
+    fun tick() { callback() }
+}
+
 @OptIn(ExperimentalForeignApi::class)
 internal object IosFpsTimer {
-    private val scope = CoroutineScope(Dispatchers.Default)
-    private var job: Job? = null
-    private var frameListener: ((Long) -> Unit)? = null
+    private var displayLink: CADisplayLink? = null
+    private var linkTarget: DisplayLinkTarget? = null
+    private val frameListeners = mutableListOf<(Long) -> Unit>()
 
-    fun setFrameListener(listener: (Long) -> Unit) {
-        frameListener = listener
+    fun addFrameListener(listener: (Long) -> Unit) {
+        if (!frameListeners.contains(listener)) frameListeners.add(listener)
+    }
+
+    fun removeFrameListener(listener: (Long) -> Unit) {
+        frameListeners.remove(listener)
     }
 
     fun start() {
-        if (job?.isActive == true) return
-        job = scope.launch {
-            while (isActive) {
-                frameListener?.invoke(currentTimeNanos())
-                delay(FRAME_INTERVAL_MS)
-            }
-        }
+        if (displayLink != null) return
+        val t = DisplayLinkTarget { val now = currentTimeNanos(); frameListeners.forEach { it(now) } }
+        linkTarget = t
+        val link = CADisplayLink.displayLinkWithTarget(t, NSSelectorFromString("tick"))
+        link.addToRunLoop(NSRunLoop.mainRunLoop(), forMode = NSDefaultRunLoopMode)
+        displayLink = link
     }
 
     fun stop() {
-        job?.cancel()
-        job = null
+        displayLink?.invalidate()
+        displayLink = null
+        linkTarget = null
     }
 
     fun clean() {
         stop()
-        frameListener = null
+        frameListeners.clear()
     }
 
     private fun currentTimeNanos(): Long = memScoped {
@@ -49,6 +61,4 @@ internal object IosFpsTimer {
         clock_gettime(CLOCK_MONOTONIC.toUInt(), ts.ptr)
         ts.tv_sec * 1_000_000_000L + ts.tv_nsec
     }
-
-    private const val FRAME_INTERVAL_MS = 1000L / 60L
 }

@@ -1,0 +1,70 @@
+name: iosApp
+options:
+  bundleIdPrefix: com.smellouk.kamper
+  deploymentTarget:
+    iOS: "16.0"
+  generateEmptyDirectories: true
+
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    USER_SCRIPT_SANDBOXING: NO
+    FRAMEWORK_SEARCH_PATHS:
+      - $(inherited)
+      - $(SRCROOT)/../build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)
+    OTHER_LDFLAGS:
+      - $(inherited)
+      - -framework ComposeApp
+    IPHONEOS_DEPLOYMENT_TARGET: "16.0"
+    TARGETED_DEVICE_FAMILY: "1,2"
+
+targets:
+  iosApp:
+    type: application
+    platform: iOS
+    deploymentTarget: "16.0"
+    sources:
+      - path: iosApp
+    info:
+      path: iosApp/Info.plist
+      properties:
+        CFBundleDisplayName: K|Compose
+        CFBundleShortVersionString: "1.0"
+        CFBundleVersion: "1"
+        LSRequiresIPhoneOS: true
+        CADisableMinimumFrameDurationOnPhone: true
+        UILaunchScreen: {}
+        UIApplicationSceneManifest:
+          UIApplicationSupportsMultipleScenes: false
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.smellouk.kamper.compose
+        CODE_SIGN_STYLE: Automatic
+        DEVELOPMENT_TEAM: ""
+    preBuildScripts:
+      - name: Compile Kotlin
+        shell: /bin/sh
+        script: |
+          if [ "YES" = "$OVERRIDE_KOTLIN_BUILD_IDE_SUPPORTED" ]; then
+            echo "Skipping Gradle build task invocation due to OVERRIDE_KOTLIN_BUILD_IDE_SUPPORTED environment variable set to \"YES\""
+            exit 0
+          fi
+          cd "$SRCROOT/../../.."
+          ./gradlew :demos:compose:embedAndSignAppleFrameworkForXcode
+        basedOnDependencyAnalysis: false
+
+schemes:
+  iosApp:
+    build:
+      targets:
+        iosApp: all
+    run:
+      config: Debug
+    test:
+      config: Debug
+    archive:
+      config: Release

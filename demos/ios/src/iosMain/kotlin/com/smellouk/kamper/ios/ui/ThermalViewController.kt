@@ -17,6 +17,7 @@ class ThermalViewController : UIViewController(nibName = null, bundle = null) {
     private lateinit var bigLabel:       UILabel
     private lateinit var unitLabel:      UILabel
     private lateinit var throttlingLabel: UILabel
+    private lateinit var simHintLabel:   UILabel
     private lateinit var stressTarget:   ActionTarget
     private lateinit var stressBtn:      UIButton
     private var stressJobs = listOf<Job>()
@@ -27,7 +28,7 @@ class ThermalViewController : UIViewController(nibName = null, bundle = null) {
         view.backgroundColor = Theme.BASE
 
         bigLabel = UILabel().apply {
-            text          = "UNKNOWN"
+            text          = "N/A"
             font          = UIFont.monospacedSystemFontOfSize(48.0, weight = 0.7)
             textColor     = Theme.MUTED
             textAlignment = NSTextAlignmentCenter
@@ -47,11 +48,13 @@ class ThermalViewController : UIViewController(nibName = null, bundle = null) {
             translatesAutoresizingMaskIntoConstraints = false
         }
 
+        simHintLabel = hintLabel("Not available on simulator")
+
         stressTarget = ActionTarget { toggleStress() }
         stressBtn    = makeButton("Start CPU Stress", stressTarget)
 
         val sep = makeSeparator()
-        listOf(bigLabel, unitLabel, throttlingLabel, sep, stressBtn).forEach { view.addSubview(it) }
+        listOf(bigLabel, unitLabel, throttlingLabel, simHintLabel, sep, stressBtn).forEach { view.addSubview(it) }
 
         val pad = 20.0
         val c = mutableListOf<NSLayoutConstraint>()
@@ -67,7 +70,10 @@ class ThermalViewController : UIViewController(nibName = null, bundle = null) {
         c += throttlingLabel.leadingAnchor.constraintEqualToAnchor(view.leadingAnchor, constant = pad)
         c += throttlingLabel.trailingAnchor.constraintEqualToAnchor(view.trailingAnchor, constant = -pad)
 
-        c += sep.topAnchor.constraintEqualToAnchor(throttlingLabel.bottomAnchor, constant = 24.0)
+        c += simHintLabel.topAnchor.constraintEqualToAnchor(throttlingLabel.bottomAnchor, constant = 12.0)
+        c += simHintLabel.leadingAnchor.constraintEqualToAnchor(view.leadingAnchor, constant = pad)
+
+        c += sep.topAnchor.constraintEqualToAnchor(simHintLabel.bottomAnchor, constant = 12.0)
         c += sep.leadingAnchor.constraintEqualToAnchor(view.leadingAnchor)
         c += sep.trailingAnchor.constraintEqualToAnchor(view.trailingAnchor)
         c += sep.heightAnchor.constraintEqualToConstant(1.0)

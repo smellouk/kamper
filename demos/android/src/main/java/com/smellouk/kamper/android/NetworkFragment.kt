@@ -91,11 +91,11 @@ class NetworkFragment : Fragment() {
 
     private fun triggerDownload() {
         val act = activity ?: return
-        statusText?.text = "Fetching 5 MB…"
+        statusText?.text = "Fetching 20 MB…"
         downloadButton?.isEnabled = false
         Executors.newSingleThreadExecutor().submit {
             runCatching {
-                URL("https://speed.cloudflare.com/__down?bytes=5000000")
+                URL("https://speed.cloudflare.com/__down?bytes=20000000")
                     .openStream().use { it.readBytes() }
             }
             act.runOnUiThread {

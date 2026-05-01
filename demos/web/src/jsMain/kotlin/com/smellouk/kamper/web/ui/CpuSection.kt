@@ -39,6 +39,14 @@ internal object CpuSection {
         fills = fillsList
         values = valuesList
 
+        container.div("card") {
+            style.fontSize = "12px"
+            style.color = "#7f849c"
+            style.padding = "8px 12px"
+            textContent = "Browser limitation: System and IOWait are not measurable via JS. " +
+                "Total, User, and App all reflect the same JS load estimate."
+        }
+
         // CPU stress button
         val controls = container.div("controls")
         loadBtn = controls.button("btn btn-action") {

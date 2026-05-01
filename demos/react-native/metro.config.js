@@ -5,7 +5,7 @@ const path = require('path');
  * Metro configuration
  * https://reactnative.dev/docs/metro
  *
- * watchFolders: Metro must watch `kamper/ui/rn/` because it lives outside
+ * watchFolders: Metro must watch `libs/ui/rn/` because it lives outside
  * the project root and Metro only follows symlinks/file: deps within watched paths.
  * resolver.nodeModulesPaths: ensures the demo's own node_modules win over any nested
  * node_modules that might shadow react-native (Pitfall 5 in 12-RESEARCH.md).
@@ -14,7 +14,7 @@ const path = require('path');
  */
 const config = {
   watchFolders: [
-    path.resolve(__dirname, '..', '..', 'kamper', 'ui', 'rn'),
+    path.resolve(__dirname, '..', '..', 'libs', 'ui', 'rn'),
   ],
   resolver: {
     nodeModulesPaths: [

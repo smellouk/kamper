@@ -14,11 +14,11 @@ internal class SlowSpanDetector(private val config: SlowSpanConfig) : IssueDetec
 
     override fun start(pingIntervalMs: Long, onIssue: (Issue) -> Unit) {
         this.onIssue = onIssue
-        IssueSpans.detector = this
+        if (!IssueSpans.detectors.contains(this)) IssueSpans.detectors.add(this)
     }
 
     override fun stop() {
-        IssueSpans.detector = null
+        IssueSpans.detectors.remove(this)
         onIssue = null
         activeSpans.clear()
     }

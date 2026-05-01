@@ -44,6 +44,14 @@ internal object ThermalSection {
 
     fun update(info: ThermalInfo) {
         if (info == ThermalInfo.INVALID) return
+        if (info == ThermalInfo.UNSUPPORTED) {
+            stateSpan.textContent      = "N/A"
+            stateSpan.style.color      = "#7f849c"
+            throttlingSpan.textContent = "—"
+            stressBtn.disabled         = true
+            stressBtn.textContent      = "Not supported in browser"
+            return
+        }
         stateSpan.textContent      = info.state.name
         stateSpan.style.color      = stateColor(info.state)
         throttlingSpan.textContent = if (info.isThrottling) "YES" else "NO"

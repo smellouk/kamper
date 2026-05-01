@@ -15,6 +15,7 @@ class GcViewController : UIViewController(nibName = null, bundle = null) {
     private lateinit var unitLabel:      UILabel
     private lateinit var pauseDeltaLabel: UILabel
     private lateinit var totalCountLabel: UILabel
+    private lateinit var arcHintLabel:   UILabel
     private lateinit var simulateTarget: ActionTarget
 
     override fun viewDidLoad() {
@@ -48,11 +49,13 @@ class GcViewController : UIViewController(nibName = null, bundle = null) {
             translatesAutoresizingMaskIntoConstraints = false
         }
 
+        arcHintLabel = hintLabel("iOS uses ARC — no JVM GC")
+
         simulateTarget = ActionTarget { simulateGc() }
         val simulateBtn = makeButton("Simulate GC", simulateTarget)
 
         val sep = makeSeparator()
-        listOf(bigLabel, unitLabel, pauseDeltaLabel, totalCountLabel, sep, simulateBtn).forEach { view.addSubview(it) }
+        listOf(bigLabel, unitLabel, pauseDeltaLabel, totalCountLabel, arcHintLabel, sep, simulateBtn).forEach { view.addSubview(it) }
 
         val pad = 20.0
         val c = mutableListOf<NSLayoutConstraint>()
@@ -72,7 +75,10 @@ class GcViewController : UIViewController(nibName = null, bundle = null) {
         c += totalCountLabel.leadingAnchor.constraintEqualToAnchor(view.leadingAnchor, constant = pad)
         c += totalCountLabel.trailingAnchor.constraintEqualToAnchor(view.trailingAnchor, constant = -pad)
 
-        c += sep.topAnchor.constraintEqualToAnchor(totalCountLabel.bottomAnchor, constant = 24.0)
+        c += arcHintLabel.topAnchor.constraintEqualToAnchor(totalCountLabel.bottomAnchor, constant = 16.0)
+        c += arcHintLabel.leadingAnchor.constraintEqualToAnchor(view.leadingAnchor, constant = pad)
+
+        c += sep.topAnchor.constraintEqualToAnchor(arcHintLabel.bottomAnchor, constant = 12.0)
         c += sep.leadingAnchor.constraintEqualToAnchor(view.leadingAnchor)
         c += sep.trailingAnchor.constraintEqualToAnchor(view.trailingAnchor)
         c += sep.heightAnchor.constraintEqualToConstant(1.0)
@@ -83,8 +89,28 @@ class GcViewController : UIViewController(nibName = null, bundle = null) {
         NSLayoutConstraint.activateConstraints(c)
     }
 
+    private var notSupportedShown = false
+
     fun update(info: GcInfo) {
-        if (info == GcInfo.INVALID) return
+        if (info == GcInfo.INVALID) {
+            if (!notSupportedShown) {
+                notSupportedShown = true
+                bigLabel.text        = "—"
+                bigLabel.textColor   = Theme.MUTED
+                unitLabel.text       = "Not supported (uses ARC)"
+                pauseDeltaLabel.text = "GC pause delta:  N/A"
+                totalCountLabel.text = "Total GC count:  N/A"
+            }
+            return
+        }
+        if (info == GcInfo.UNSUPPORTED) {
+            bigLabel.text        = "N/A"
+            bigLabel.textColor   = Theme.MUTED
+            pauseDeltaLabel.text = "GC pause delta:  —"
+            totalCountLabel.text = "Total GC count:  —"
+            return
+        }
+        bigLabel.textColor   = Theme.YELLOW
         bigLabel.text        = info.gcCountDelta.toString()
         pauseDeltaLabel.text = "GC pause delta:  ${info.gcPauseMsDelta} ms"
         totalCountLabel.text = "Total GC count:  ${info.gcCount}"

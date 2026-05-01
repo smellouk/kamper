@@ -19,7 +19,8 @@ internal class JankPerformance(
     watcher: IWatcher<JankInfo>,
     logger: Logger,
     private val application: Application,
-    private val frameTracker: JankFrameTracker
+    private val frameTracker: JankFrameTracker,
+    private val initialActivity: Activity? = null
 ) : Performance<JankConfig, IWatcher<JankInfo>, JankInfo>(watcher, logger), Cleanable {
 
     private val mainHandler = Handler(Looper.getMainLooper())
@@ -41,6 +42,7 @@ internal class JankPerformance(
     override fun initialize(config: JankConfig, listeners: List<InfoListener<JankInfo>>): Boolean {
         if (!super.initialize(config, listeners)) return false
         application.registerActivityLifecycleCallbacks(lifecycleCallbacks)
+        initialActivity?.let { mainHandler.post { registerWindow(it.window) } }
         return true
     }
 

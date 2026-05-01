@@ -99,8 +99,8 @@ internal fun ThemeToggle(isDark: Boolean, onToggle: () -> Unit) {
             .padding(2.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        ThemeSegment(icon = "🌙", label = "Dark",  active = isDark,  shape = innerShape)
-        ThemeSegment(icon = "☀",  label = "Light", active = !isDark, shape = innerShape)
+        ThemeSegment(icon = ChipIcons.dark, label = "Dark", active = isDark, shape = innerShape)
+        ThemeSegment(icon = ChipIcons.light, label = "Light", active = !isDark, shape = innerShape)
     }
 }
 
@@ -299,6 +299,7 @@ internal fun EngineButton(
 
 // ── 7. ModuleCard ──────────────────────────────────────────────────────────────
 
+@Suppress("LongParameterList", "LongMethod")
 @Composable
 internal fun ModuleCard(
     icon: String,
@@ -311,6 +312,7 @@ internal fun ModuleCard(
     onEnabledChange: (Boolean) -> Unit,
     onShowInChipChange: (Boolean) -> Unit,
     onIntervalChange: (Long) -> Unit,
+    unsupported: Boolean = false,
     extraContent: (@Composable () -> Unit)? = null
 ) {
     var expanded by remember { mutableStateOf(false) }
@@ -324,6 +326,7 @@ internal fun ModuleCard(
             .border(
                 if (cardHasFocus) 1.5.dp else 0.5.dp,
                 when {
+                    unsupported  -> KamperTheme.BORDER
                     cardHasFocus -> KamperTheme.BLUE
                     enabled      -> color.copy(alpha = 0.3f)
                     else         -> KamperTheme.BORDER
@@ -340,27 +343,36 @@ internal fun ModuleCard(
                 .padding(horizontal = 12.dp, vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Expand-clickable area
+            // Expand-clickable area (not clickable when unsupported)
             Row(
                 modifier = Modifier
                     .weight(1f)
-                    .clickable { if (enabled) expanded = !expanded },
+                    .clickable { if (enabled && !unsupported) expanded = !expanded },
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
                     icon,
-                    color = if (enabled) color else KamperTheme.SUBTEXT,
+                    color = KamperTheme.SUBTEXT,
                     fontSize = 14.sp
                 )
                 Spacer(Modifier.width(8.dp))
                 Text(
                     name,
-                    color = if (enabled) KamperTheme.TEXT else KamperTheme.SUBTEXT,
+                    color = KamperTheme.SUBTEXT,
                     fontSize = 13.sp,
                     fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.weight(1f)
+                    modifier = if (unsupported) Modifier else Modifier.weight(1f)
                 )
-                if (enabled) {
+                if (unsupported) {
+                    Spacer(Modifier.width(8.dp))
+                    Text(
+                        "not supported",
+                        color = KamperTheme.SUBTEXT.copy(alpha = 0.6f),
+                        fontSize = 10.sp,
+                        fontWeight = FontWeight.Normal,
+                        modifier = Modifier.weight(1f)
+                    )
+                } else if (enabled) {
                     Text(
                         if (expanded) "▲" else "▼",
                         color = KamperTheme.SUBTEXT,
@@ -369,19 +381,21 @@ internal fun ModuleCard(
                     )
                 }
             }
-            // Switch is a standalone peer — independently focusable via D-pad
-            KamperSwitch(
-                checked = enabled,
-                color = color,
-                onCheckedChange = {
-                    onEnabledChange(it)
-                    if (!it) expanded = false
-                }
-            )
+            if (!unsupported) {
+                // Switch is a standalone peer — independently focusable via D-pad
+                KamperSwitch(
+                    checked = enabled,
+                    color = color,
+                    onCheckedChange = {
+                        onEnabledChange(it)
+                        if (!it) expanded = false
+                    }
+                )
+            }
         }
 
         // Expanded content
-        if (enabled && expanded) {
+        if (!unsupported && enabled && expanded) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()

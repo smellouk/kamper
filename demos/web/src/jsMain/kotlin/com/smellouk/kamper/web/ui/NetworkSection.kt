@@ -37,7 +37,7 @@ internal object NetworkSection {
         statusEl = container.div("card") {
             style.fontSize = "13px"
             style.color = "#7f849c"
-            textContent = "Using navigator.connection API (Chrome/Edge). Values reflect current bandwidth estimate."
+            textContent = "Using navigator.connection API (Chromium-based browsers). Values reflect current bandwidth estimate."
         }
 
         val controls = container.div("controls")
@@ -51,7 +51,7 @@ internal object NetworkSection {
         if (info == NetworkInfo.NOT_SUPPORTED) {
             dlValue.textContent = "N/A"
             ulValue.textContent = "N/A"
-            statusEl.textContent = "Network API not available in this browser (Chrome/Edge required)."
+            statusEl.textContent = "navigator.connection not available — use a Chromium-based browser (Chrome, Edge, Brave, Opera)."
             return
         }
         if (info == NetworkInfo.INVALID) return
@@ -68,13 +68,21 @@ internal object NetworkSection {
     }
 
     private fun measureBandwidth() {
-        val start = js("performance.now()").unsafeCast<Double>()
+        val statusElem = statusEl
+        val dlElem = dlValue
+        statusElem.textContent = "Measuring… (downloading 1 MB test file)"
+        val t0 = js("performance.now()").unsafeCast<Double>()
         js("""
-            fetch('https://www.google.com/generate_204', { method: 'HEAD', mode: 'no-cors' })
-              .then(function() {
-                var elapsed = performance.now() - start;
-                console.log('RTT: ' + elapsed.toFixed(0) + 'ms');
-              }).catch(function(){});
+            fetch('https://speed.cloudflare.com/__down?bytes=1000000', {cache: 'no-store'})
+              .then(function(r) { return r.blob(); })
+              .then(function(b) {
+                var secs = (performance.now() - t0) / 1000.0;
+                var mbps = (b.size * 8.0 / 1000000.0) / secs;
+                dlElem.textContent = mbps.toFixed(1) + ' Mbps';
+                statusElem.textContent = 'Active measurement: ' + mbps.toFixed(1) + ' Mbps (' + b.size + ' bytes in ' + secs.toFixed(2) + 's)';
+              }).catch(function(e) {
+                statusElem.textContent = 'Measurement failed — CORS or network error: ' + e.message;
+              });
         """)
     }
 }

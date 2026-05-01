@@ -12,6 +12,8 @@ import type {
   JankInfo,
   GcInfo,
   ThermalInfo,
+  JsMemoryInfo,
+  JsGcInfo,
   KamperConfig,
 } from './types';
 
@@ -36,6 +38,8 @@ export type KamperEventMap = {
   jank: JankInfo;
   gc: GcInfo;
   thermal: ThermalInfo;
+  jsMemory: JsMemoryInfo;
+  jsGc: JsGcInfo;
 };
 
 export type KamperSubscription = { remove(): void };
@@ -50,6 +54,8 @@ const EVENT_TO_PROP: Record<keyof KamperEventMap, string> = {
   jank: 'onJank',
   gc: 'onGc',
   thermal: 'onThermal',
+  jsMemory: 'onJsMemory',
+  jsGc: 'onJsGc',
 };
 
 /**
@@ -62,6 +68,45 @@ const EVENT_TO_PROP: Record<keyof KamperEventMap, string> = {
  *   Kamper.stop();
  *   Kamper.showOverlay();  // Native debug overlay
  */
+let _jsPollingTimer: ReturnType<typeof setInterval> | null = null;
+
+function startJsRuntimePolling(): void {
+  if (_jsPollingTimer != null) return;
+  _jsPollingTimer = setInterval(() => {
+    const h = (global as any).HermesInternal?.getInstrumentedStats?.();
+    if (!h) return;
+    // Hermes uses js_* prefix. TypedArray backing stores are external (js_externalBytes),
+    // not counted in js_allocatedBytes — add both for accurate "used" reporting.
+    const usedBytes  = (h.js_allocatedBytes ?? 0) + (h.js_externalBytes ?? 0);
+    const totalBytes = (h.js_heapSize ?? 0) + (h.js_externalBytes ?? 0);
+    const usedMb  = usedBytes  / (1024 * 1024);
+    const totalMb = totalBytes / (1024 * 1024);
+    const gcCount = h.js_numGCs ?? 0;
+    const pauseMs = (h.js_gcTime ?? 0) / 1000;
+    NativeKamperModule.reportJsMemory(usedMb, totalMb);
+    NativeKamperModule.reportJsGc(gcCount, pauseMs);
+  }, 1000);
+}
+
+function stopJsRuntimePolling(): void {
+  if (_jsPollingTimer != null) {
+    clearInterval(_jsPollingTimer);
+    _jsPollingTimer = null;
+  }
+}
+
+function hookErrorHandler(): void {
+  const prev = ErrorUtils.getGlobalHandler();
+  ErrorUtils.setGlobalHandler((error: Error, isFatal?: boolean) => {
+    NativeKamperModule.reportCrash(
+      error?.message ?? 'Unknown error',
+      error?.stack ?? '',
+      isFatal ?? false,
+    );
+    prev?.(error, isFatal);
+  });
+}
+
 export const Kamper = {
   /**
    * Start the engine with optional per-module config (D-08).
@@ -71,10 +116,13 @@ export const Kamper = {
    */
   start(config?: KamperConfig): void {
     NativeKamperModule.start(config ?? {});
+    startJsRuntimePolling();
+    hookErrorHandler();
   },
 
   /** Stop the engine. Idempotent. */
   stop(): void {
+    stopJsRuntimePolling();
     NativeKamperModule.stop();
   },
 
@@ -109,6 +157,16 @@ export const Kamper = {
   /** Hide the native Kamper overlay (D-10, D-12). */
   hideOverlay(): void {
     NativeKamperModule.hideOverlay();
+  },
+
+  /** Open a named span. If it exceeds thresholdMs when closed, fires a SLOW_SPAN issue. */
+  beginSpan(label: string, thresholdMs: number): void {
+    NativeKamperModule.beginSpan(label, thresholdMs);
+  },
+
+  /** Close a named span opened with beginSpan. */
+  endSpan(label: string): void {
+    NativeKamperModule.endSpan(label);
   },
 } as const;
 

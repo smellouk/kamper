@@ -248,5 +248,5 @@ private class TvosChipViewController(
     }
 
     private fun nowMs(): Long =
-        (NSDate().timeIntervalSince1970 * 1000.0).toLong()
+        (NSDate.date().timeIntervalSince1970 * 1000.0).toLong()
 }

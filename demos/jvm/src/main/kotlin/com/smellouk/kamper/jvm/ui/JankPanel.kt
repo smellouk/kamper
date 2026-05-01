@@ -76,9 +76,21 @@ class JankPanel : JPanel(BorderLayout(0, 0)) {
     fun update(info: JankInfo) {
         if (info == JankInfo.INVALID) return
         SwingUtilities.invokeLater {
+            if (info == JankInfo.UNSUPPORTED) {
+                bigLabel.text   = "N/A"
+                bigLabel.foreground = Theme.MUTED
+                unitLabel.text  = "not supported on JVM"
+                ratioLabel.text = "Janky ratio:  —"
+                worstLabel.text = "Worst frame:  —"
+                simulateButton.isEnabled = false
+                return@invokeLater
+            }
             bigLabel.text  = info.droppedFrames.toString()
+            bigLabel.foreground = Theme.MAUVE
+            unitLabel.text = "dropped frames / window"
             ratioLabel.text = "Janky ratio:  ${"%.1f".format(info.jankyFrameRatio * 100f)}%"
             worstLabel.text = "Worst frame:  ${info.worstFrameMs} ms"
+            simulateButton.isEnabled = true
         }
     }
 }

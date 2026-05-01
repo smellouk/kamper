@@ -44,7 +44,6 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.core.ktx)
 
-    implementation(project(":libs:engine"))
     implementation(project(":libs:modules:cpu"))
     implementation(project(":libs:modules:fps"))
     implementation(project(":libs:modules:memory"))
@@ -54,4 +53,5 @@ dependencies {
     implementation(project(":libs:modules:gc"))
     implementation(project(":libs:modules:thermal"))
     debugImplementation(project(":libs:ui:kmm"))
+    // ui module is exposing project(":libs:engine")
 }

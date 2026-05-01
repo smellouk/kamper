@@ -148,9 +148,14 @@ class IssuesViewController : UIViewController(nibName = null, bundle = null) {
     }
 
     private fun triggerCrash() {
-        CoroutineScope(Dispatchers.Default).launch {
-            throw RuntimeException("Demo crash from K|iOS")
-        }
+        val ts = (NSDate.date().timeIntervalSince1970 * 1000).toLong()
+        addIssue(Issue(
+            id = "demo-crash-$ts",
+            type = IssueType.CRASH,
+            severity = Severity.CRITICAL,
+            message = "Demo crash from K|iOS",
+            timestampMs = ts
+        ))
     }
 }
 

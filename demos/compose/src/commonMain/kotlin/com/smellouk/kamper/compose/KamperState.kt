@@ -37,3 +37,9 @@ expect fun KamperState.initialize(scope: CoroutineScope)
 expect fun startKamper()
 expect fun stopKamper()
 expect fun disposeKamper()
+
+/**
+ * Returns true on platforms where per-app network traffic tracking is available.
+ * On JVM/desktop and iOS, app-level traffic stats are not provided, so this returns false.
+ */
+expect fun platformSupportsAppTraffic(): Boolean

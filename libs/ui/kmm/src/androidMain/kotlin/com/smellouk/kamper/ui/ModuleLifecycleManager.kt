@@ -34,12 +34,19 @@ import com.smellouk.kamper.network.NetworkModule
 import com.smellouk.kamper.thermal.ThermalConfig
 import com.smellouk.kamper.thermal.ThermalInfo
 import com.smellouk.kamper.thermal.ThermalModule
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 
 private const val HISTORY_SIZE = 60
 private const val MAX_ISSUES = 100
 private const val PREF_ISSUES = "kamper_issues_list"
+private const val SUPPORT_PROBE_DELAY_MS = 1_500L
 
 @Suppress("TooManyFunctions")
 internal class ModuleLifecycleManager(
@@ -49,6 +56,7 @@ internal class ModuleLifecycleManager(
     private val preferencesStore: PreferencesStore
 ) {
     private val engine = Engine()
+    private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
     // Tracks actual engine running state separately from UI StateFlow to avoid
     // TOCTOU races in applySettings() (WR-03).
@@ -103,11 +111,15 @@ internal class ModuleLifecycleManager(
     }
 
     private val netListener: InfoListener<NetworkInfo> = listener@{ info ->
-        if (info == NetworkInfo.INVALID || info == NetworkInfo.NOT_SUPPORTED) return@listener
+        if (info == NetworkInfo.INVALID) return@listener
+        if (info == NetworkInfo.NOT_SUPPORTED) {
+            state.update { s -> s.copy(networkUnsupported = true) }
+            return@listener
+        }
         val v = info.rxSystemTotalInMb
         netHist.push(v)
         recordingManager.record(Tracks.NETWORK, v.toDouble())
-        state.update { s -> s.copy(downloadMbps = v, downloadHistory = netHist.toList()) }
+        state.update { s -> s.copy(downloadMbps = v, downloadHistory = netHist.toList(), networkUnsupported = false) }
     }
 
     private val issuesListener: InfoListener<IssueInfo> = listener@{ info ->
@@ -124,14 +136,22 @@ internal class ModuleLifecycleManager(
 
     private val jankListener: InfoListener<JankInfo> = listener@{ info ->
         if (info == JankInfo.INVALID) return@listener
+        if (info == JankInfo.UNSUPPORTED) {
+            state.update { s -> s.copy(jankUnsupported = true) }
+            return@listener
+        }
         recordingManager.record(Tracks.JANK, info.droppedFrames.toDouble())
         state.update { s ->
-            s.copy(jankDroppedFrames = info.droppedFrames, jankRatio = info.jankyFrameRatio)
+            s.copy(jankDroppedFrames = info.droppedFrames, jankRatio = info.jankyFrameRatio, jankUnsupported = false)
         }
     }
 
     private val gcListener: InfoListener<GcInfo> = listener@{ info ->
         if (info == GcInfo.INVALID) return@listener
+        if (info == GcInfo.UNSUPPORTED) {
+            state.update { s -> s.copy(gcUnsupported = true) }
+            return@listener
+        }
         recordingManager.record(Tracks.GC, info.gcCountDelta.toDouble())
         state.update { s ->
             s.copy(gcCountDelta = info.gcCountDelta, gcPauseMsDelta = info.gcPauseMsDelta)
@@ -440,15 +460,41 @@ internal class ModuleLifecycleManager(
         if (s.jankEnabled) installJank()
         if (s.gcEnabled) installGc()
         if (s.thermalEnabled) installThermal()
+
+        // Probe potentially-unsupported modules so the "not supported" label
+        // appears before the user manually enables them.
+        val probeCpu     = !s.cpuEnabled
+        val probeNetwork = !s.networkEnabled
+        val probeJank    = !s.jankEnabled
+        val probeThermal = !s.thermalEnabled
+        if (probeCpu)     installCpu(s)
+        if (probeNetwork) installNetwork(s)
+        if (probeJank)    installJank()
+        if (probeThermal) installThermal()
+
         engine.start()
         engineRunning = true
         if (s.fpsEnabled) startFps()
         state.update { it.copy(engineRunning = true) }
+
+        // After one watcher tick, remove probe modules that aren't user-enabled.
+        val anyProbe = probeCpu || probeNetwork || probeJank || probeThermal
+        if (anyProbe) {
+            scope.launch {
+                delay(SUPPORT_PROBE_DELAY_MS)
+                if (probeCpu)     uninstallCpu()
+                if (probeNetwork) uninstallNetwork()
+                if (probeJank)    uninstallJank()
+                if (probeThermal) uninstallThermal()
+                if (engineRunning) { engine.stop(); engine.start() }
+            }
+        }
     }
 
     // ── Clear ─────────────────────────────────────────────────────────────────
 
     fun clear() {
+        scope.cancel()
         stopFps()
         engine.clear()
         cpuModule = null

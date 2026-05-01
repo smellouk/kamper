@@ -40,7 +40,7 @@ class MemoryViewController : UIViewController(nibName = null, bundle = null) {
 
         val heapLabel = sectionLabel("Heap Memory")
         val ramLabel  = sectionLabel("System RAM")
-        val pssHint   = hintLabel("PSS metrics: Android only")
+        val pssHint   = hintLabel("PSS metrics: Android only  ·  Simulator shows host Mac RAM")
         val sep       = makeSeparator()
 
         listOf(heapLabel, heapRow, heapDetail, ramLabel, ramRow, ramDetail, pssHint,

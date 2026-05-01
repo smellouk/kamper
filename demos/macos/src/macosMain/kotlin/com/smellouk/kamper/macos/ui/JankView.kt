@@ -38,7 +38,7 @@ class JankView : NSView {
         translatesAutoresizingMaskIntoConstraints = false
         wantsLayer = true
 
-        val sep = NSBox(NSMakeRect(0.0, 0.0, 0.0, 1.0)).apply {
+        val sep = NSBox(NSMakeRect(0.0, 0.0, 0.0, 0.0)).apply {
             boxType = NSBoxSeparator
             translatesAutoresizingMaskIntoConstraints = false
         }
@@ -65,7 +65,6 @@ class JankView : NSView {
 
         c += sep.leadingAnchor.constraintEqualToAnchor(leadingAnchor)
         c += sep.trailingAnchor.constraintEqualToAnchor(trailingAnchor)
-        c += sep.heightAnchor.constraintEqualToConstant(1.0)
         c += sep.bottomAnchor.constraintEqualToAnchor(simulateButton.topAnchor, constant = -10.0)
 
         c += simulateButton.trailingAnchor.constraintEqualToAnchor(trailingAnchor, constant = -pad)
@@ -77,6 +76,14 @@ class JankView : NSView {
 
     fun update(info: JankInfo) {
         if (info == JankInfo.INVALID) return
+        if (info == JankInfo.UNSUPPORTED) {
+            bigLabel.stringValue    = "—"
+            unitLabel.stringValue   = "Not supported on macOS"
+            ratioLabel.stringValue  = "Janky ratio:  N/A"
+            worstLabel.stringValue  = "Worst frame:  N/A"
+            simulateButton.setEnabled(false)
+            return
+        }
         bigLabel.stringValue   = info.droppedFrames.toString()
         val ratio = info.jankyFrameRatio * 100.0
         val ri = ratio.toInt(); val rd = ((ratio - ri) * 10).toInt()

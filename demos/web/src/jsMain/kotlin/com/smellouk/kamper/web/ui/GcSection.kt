@@ -2,12 +2,14 @@ package com.smellouk.kamper.web.ui
 
 import com.smellouk.kamper.gc.GcInfo
 import kotlinx.browser.document
+import org.w3c.dom.HTMLButtonElement
 import org.w3c.dom.HTMLElement
 
 internal object GcSection {
     private lateinit var gcCountSpan:  HTMLElement
     private lateinit var pauseSpan:    HTMLElement
     private lateinit var totalSpan:    HTMLElement
+    private var simulateBtn: HTMLButtonElement? = null
 
     fun build(container: HTMLElement) {
         container.div("card") {
@@ -33,7 +35,7 @@ internal object GcSection {
             }
 
             div("card-footer") {
-                button("btn btn-action") {
+                simulateBtn = button("btn btn-action") {
                     textContent = "Simulate GC"
                     onclick = {
                         repeat(200_000) { js("new Array(100)") }
@@ -46,6 +48,13 @@ internal object GcSection {
 
     fun update(info: GcInfo) {
         if (info == GcInfo.INVALID) return
+        if (info == GcInfo.UNSUPPORTED) {
+            gcCountSpan.textContent = "N/A"
+            pauseSpan.textContent   = "—"
+            totalSpan.textContent   = "—"
+            simulateBtn?.let { it.disabled = true; it.textContent = "Not supported in browser" }
+            return
+        }
         gcCountSpan.textContent = info.gcCountDelta.toString()
         pauseSpan.textContent   = "${info.gcPauseMsDelta} ms"
         totalSpan.textContent   = info.gcCount.toString()

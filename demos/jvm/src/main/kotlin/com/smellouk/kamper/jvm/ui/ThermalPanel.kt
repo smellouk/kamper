@@ -81,6 +81,15 @@ class ThermalPanel : JPanel(BorderLayout(0, 0)) {
 
     fun update(info: ThermalInfo) {
         if (info == ThermalInfo.INVALID) return
+        if (info == ThermalInfo.UNSUPPORTED) {
+            SwingUtilities.invokeLater {
+                bigLabel.text = "N/A"
+                bigLabel.foreground = Theme.MUTED
+                throttlingLabel.text = "Throttling:  N/A"
+                stressButton.isEnabled = false
+            }
+            return
+        }
         SwingUtilities.invokeLater {
             bigLabel.text      = info.state.name
             bigLabel.foreground = stateColor(info.state)
