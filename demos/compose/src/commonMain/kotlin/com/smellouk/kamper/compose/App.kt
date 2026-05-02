@@ -33,6 +33,7 @@ import com.smellouk.kamper.compose.ui.KamperColors
 import com.smellouk.kamper.compose.ui.KamperTheme
 import com.smellouk.kamper.compose.ui.tabs.CpuTab
 import com.smellouk.kamper.compose.ui.tabs.FpsTab
+import com.smellouk.kamper.compose.ui.tabs.GpuTab
 import com.smellouk.kamper.compose.ui.tabs.GcTab
 import com.smellouk.kamper.compose.ui.tabs.IssuesTab
 import com.smellouk.kamper.compose.ui.tabs.JankTab
@@ -99,7 +100,7 @@ private fun Header(isRunning: Boolean) {
 @Composable
 private fun KamperContent(state: KamperState) {
     var selectedTab by remember { mutableIntStateOf(0) }
-    val tabs = listOf("CPU", "FPS", "Memory", "Network", "Issues", "Jank", "GC", "Thermal")
+    val tabs = listOf("CPU", "GPU", "FPS", "Memory", "Network", "Issues", "Jank", "GC", "Thermal")
 
     Column(modifier = Modifier.fillMaxSize()) {
         PrimaryScrollableTabRow(
@@ -133,13 +134,14 @@ private fun KamperContent(state: KamperState) {
         ) {
             when (selectedTab) {
                 0 -> CpuTab(info = state.cpuInfo)
-                1 -> FpsTab(info = state.fpsInfo)
-                2 -> MemoryTab(info = state.memoryInfo)
-                3 -> NetworkTab(info = state.networkInfo, showAppTrafficSection = platformSupportsAppTraffic())
-                4 -> IssuesTab(issues = state.issues, onClear = { state.clearIssues() })
-                5 -> JankTab(info = state.jankInfo)
-                6 -> GcTab(info = state.gcInfo)
-                7 -> ThermalTab(info = state.thermalInfo)
+                1 -> GpuTab(info = state.gpuInfo)
+                2 -> FpsTab(info = state.fpsInfo)
+                3 -> MemoryTab(info = state.memoryInfo)
+                4 -> NetworkTab(info = state.networkInfo, showAppTrafficSection = platformSupportsAppTraffic())
+                5 -> IssuesTab(issues = state.issues, onClear = { state.clearIssues() })
+                6 -> JankTab(info = state.jankInfo)
+                7 -> GcTab(info = state.gcInfo)
+                8 -> ThermalTab(info = state.thermalInfo)
             }
         }
     }

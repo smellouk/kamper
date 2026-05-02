@@ -24,6 +24,8 @@ import com.smellouk.kamper.memory.MemoryInfo
 import com.smellouk.kamper.memory.MemoryModule
 import com.smellouk.kamper.network.NetworkInfo
 import com.smellouk.kamper.network.NetworkModule
+import com.smellouk.kamper.gpu.GpuInfo
+import com.smellouk.kamper.gpu.GpuModule
 import com.smellouk.kamper.thermal.ThermalInfo
 import com.smellouk.kamper.thermal.ThermalModule
 import com.smellouk.kamper.rn.JsGcInfo
@@ -90,6 +92,7 @@ class KamperTurboModule(reactContext: ReactApplicationContext) :
             if (config.flag("jank"))    install(JankModule(reactApplicationContext.applicationContext as android.app.Application, reactApplicationContext.currentActivity))
             if (config.flag("gc"))       install(GcModule)
             if (config.flag("thermal"))  install(ThermalModule(reactApplicationContext))
+            if (config.flag("gpu"))      install(GpuModule)
             if (config.flag("jsMemory")) install(JsMemoryModule)
             if (config.flag("jsGc"))     install(JsGcModule)
             if (config.flag("jsCrash"))  install(JsIssueModule)
@@ -164,6 +167,21 @@ class KamperTurboModule(reactContext: ReactApplicationContext) :
                     putDouble("gcCountDelta",   info.gcCountDelta.toDouble())
                     putDouble("gcPauseMsDelta", info.gcPauseMsDelta.toDouble())
                     putDouble("gcCount",        info.gcCount.toDouble())
+                })
+            }
+
+            addInfoListener<GpuInfo> { info ->
+                if (info == GpuInfo.INVALID || info == GpuInfo.UNSUPPORTED) return@addInfoListener
+                emitOnGpu(Arguments.createMap().apply {
+                    putDouble("utilization",          info.utilization)
+                    putDouble("usedMemoryMb",         info.usedMemoryMb)
+                    putDouble("totalMemoryMb",        info.totalMemoryMb)
+                    putDouble("curFreqKhz",           info.curFreqKhz.toDouble())
+                    putDouble("maxFreqKhz",           info.maxFreqKhz.toDouble())
+                    putDouble("appUtilization",       info.appUtilization)
+                    putDouble("rendererUtilization",  info.rendererUtilization)
+                    putDouble("tilerUtilization",     info.tilerUtilization)
+                    putDouble("computeUtilization",   info.computeUtilization)
                 })
             }
 

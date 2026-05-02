@@ -7,6 +7,8 @@ import com.smellouk.kamper.fps.FpsInfo
 import com.smellouk.kamper.fps.FpsModule
 import com.smellouk.kamper.gc.GcInfo
 import com.smellouk.kamper.gc.GcModule
+import com.smellouk.kamper.gpu.GpuInfo
+import com.smellouk.kamper.gpu.GpuModule
 import com.smellouk.kamper.issues.IssueInfo
 import com.smellouk.kamper.issues.IssuesModule
 import com.smellouk.kamper.jank.JankInfo
@@ -22,6 +24,7 @@ import kotlinx.coroutines.launch
 
 actual fun KamperState.initialize(scope: CoroutineScope) {
     Kamper.install(CpuModule)
+    Kamper.install(GpuModule)
     Kamper.install(FpsModule)
     Kamper.install(MemoryModule())
     Kamper.install(NetworkModule)
@@ -31,6 +34,7 @@ actual fun KamperState.initialize(scope: CoroutineScope) {
     Kamper.install(ThermalModule)
 
     Kamper.addInfoListener<CpuInfo>     { info -> if (info != CpuInfo.INVALID) scope.launch { cpuInfo = info } }
+    Kamper.addInfoListener<GpuInfo>     { info -> if (info != GpuInfo.INVALID) scope.launch { gpuInfo = info } }
     Kamper.addInfoListener<FpsInfo>     { info -> if (info != FpsInfo.INVALID) scope.launch { fpsInfo = info } }
     Kamper.addInfoListener<MemoryInfo>  { info -> if (info != MemoryInfo.INVALID) scope.launch { memoryInfo = info } }
     Kamper.addInfoListener<NetworkInfo> { info -> if (info != NetworkInfo.INVALID) scope.launch { networkInfo = info } }

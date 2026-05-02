@@ -51,8 +51,9 @@ internal object JankSection {
         if (info == JankInfo.INVALID) return
         if (info == JankInfo.UNSUPPORTED) {
             droppedSpan.textContent = "N/A"
-            ratioSpan.textContent   = "—"
-            worstSpan.textContent   = "—"
+            droppedSpan.style.color = "#7f849c"
+            ratioSpan.textContent   = "N/A"
+            worstSpan.textContent   = "N/A"
             simulateBtn?.let { it.disabled = true; it.textContent = "Not supported in browser" }
             return
         }

@@ -5,6 +5,7 @@ package com.smellouk.kamper.ui.compose
 // are present as monochrome outlines in every system text font.
 internal actual object ChipIcons {
     actual val cpu = "●"
+    actual val gpu = "▣"
     actual val fps = "▶"
     actual val mem = "■"
     actual val net = "▼"

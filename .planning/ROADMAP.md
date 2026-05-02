@@ -4,7 +4,7 @@
 
 Kamper v1.0 takes an existing KMP performance monitoring library from a rough brownfield state to a stable, well-documented, fully-tested, and open-source-ready release. Work spans history cleanup, documentation, bug fixes, lifecycle hardening, performance improvements, architecture refactoring, build modernization, platform expansion, and release automation across 20 phases.
 
-## Phases
+    ## Phases
 
 **Phase Numbering:**
 - Integer phases (1–20): Planned milestone work
@@ -366,10 +366,9 @@ Plans:
 | 4. Fragile Lifecycle Hardening | 3/3 | Complete | 2026-04-26 |
 | 5. CPU Recording Buffer | 2/2 | Complete | 2026-04-26 |
 | 6. KamperUiRepository Refactor | 6/6 | Complete | 2026-04-26 |
-| 6. KamperUiRepository Refactor | 6/6 | Complete | 2026-04-26 |
 | 7. KamperPanel Refactor | 5/5 | Complete | 2026-04-26 |
 | 8. Security, Docs & Scaling | 5/5 | Complete | 2026-04-26 |
-| 9. Missing Features | 0/6 | Not started | - |
+| 9. Missing Features | 6/6 | Complete | 2026-04-26 |
 | 10. Test Coverage | 3/3 | Complete   | 2026-04-26 |
 | 11. Migrate buildSrc | 4/4 | Complete    | 2026-04-26 |
 | 12. Monorepo Consolidation | 5/5 | Complete   | 2026-04-26 |
@@ -381,6 +380,10 @@ Plans:
 | 18. Service Integrations | 6/6 | Complete    | 2026-04-28 |
 | 19. Claude-Friendly Repo | 3/3 | Complete    | 2026-04-28 |
 | 20. Open Source Cleanup | 3/3 | Complete    | 2026-04-29 |
+| 21. Monorepo Clean-up   | 4/4 | Complete    | 2026-04-29 |
+| 22. Manual Demo Testing | 8/8 | Complete    | 2026-05-02 |
+| 23. GPU Module          | 12/12 | Complete  | 2026-05-02 |
+| 24. Log Events (Perfetto) | 0/10 | Not started | - |
 
 ### Phase 21: Monorepo structure and clean up (e.g. renaming kamper/ to libs/) is a structural refactor
 
@@ -416,15 +419,21 @@ Plans:
 **Goal:** Deliver a fully idiomatic Kamper `GpuModule` (4-class structure: GpuInfo, GpuConfig, GpuWatcher, GpuPerformance) with seven platform actuals and KamperPanel UI integration. GpuInfo carries utilization %, used/total VRAM in MB, and two distinct sentinels (INVALID = -1.0 for transient read failure, UNSUPPORTED = -2.0 for platform capability gap) per D-03/D-04/D-13. Android probes /sys/class/kgsl/kgsl-3d0/gpu_busy_percentage with a /sys/class/devfreq Mali fallback (D-05); JVM uses OSHI 7.0.0 returning partial data per D-02 because OSHI exposes no GPU utilization API; macOS uses an IOKit IOAccelerator cinterop scoped to macosArm64/macosX64 only (D-07); iOS/tvOS/JS/wasmJs return UNSUPPORTED unconditionally for App Store safety and lack of public APIs (D-07/D-08). The KamperPanel adds a GPU MetricCard between CPU and FPS (D-10) showing utilization % primary + memory secondary (D-11), grayed-out when UNSUPPORTED (D-12).
 **Requirements**: D-01, D-02, D-03, D-04, D-05, D-06, D-07, D-08, D-09, D-10, D-11, D-12, D-13
 **Depends on:** Phase 22
-**Plans:** 6 plans
+**Plans:** 12/12 plans complete
 
 Plans:
-- [ ] 23-01-PLAN.md — Wave 1: register :libs:modules:gpu, declare OSHI 7.0.0 in catalog, write build.gradle.kts + gpuInfo.def IOKit cinterop, scaffold 5 @Ignore-marked test files
-- [ ] 23-02-PLAN.md — Wave 2: commonMain layer (GpuInfo + GpuConfig + GpuWatcher + GpuPerformance + Module.kt expect + repository interfaces) with TDD activation of 3 commonTest files
-- [ ] 23-03-PLAN.md — Wave 3: Android + JVM actuals (kgsl probe-before-read, devfreq Mali fallback, OSHI partial data) + 2 activated tests
-- [ ] 23-04-PLAN.md — Wave 3: macOS IOKit cinterop actual + iOS/tvOS UNSUPPORTED stubs (D-07 App Store safety)
-- [ ] 23-05-PLAN.md — Wave 3: JS + wasmJs UNSUPPORTED stubs (D-08 no public browser GPU API)
-- [ ] 23-06-PLAN.md — Wave 4: UI integration (KamperUiState/Settings, Tracks.GPU=8, ChipIcons, ActivityTab, SettingsTab, ModuleLifecycleManager android+apple, KamperUiRepository normalize) + human-verify checkpoint
+- [x] 23-01-PLAN.md — Wave 1: register :libs:modules:gpu, declare OSHI 7.0.0 in catalog, write build.gradle.kts + gpuInfo.def IOKit cinterop, scaffold 5 @Ignore-marked test files
+- [x] 23-02-PLAN.md — Wave 2: commonMain layer (GpuInfo + GpuConfig + GpuWatcher + GpuPerformance + Module.kt expect + repository interfaces) with TDD activation of 3 commonTest files
+- [x] 23-03-PLAN.md — Wave 3: Android + JVM actuals (kgsl probe-before-read, devfreq Mali fallback, OSHI partial data) + 2 activated tests
+- [x] 23-04-PLAN.md — Wave 3: macOS IOKit cinterop actual + iOS/tvOS UNSUPPORTED stubs (D-07 App Store safety)
+- [x] 23-05-PLAN.md — Wave 3: JS + wasmJs UNSUPPORTED stubs (D-08 no public browser GPU API)
+- [x] 23-06-PLAN.md — Wave 4: UI integration (KamperUiState/Settings, Tracks.GPU=8, ChipIcons, ActivityTab, SettingsTab, ModuleLifecycleManager android+apple, KamperUiRepository normalize) + human-verify checkpoint
+- [x] 23-07-PLAN.md — Wave 5 (gap-closure): JVM Swing demo + Web JS demo — install GpuModule + GPU tab/section
+- [x] 23-08-PLAN.md — Wave 5 (gap-closure): Android Views demo — install GpuModule + GpuFragment + fragment_gpu.xml
+- [x] 23-09-PLAN.md — Wave 5 (gap-closure): Compose Multiplatform demo — KamperState.gpuInfo + GpuTab + 4 KamperSetup actuals (android/ios/desktop/wasmJs)
+- [x] 23-10-PLAN.md — Wave 5 (gap-closure): React Native demo — placeholder GpuTab in App.tsx (RN bridge deferred per CONTEXT)
+- [x] 23-11-PLAN.md — Wave 6 (gap-closure): iOS + tvOS UIKit demos — install GpuModule + GpuViewController in each
+- [x] 23-12-PLAN.md — Wave 6 (gap-closure): macOS AppKit demo — install GpuModule + GpuView in NSTabView
 
 ### Phase 24: add the option log events which will allow to see them in perfetto UI
 
@@ -445,12 +454,3 @@ Plans:
 - [ ] 24-09-PLAN.md — Wave 4: Android demo — EventsFragment + fragment_events.xml + item_event.xml + MainActivity (D-22, D-23, D-24); includes human-verify checkpoint
 - [ ] 24-10-PLAN.md — Wave 4: Phase 25 ROADMAP cleanup — remove duplicate entry + sync STATE.md (D-33)
 
-### Phase 25: add the option log events which will allow to see them in perfetto UI
-
-**Goal:** [To be planned]
-**Requirements**: TBD
-**Depends on:** Phase 24
-**Plans:** 0 plans
-
-Plans:
-- [ ] TBD (run /gsd-plan-phase 25 to break down)

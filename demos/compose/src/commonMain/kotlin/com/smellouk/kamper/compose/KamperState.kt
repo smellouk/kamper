@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.smellouk.kamper.cpu.CpuInfo
 import com.smellouk.kamper.fps.FpsInfo
+import com.smellouk.kamper.gpu.GpuInfo
 import com.smellouk.kamper.gc.GcInfo
 import com.smellouk.kamper.issues.Issue
 import com.smellouk.kamper.jank.JankInfo
@@ -16,6 +17,7 @@ import kotlinx.coroutines.CoroutineScope
 
 class KamperState {
     var cpuInfo by mutableStateOf(CpuInfo.INVALID)
+    var gpuInfo by mutableStateOf(GpuInfo.INVALID)
     var fpsInfo by mutableStateOf(FpsInfo.INVALID)
     var memoryInfo by mutableStateOf(MemoryInfo.INVALID)
     var networkInfo by mutableStateOf(NetworkInfo.INVALID)

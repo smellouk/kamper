@@ -1,0 +1,67 @@
+language = Objective-C
+headers = Foundation/Foundation.h IOKit/IOKitLib.h
+linkerOpts = -framework IOKit
+
+---
+
+typedef struct {
+    double utilization;     /* "Device Utilization %" or "GPU Activity(%)" */
+    double rendererUtil;    /* "Renderer Utilization %" */
+    double tilerUtil;       /* "Tiler Utilization %" */
+} KamperGpuStats;
+
+/* Reads GPU stats from IOAccelerator PerformanceStatistics.
+ * utilization: overall GPU %, 0..100. -1.0 on read failure, -2.0 if UNSUPPORTED.
+ * rendererUtil / tilerUtil: per-engine %, or -1.0 if the key is absent.
+ * Iterates IOAccelerator class — handles AGX (Apple Silicon), Intel, AMD. */
+static KamperGpuStats kamper_gpu_stats(void) {
+    KamperGpuStats result = { -2.0, -1.0, -1.0 };
+    io_iterator_t iter = 0;
+    if (IOServiceGetMatchingServices(0, IOServiceMatching("IOAccelerator"), &iter) != KERN_SUCCESS) {
+        return result;
+    }
+    io_service_t svc;
+    double bestUtil = -2.0;
+    double bestRenderer = -1.0;
+    double bestTiler = -1.0;
+    while ((svc = IOIteratorNext(iter)) != 0) {
+        CFMutableDictionaryRef props = NULL;
+        if (IORegistryEntryCreateCFProperties(svc, &props, kCFAllocatorDefault, 0) == KERN_SUCCESS) {
+            CFDictionaryRef perf = (CFDictionaryRef)CFDictionaryGetValue(props, CFSTR("PerformanceStatistics"));
+            if (perf) {
+                /* Overall utilization */
+                CFNumberRef val = (CFNumberRef)CFDictionaryGetValue(perf, CFSTR("Device Utilization %"));
+                if (!val) val = (CFNumberRef)CFDictionaryGetValue(perf, CFSTR("GPU Activity(%)"));
+                if (val) {
+                    double d = 0.0;
+                    CFNumberGetValue(val, kCFNumberDoubleType, &d);
+                    if (d >= 0.0) {
+                        if (d > 100.0) d = 100.0;
+                        bestUtil = d;
+                    }
+                }
+                /* Renderer utilization */
+                CFNumberRef rVal = (CFNumberRef)CFDictionaryGetValue(perf, CFSTR("Renderer Utilization %"));
+                if (rVal) {
+                    double d = 0.0;
+                    CFNumberGetValue(rVal, kCFNumberDoubleType, &d);
+                    if (d >= 0.0) bestRenderer = (d > 100.0) ? 100.0 : d;
+                }
+                /* Tiler utilization */
+                CFNumberRef tVal = (CFNumberRef)CFDictionaryGetValue(perf, CFSTR("Tiler Utilization %"));
+                if (tVal) {
+                    double d = 0.0;
+                    CFNumberGetValue(tVal, kCFNumberDoubleType, &d);
+                    if (d >= 0.0) bestTiler = (d > 100.0) ? 100.0 : d;
+                }
+            }
+            if (props) CFRelease(props);
+        }
+        IOObjectRelease(svc);
+    }
+    IOObjectRelease(iter);
+    result.utilization    = bestUtil;
+    result.rendererUtil   = bestRenderer;
+    result.tilerUtil      = bestTiler;
+    return result;
+}

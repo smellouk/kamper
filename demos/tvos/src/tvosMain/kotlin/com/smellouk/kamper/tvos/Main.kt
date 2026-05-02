@@ -8,6 +8,8 @@ import com.smellouk.kamper.fps.FpsInfo
 import com.smellouk.kamper.fps.FpsModule
 import com.smellouk.kamper.gc.GcInfo
 import com.smellouk.kamper.gc.GcModule
+import com.smellouk.kamper.gpu.GpuInfo
+import com.smellouk.kamper.gpu.GpuModule
 import com.smellouk.kamper.issues.AnrConfig
 import com.smellouk.kamper.issues.IssueInfo
 import com.smellouk.kamper.issues.IssuesModule
@@ -49,10 +51,11 @@ class AppDelegate : NSObject {
     }
 }
 
-private val TAB_TITLES = listOf("CPU", "FPS", "Memory", "Network", "Issues", "Jank", "GC", "Thermal")
+private val TAB_TITLES = listOf("CPU", "GPU", "FPS", "Memory", "Network", "Issues", "Jank", "GC", "Thermal")
 
 class RootViewController : UIViewController(nibName = null, bundle = null) {
     private lateinit var cpuVC:     CpuViewController
+    private lateinit var gpuVC:     GpuViewController
     private lateinit var fpsVC:     FpsViewController
     private lateinit var memoryVC:  MemoryViewController
     private lateinit var networkVC: NetworkViewController
@@ -71,6 +74,7 @@ class RootViewController : UIViewController(nibName = null, bundle = null) {
         view.backgroundColor = Theme.BASE
 
         cpuVC     = CpuViewController()
+        gpuVC     = GpuViewController()
         fpsVC     = FpsViewController()
         memoryVC  = MemoryViewController()
         networkVC = NetworkViewController()
@@ -78,7 +82,7 @@ class RootViewController : UIViewController(nibName = null, bundle = null) {
         jankVC    = JankViewController()
         gcVC      = GcViewController()
         thermalVC = ThermalViewController()
-        children  = listOf(cpuVC, fpsVC, memoryVC, networkVC, issuesVC, jankVC, gcVC, thermalVC)
+        children  = listOf(cpuVC, gpuVC, fpsVC, memoryVC, networkVC, issuesVC, jankVC, gcVC, thermalVC)
 
         val seg = UISegmentedControl(items = TAB_TITLES)
         seg.selectedSegmentIndex = 0
@@ -136,6 +140,7 @@ class RootViewController : UIViewController(nibName = null, bundle = null) {
     private fun setupKamper() {
         Kamper.apply {
             install(CpuModule)
+            install(GpuModule)
             install(FpsModule)
             install(MemoryModule())
             install(NetworkModule)
@@ -145,6 +150,7 @@ class RootViewController : UIViewController(nibName = null, bundle = null) {
             install(ThermalModule)
 
             addInfoListener<CpuInfo>     { info -> dispatch_async(dispatch_get_main_queue()) { if (cpuVC.isViewLoaded())     cpuVC.update(info) } }
+            addInfoListener<GpuInfo>     { info -> dispatch_async(dispatch_get_main_queue()) { if (gpuVC.isViewLoaded())     gpuVC.update(info) } }
             addInfoListener<FpsInfo>     { info -> dispatch_async(dispatch_get_main_queue()) { if (fpsVC.isViewLoaded())     fpsVC.update(info) } }
             addInfoListener<MemoryInfo>  { info -> dispatch_async(dispatch_get_main_queue()) { if (memoryVC.isViewLoaded()) memoryVC.update(info) } }
             addInfoListener<NetworkInfo> { info -> dispatch_async(dispatch_get_main_queue()) { if (networkVC.isViewLoaded()) networkVC.update(info) } }

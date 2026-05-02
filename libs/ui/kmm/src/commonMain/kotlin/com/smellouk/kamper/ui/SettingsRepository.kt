@@ -30,6 +30,7 @@ internal class SettingsRepository(
         showJank                         = store.getBoolean("show_jank", false),
         showGc                           = store.getBoolean("show_gc", false),
         showThermal                      = store.getBoolean("show_thermal", false),
+        showGpu                          = store.getBoolean("show_gpu", true),
         cpuEnabled                       = store.getBoolean("cpu_enabled", true),
         fpsEnabled                       = store.getBoolean("fps_enabled", true),
         memoryEnabled                    = store.getBoolean("memory_enabled", true),
@@ -38,6 +39,7 @@ internal class SettingsRepository(
         jankEnabled                      = store.getBoolean("jank_enabled", false),
         gcEnabled                        = store.getBoolean("gc_enabled", false),
         thermalEnabled                   = store.getBoolean("thermal_enabled", false),
+        gpuEnabled                       = store.getBoolean("gpu_enabled", true),
         cpuIntervalMs                    = store.getLong("cpu_interval_ms", 1_000L),
         memoryIntervalMs                 = store.getLong("memory_interval_ms", 1_000L),
         networkIntervalMs                = store.getLong("network_interval_ms", 1_000L),
@@ -78,6 +80,7 @@ internal class SettingsRepository(
         store.putBoolean("show_jank", s.showJank)
         store.putBoolean("show_gc", s.showGc)
         store.putBoolean("show_thermal", s.showThermal)
+        store.putBoolean("show_gpu", s.showGpu)
         store.putBoolean("cpu_enabled", s.cpuEnabled)
         store.putBoolean("fps_enabled", s.fpsEnabled)
         store.putBoolean("memory_enabled", s.memoryEnabled)
@@ -86,6 +89,7 @@ internal class SettingsRepository(
         store.putBoolean("jank_enabled", s.jankEnabled)
         store.putBoolean("gc_enabled", s.gcEnabled)
         store.putBoolean("thermal_enabled", s.thermalEnabled)
+        store.putBoolean("gpu_enabled", s.gpuEnabled)
         store.putLong("cpu_interval_ms", s.cpuIntervalMs)
         store.putLong("memory_interval_ms", s.memoryIntervalMs)
         store.putLong("network_interval_ms", s.networkIntervalMs)

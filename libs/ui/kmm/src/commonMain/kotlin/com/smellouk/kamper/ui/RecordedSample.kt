@@ -14,6 +14,7 @@ internal object Tracks {
     const val JANK    = 5
     const val GC      = 6
     const val THERMAL = 7
+    const val GPU     = 8
 
     val ALL = listOf(
         CPU     to "CPU %",
@@ -22,6 +23,7 @@ internal object Tracks {
         NETWORK to "Network \u2193 MB/s",
         JANK    to "Jank dropped frames",
         GC      to "GC count delta",
-        THERMAL to "Thermal state"
+        THERMAL to "Thermal state",
+        GPU     to "GPU %"
     )
 }

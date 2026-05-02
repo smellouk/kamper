@@ -90,21 +90,8 @@ class GcViewController : UIViewController(nibName = null, bundle = null) {
         NSLayoutConstraint.activateConstraints(c)
     }
 
-    private var notSupportedShown = false
-
     fun update(info: GcInfo) {
-        if (info == GcInfo.INVALID) {
-            if (!notSupportedShown) {
-                notSupportedShown = true
-                bigLabel.text        = "—"
-                bigLabel.textColor   = Theme.MUTED
-                unitLabel.text       = "Not supported (uses ARC)"
-                pauseDeltaLabel.text = "GC pause delta:  N/A"
-                totalCountLabel.text = "Total GC count:  N/A"
-            }
-            return
-        }
-        if (info == GcInfo.UNSUPPORTED) {
+        if (info == GcInfo.INVALID || info == GcInfo.UNSUPPORTED) {
             bigLabel.text        = "N/A"
             bigLabel.textColor   = Theme.MUTED
             pauseDeltaLabel.text = "GC pause delta:  —"

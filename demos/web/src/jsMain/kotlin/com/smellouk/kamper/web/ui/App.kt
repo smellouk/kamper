@@ -7,6 +7,8 @@ import com.smellouk.kamper.fps.FpsInfo
 import com.smellouk.kamper.fps.FpsModule
 import com.smellouk.kamper.gc.GcInfo
 import com.smellouk.kamper.gc.GcModule
+import com.smellouk.kamper.gpu.GpuInfo
+import com.smellouk.kamper.gpu.GpuModule
 import com.smellouk.kamper.issues.IssueInfo
 import com.smellouk.kamper.issues.IssuesModule
 import com.smellouk.kamper.jank.JankInfo
@@ -61,7 +63,7 @@ internal object App {
         val main = document.createElement("main") as HTMLElement
         root.appendChild(main)
 
-        val tabNames = listOf("CPU", "FPS", "Memory", "Network", "Issues", "Jank", "GC", "Thermal")
+        val tabNames = listOf("CPU", "GPU", "FPS", "Memory", "Network", "Issues", "Jank", "GC", "Thermal")
         val tabs = tabNames.map { name ->
             (document.createElement("button") as HTMLElement).also { btn ->
                 btn.className = "tab"
@@ -90,17 +92,19 @@ internal object App {
 
     private fun buildSections(panels: List<HTMLElement>) {
         CpuSection.build(panels[0])
-        FpsSection.build(panels[1])
-        MemorySection.build(panels[2])
-        NetworkSection.build(panels[3])
-        IssuesSection.build(panels[4])
-        JankSection.build(panels[5])
-        GcSection.build(panels[6])
-        ThermalSection.build(panels[7])
+        GpuSection.build(panels[1])
+        FpsSection.build(panels[2])
+        MemorySection.build(panels[3])
+        NetworkSection.build(panels[4])
+        IssuesSection.build(panels[5])
+        JankSection.build(panels[6])
+        GcSection.build(panels[7])
+        ThermalSection.build(panels[8])
     }
 
     private fun setupKamper() {
         Kamper.install(CpuModule)
+        Kamper.install(GpuModule)
         Kamper.install(FpsModule)
         Kamper.install(MemoryModule())
         Kamper.install(NetworkModule)
@@ -110,6 +114,7 @@ internal object App {
         Kamper.install(ThermalModule)
 
         Kamper.addInfoListener<CpuInfo>     { CpuSection.update(it) }
+        Kamper.addInfoListener<GpuInfo>     { GpuSection.update(it) }
         Kamper.addInfoListener<FpsInfo>     { FpsSection.update(it) }
         Kamper.addInfoListener<MemoryInfo>  { MemorySection.update(it) }
         Kamper.addInfoListener<NetworkInfo> { NetworkSection.update(it) }

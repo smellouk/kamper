@@ -14,10 +14,11 @@ import platform.Foundation.*
 import platform.UIKit.*
 
 class ThermalViewController : UIViewController(nibName = null, bundle = null) {
-    private lateinit var bigLabel:       UILabel
-    private lateinit var unitLabel:      UILabel
-    private lateinit var throttlingLabel: UILabel
-    private lateinit var simHintLabel:   UILabel
+    private lateinit var bigLabel:        UILabel
+    private lateinit var unitLabel:       UILabel
+    private lateinit var temperatureLabel: UILabel
+    private lateinit var throttlingLabel:  UILabel
+    private lateinit var simHintLabel:    UILabel
     private lateinit var stressTarget:   ActionTarget
     private lateinit var stressBtn:      UIButton
     private var stressJobs = listOf<Job>()
@@ -41,8 +42,14 @@ class ThermalViewController : UIViewController(nibName = null, bundle = null) {
             textAlignment = NSTextAlignmentCenter
             translatesAutoresizingMaskIntoConstraints = false
         }
+        temperatureLabel = UILabel().apply {
+            text      = "Temperature:  —"
+            font      = Theme.LABEL_FONT
+            textColor = Theme.TEXT
+            translatesAutoresizingMaskIntoConstraints = false
+        }
         throttlingLabel = UILabel().apply {
-            text      = "Throttling:  —"
+            text      = "Throttling:   —"
             font      = Theme.LABEL_FONT
             textColor = Theme.TEXT
             translatesAutoresizingMaskIntoConstraints = false
@@ -54,7 +61,7 @@ class ThermalViewController : UIViewController(nibName = null, bundle = null) {
         stressBtn    = makeButton("Start CPU Stress", stressTarget)
 
         val sep = makeSeparator()
-        listOf(bigLabel, unitLabel, throttlingLabel, simHintLabel, sep, stressBtn).forEach { view.addSubview(it) }
+        listOf(bigLabel, unitLabel, temperatureLabel, throttlingLabel, simHintLabel, sep, stressBtn).forEach { view.addSubview(it) }
 
         val pad = 20.0
         val c = mutableListOf<NSLayoutConstraint>()
@@ -66,7 +73,11 @@ class ThermalViewController : UIViewController(nibName = null, bundle = null) {
         c += unitLabel.topAnchor.constraintEqualToAnchor(bigLabel.bottomAnchor, constant = 4.0)
         c += unitLabel.centerXAnchor.constraintEqualToAnchor(view.centerXAnchor)
 
-        c += throttlingLabel.topAnchor.constraintEqualToAnchor(unitLabel.bottomAnchor, constant = 24.0)
+        c += temperatureLabel.topAnchor.constraintEqualToAnchor(unitLabel.bottomAnchor, constant = 24.0)
+        c += temperatureLabel.leadingAnchor.constraintEqualToAnchor(view.leadingAnchor, constant = pad)
+        c += temperatureLabel.trailingAnchor.constraintEqualToAnchor(view.trailingAnchor, constant = -pad)
+
+        c += throttlingLabel.topAnchor.constraintEqualToAnchor(temperatureLabel.bottomAnchor, constant = 8.0)
         c += throttlingLabel.leadingAnchor.constraintEqualToAnchor(view.leadingAnchor, constant = pad)
         c += throttlingLabel.trailingAnchor.constraintEqualToAnchor(view.trailingAnchor, constant = -pad)
 
@@ -86,9 +97,27 @@ class ThermalViewController : UIViewController(nibName = null, bundle = null) {
 
     fun update(info: ThermalInfo) {
         if (info == ThermalInfo.INVALID) return
-        bigLabel.text        = info.state.name
-        bigLabel.textColor   = stateColor(info.state)
-        throttlingLabel.text = "Throttling:  ${if (info.isThrottling) "YES" else "NO"}"
+        bigLabel.text           = info.state.name
+        bigLabel.textColor      = stateColor(info.state)
+        temperatureLabel.text   = "Temperature:  ${temperatureString(info)}"
+        throttlingLabel.text    = "Throttling:   ${if (info.isThrottling) "YES" else "NO"}"
+    }
+
+    private fun temperatureString(info: ThermalInfo): String {
+        if (info.temperatureC >= 0) {
+            val t = (info.temperatureC * 10).toLong()
+            return "${t / 10}.${t % 10} °C"
+        }
+        return when (info.state) {
+            ThermalState.NONE     -> "< 60 °C"
+            ThermalState.LIGHT    -> "60 – 75 °C"
+            ThermalState.MODERATE -> "75 – 85 °C"
+            ThermalState.SEVERE   -> "85 – 95 °C"
+            ThermalState.CRITICAL,
+            ThermalState.EMERGENCY,
+            ThermalState.SHUTDOWN -> "> 95 °C"
+            else                  -> "—"
+        }
     }
 
     private fun stateColor(state: ThermalState): UIColor = when (state) {

@@ -50,6 +50,7 @@ actual object KamperUi {
     private const val PREF_CHIP_Y = "kamper_chip_y"
     private const val PREF_ON_RIGHT = "kamper_on_right"
     private const val AUTO_COLLAPSE_MS = 3_000L
+    private const val SNAP_ANIM_DURATION = 0.28
 
     internal var config: KamperUiConfig = KamperUiConfig()
     internal var repository: KamperUiRepository? = null
@@ -60,7 +61,6 @@ actual object KamperUi {
     private var chipX = 0.0
     private var chipY = 0.0
     private var onRightSide = true
-    private var dragStartChipX = 0.0
     private var screenW = 0.0
     private var screenH = 0.0
 
@@ -143,7 +143,7 @@ actual object KamperUi {
             window.setFrame(CGRectMake(chipX, chipY, CHIP_WIDTH, CHIP_HEIGHT))
             CATransaction.commit()
         }
-        touchView.onDragStart = { autoCollapseJob?.cancel(); dragStartChipX = chipX }
+        touchView.onDragStart = { autoCollapseJob?.cancel() }
         touchView.onDragEnd = { snapToEdge() }
         touchView.chipWindow = window
         vc.view.addSubview(touchView)
@@ -180,15 +180,13 @@ actual object KamperUi {
     private fun snapToEdge() {
         autoCollapseJob?.cancel()
         chipState = ChipState.PEEK
-        val displacement = chipX - dragStartChipX
-        onRightSide = when {
-            displacement < -20.0 -> false  // dragged left → snap left
-            displacement >  20.0 -> true   // dragged right → snap right
-            else -> chipX + PEEK_WIDTH / 2 > screenW / 2  // tiny/no drag → nearest edge
-        }
+        onRightSide = chipX + CONTENT_WIDTH / 2 > screenW / 2
         mirrorLayout = !onRightSide
-        chipX = peekX()
-        chipWindow?.setFrame(CGRectMake(chipX, chipY, CHIP_WIDTH, CHIP_HEIGHT))
+        val targetX = peekX()
+        chipX = targetX
+        UIView.animateWithDuration(SNAP_ANIM_DURATION) {
+            chipWindow?.setFrame(CGRectMake(targetX, chipY, CHIP_WIDTH, CHIP_HEIGHT))
+        }
         val d = NSUserDefaults.standardUserDefaults
         d.setDouble(chipY, PREF_CHIP_Y)
         d.setBool(onRightSide, PREF_ON_RIGHT)

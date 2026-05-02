@@ -57,6 +57,7 @@ include(":libs:modules:issues")
 include(":libs:modules:jank")
 include(":libs:modules:gc")
 include(":libs:modules:thermal")
+include(":libs:modules:gpu")
 
 include(":libs:rn")
 

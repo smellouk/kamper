@@ -50,8 +50,9 @@ internal object GcSection {
         if (info == GcInfo.INVALID) return
         if (info == GcInfo.UNSUPPORTED) {
             gcCountSpan.textContent = "N/A"
-            pauseSpan.textContent   = "—"
-            totalSpan.textContent   = "—"
+            gcCountSpan.style.color = "#7f849c"
+            pauseSpan.textContent   = "N/A"
+            totalSpan.textContent   = "N/A"
             simulateBtn?.let { it.disabled = true; it.textContent = "Not supported in browser" }
             return
         }

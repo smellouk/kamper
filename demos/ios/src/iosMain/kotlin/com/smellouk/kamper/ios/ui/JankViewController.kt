@@ -45,11 +45,13 @@ class JankViewController : UIViewController(nibName = null, bundle = null) {
             translatesAutoresizingMaskIntoConstraints = false
         }
 
+        val notSupportedHint = hintLabel("Jank detection not available on iOS")
+
         simulateTarget = ActionTarget { simulateJank() }
         val simulateBtn = makeButton("Simulate Jank", simulateTarget)
 
         val sep = makeSeparator()
-        listOf(bigLabel, unitLabel, ratioLabel, worstLabel, sep, simulateBtn).forEach { view.addSubview(it) }
+        listOf(bigLabel, unitLabel, ratioLabel, worstLabel, notSupportedHint, sep, simulateBtn).forEach { view.addSubview(it) }
 
         val pad = 20.0
         val c = mutableListOf<NSLayoutConstraint>()
@@ -69,7 +71,10 @@ class JankViewController : UIViewController(nibName = null, bundle = null) {
         c += worstLabel.leadingAnchor.constraintEqualToAnchor(view.leadingAnchor, constant = pad)
         c += worstLabel.trailingAnchor.constraintEqualToAnchor(view.trailingAnchor, constant = -pad)
 
-        c += sep.topAnchor.constraintEqualToAnchor(worstLabel.bottomAnchor, constant = 24.0)
+        c += notSupportedHint.topAnchor.constraintEqualToAnchor(worstLabel.bottomAnchor, constant = 12.0)
+        c += notSupportedHint.leadingAnchor.constraintEqualToAnchor(view.leadingAnchor, constant = pad)
+
+        c += sep.topAnchor.constraintEqualToAnchor(notSupportedHint.bottomAnchor, constant = 12.0)
         c += sep.leadingAnchor.constraintEqualToAnchor(view.leadingAnchor)
         c += sep.trailingAnchor.constraintEqualToAnchor(view.trailingAnchor)
         c += sep.heightAnchor.constraintEqualToConstant(1.0)
@@ -83,11 +88,13 @@ class JankViewController : UIViewController(nibName = null, bundle = null) {
     fun update(info: JankInfo) {
         if (info == JankInfo.INVALID) return
         if (info == JankInfo.UNSUPPORTED) {
-            bigLabel.text   = "N/A"
-            ratioLabel.text = "Not supported on iOS"
-            worstLabel.text = ""
+            bigLabel.text      = "N/A"
+            bigLabel.textColor = Theme.MUTED
+            ratioLabel.text    = "Janky ratio:  —"
+            worstLabel.text    = "Worst frame:  —"
             return
         }
+        bigLabel.textColor = Theme.MAUVE
         bigLabel.text   = info.droppedFrames.toString()
         val ratio = info.jankyFrameRatio * 100.0
         val ri = ratio.toInt(); val rd = ((ratio - ri) * 10).toInt()

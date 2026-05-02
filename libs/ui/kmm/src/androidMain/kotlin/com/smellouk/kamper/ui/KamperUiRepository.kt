@@ -37,7 +37,8 @@ internal actual class KamperUiRepository(
         val normalized = s.copy(
             showJank    = if (!old.jankEnabled    && s.jankEnabled)    true else s.showJank,
             showGc      = if (!old.gcEnabled      && s.gcEnabled)      true else s.showGc,
-            showThermal = if (!old.thermalEnabled && s.thermalEnabled) true else s.showThermal
+            showThermal = if (!old.thermalEnabled && s.thermalEnabled) true else s.showThermal,
+            showGpu     = if (!old.gpuEnabled     && s.gpuEnabled)     true else s.showGpu
         )
         settingsRepository.updateSettings(normalized)
         lifecycleManager.applySettings(old, normalized)

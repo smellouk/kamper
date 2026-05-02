@@ -33,6 +33,7 @@ kotlin {
                 implementation(project(":libs:modules:issues"))
                 implementation(project(":libs:modules:jank"))
                 implementation(project(":libs:modules:gc"))
+                implementation(project(":libs:modules:gpu"))
                 implementation(project(":libs:modules:thermal"))
             }
         }

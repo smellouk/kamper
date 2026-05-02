@@ -6,6 +6,7 @@ import NativeKamperModule from './NativeKamperModule';
 import type {
   CpuInfo,
   FpsInfo,
+  GpuInfo,
   MemoryInfo,
   NetworkInfo,
   IssueInfo,
@@ -32,6 +33,7 @@ import type {
 export type KamperEventMap = {
   cpu: CpuInfo;
   fps: FpsInfo;
+  gpu: GpuInfo;
   memory: MemoryInfo;
   network: NetworkInfo;
   issue: IssueInfo;
@@ -48,6 +50,7 @@ export type KamperSubscription = { remove(): void };
 const EVENT_TO_PROP: Record<keyof KamperEventMap, string> = {
   cpu: 'onCpu',
   fps: 'onFps',
+  gpu: 'onGpu',
   memory: 'onMemory',
   network: 'onNetwork',
   issue: 'onIssue',

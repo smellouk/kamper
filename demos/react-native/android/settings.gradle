@@ -37,6 +37,7 @@ includeBuild('../../..') {
         substitute module('com.smellouk.kamper:jank-module') using project(':libs:modules:jank')
         substitute module('com.smellouk.kamper:gc-module') using project(':libs:modules:gc')
         substitute module('com.smellouk.kamper:thermal-module') using project(':libs:modules:thermal')
+        substitute module('com.smellouk.kamper:gpu-module') using project(':libs:modules:gpu')
         substitute module('com.smellouk.kamper:rn') using project(':libs:rn')
         substitute module('com.smellouk.kamper:kmm') using project(':libs:ui:kmm')
     }

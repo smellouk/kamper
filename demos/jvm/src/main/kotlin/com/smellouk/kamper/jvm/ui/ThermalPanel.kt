@@ -28,7 +28,11 @@ class ThermalPanel : JPanel(BorderLayout(0, 0)) {
         foreground = Theme.MUTED
         font = Font("SansSerif", Font.PLAIN, 14)
     }
-    private val throttlingLabel = JLabel("Throttling:  —", SwingConstants.LEFT).apply {
+    private val temperatureLabel = JLabel("Temperature:  —", SwingConstants.LEFT).apply {
+        foreground = Theme.TEXT
+        font = Theme.LABEL_FONT
+    }
+    private val throttlingLabel = JLabel("Throttling:   —", SwingConstants.LEFT).apply {
         foreground = Theme.TEXT
         font = Theme.LABEL_FONT
     }
@@ -45,9 +49,10 @@ class ThermalPanel : JPanel(BorderLayout(0, 0)) {
             add(unitLabel, BorderLayout.SOUTH)
         }
 
-        val statsPanel = JPanel(GridLayout(1, 1, 0, 8)).apply {
+        val statsPanel = JPanel(GridLayout(2, 1, 0, 8)).apply {
             background = Theme.BASE
             border = BorderFactory.createEmptyBorder(16, 20, 12, 20)
+            add(temperatureLabel)
             add(throttlingLabel)
         }
 
@@ -85,17 +90,22 @@ class ThermalPanel : JPanel(BorderLayout(0, 0)) {
             SwingUtilities.invokeLater {
                 bigLabel.text = "N/A"
                 bigLabel.foreground = Theme.MUTED
-                throttlingLabel.text = "Throttling:  N/A"
+                temperatureLabel.text = "Temperature:  N/A"
+                throttlingLabel.text  = "Throttling:   N/A"
                 stressButton.isEnabled = false
             }
             return
         }
         SwingUtilities.invokeLater {
-            bigLabel.text      = info.state.name
+            bigLabel.text       = info.state.name
             bigLabel.foreground = stateColor(info.state)
-            throttlingLabel.text = "Throttling:  ${if (info.isThrottling) "YES" else "NO"}"
+            temperatureLabel.text = "Temperature:  ${formatTemp(info.temperatureC)}"
+            throttlingLabel.text  = "Throttling:   ${if (info.isThrottling) "YES" else "NO"}"
         }
     }
+
+    private fun formatTemp(tempC: Double): String =
+        if (tempC > 0.0) "%.1f °C".format(tempC) else "—"
 
     private fun stateColor(state: ThermalState): Color = when (state) {
         ThermalState.NONE, ThermalState.LIGHT -> Theme.GREEN

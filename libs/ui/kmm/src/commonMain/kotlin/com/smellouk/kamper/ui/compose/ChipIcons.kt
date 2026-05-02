@@ -2,6 +2,7 @@ package com.smellouk.kamper.ui.compose
 
 internal expect object ChipIcons {
     val cpu: String
+    val gpu: String
     val fps: String
     val mem: String
     val net: String

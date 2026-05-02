@@ -34,6 +34,9 @@ import com.smellouk.kamper.network.NetworkModule
 import com.smellouk.kamper.thermal.ThermalConfig
 import com.smellouk.kamper.thermal.ThermalInfo
 import com.smellouk.kamper.thermal.ThermalModule
+import com.smellouk.kamper.gpu.GpuConfig
+import com.smellouk.kamper.gpu.GpuInfo
+import com.smellouk.kamper.gpu.GpuModule
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -46,6 +49,7 @@ import kotlinx.coroutines.flow.update
 private const val HISTORY_SIZE = 60
 private const val MAX_ISSUES = 100
 private const val PREF_ISSUES = "kamper_issues_list"
+private const val PCT_SCALE = 100f
 private const val SUPPORT_PROBE_DELAY_MS = 1_500L
 
 @Suppress("TooManyFunctions")
@@ -66,6 +70,7 @@ internal class ModuleLifecycleManager(
     private val fpsHist = ArrayDeque<Float>()
     private val memHist = ArrayDeque<Float>()
     private val netHist = ArrayDeque<Float>()
+    private val gpuHist = ArrayDeque<Float>()
 
     private fun ArrayDeque<Float>.push(v: Float) {
         if (size >= HISTORY_SIZE) removeFirst()
@@ -81,6 +86,7 @@ internal class ModuleLifecycleManager(
     private var jankModule: PerformanceModule<JankConfig, JankInfo>? = null
     private var gcModule: PerformanceModule<GcConfig, GcInfo>? = null
     private var thermalModule: PerformanceModule<ThermalConfig, ThermalInfo>? = null
+    private var gpuModule: PerformanceModule<GpuConfig, GpuInfo>? = null
 
     // ── Stable listener references ────────────────────────────────────────────
 
@@ -170,6 +176,35 @@ internal class ModuleLifecycleManager(
                 thermalState = info.state,
                 isThrottling = info.isThrottling,
                 thermalUnsupported = false
+            )
+        }
+    }
+
+    private val gpuListener: InfoListener<GpuInfo> = listener@{ info ->
+        if (info == GpuInfo.INVALID) return@listener
+        if (info == GpuInfo.UNSUPPORTED) {
+            state.update { s -> s.copy(gpuUnsupported = true) }
+            return@listener
+        }
+        val utilFloat = info.utilization.toFloat()
+        // When utilization is unknown (-1.0), fall back to cur_freq as the activity signal.
+        // The Sparkline normalises against data.max(), so raw KHz works for relative trends.
+        val histValue: Float = when {
+            utilFloat >= 0f -> utilFloat
+            info.curFreqKhz >= 0L && info.maxFreqKhz > 0L ->
+                (info.curFreqKhz.toFloat() / info.maxFreqKhz.toFloat()) * PCT_SCALE
+            info.curFreqKhz >= 0L -> info.curFreqKhz.toFloat()
+            else -> -1f
+        }
+        if (histValue >= 0f) gpuHist.push(histValue)
+        if (histValue >= 0f) recordingManager.record(Tracks.GPU, histValue.toDouble())
+        state.update { s ->
+            s.copy(
+                gpuUtilization   = utilFloat,
+                gpuUsedMemoryMb  = info.usedMemoryMb.toFloat(),
+                gpuTotalMemoryMb = info.totalMemoryMb.toFloat(),
+                gpuHistory       = gpuHist.toList(),
+                gpuUnsupported   = false
             )
         }
     }
@@ -369,6 +404,18 @@ internal class ModuleLifecycleManager(
         thermalModule = null
     }
 
+    private fun installGpu() {
+        val mod = GpuModule
+        engine.install(mod)
+        engine.addInfoListener(gpuListener)
+        gpuModule = mod
+    }
+
+    private fun uninstallGpu() {
+        gpuModule?.let { engine.uninstall(it) }
+        gpuModule = null
+    }
+
     // ── issuesConfigKey ───────────────────────────────────────────────────────
 
     private fun KamperUiSettings.issuesConfigKey() =
@@ -421,6 +468,10 @@ internal class ModuleLifecycleManager(
             !old.thermalEnabled && normalized.thermalEnabled -> installThermal()
             old.thermalEnabled && !normalized.thermalEnabled -> uninstallThermal()
         }
+        when {
+            !old.gpuEnabled && normalized.gpuEnabled -> installGpu()
+            old.gpuEnabled && !normalized.gpuEnabled -> uninstallGpu()
+        }
 
         if (engineRunning) {
             engine.stop()   // stop currently running instances cleanly
@@ -460,6 +511,7 @@ internal class ModuleLifecycleManager(
         if (s.jankEnabled) installJank()
         if (s.gcEnabled) installGc()
         if (s.thermalEnabled) installThermal()
+        if (s.gpuEnabled) installGpu()
 
         // Probe potentially-unsupported modules so the "not supported" label
         // appears before the user manually enables them.
@@ -467,10 +519,12 @@ internal class ModuleLifecycleManager(
         val probeNetwork = !s.networkEnabled
         val probeJank    = !s.jankEnabled
         val probeThermal = !s.thermalEnabled
+        val probeGpu     = !s.gpuEnabled
         if (probeCpu)     installCpu(s)
         if (probeNetwork) installNetwork(s)
         if (probeJank)    installJank()
         if (probeThermal) installThermal()
+        if (probeGpu)     installGpu()
 
         engine.start()
         engineRunning = true
@@ -478,7 +532,7 @@ internal class ModuleLifecycleManager(
         state.update { it.copy(engineRunning = true) }
 
         // After one watcher tick, remove probe modules that aren't user-enabled.
-        val anyProbe = probeCpu || probeNetwork || probeJank || probeThermal
+        val anyProbe = probeCpu || probeNetwork || probeJank || probeThermal || probeGpu
         if (anyProbe) {
             scope.launch {
                 delay(SUPPORT_PROBE_DELAY_MS)
@@ -486,6 +540,7 @@ internal class ModuleLifecycleManager(
                 if (probeNetwork) uninstallNetwork()
                 if (probeJank)    uninstallJank()
                 if (probeThermal) uninstallThermal()
+                if (probeGpu)     uninstallGpu()
                 if (engineRunning) { engine.stop(); engine.start() }
             }
         }
@@ -504,5 +559,6 @@ internal class ModuleLifecycleManager(
         jankModule = null
         gcModule = null
         thermalModule = null
+        gpuModule = null
     }
 }

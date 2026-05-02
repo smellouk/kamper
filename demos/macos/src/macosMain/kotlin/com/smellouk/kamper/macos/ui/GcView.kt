@@ -80,7 +80,7 @@ class GcView : NSView {
     private var notSupportedShown = false
 
     fun update(info: GcInfo) {
-        if (info == GcInfo.INVALID) {
+        if (info == GcInfo.INVALID || info == GcInfo.UNSUPPORTED) {
             if (!notSupportedShown) {
                 notSupportedShown = true
                 bigLabel.stringValue        = "—"

@@ -61,6 +61,20 @@ internal fun SettingsTab(
         )
 
         ModuleCard(
+            icon = ChipIcons.gpu,
+            name = "GPU",
+            color = KamperTheme.MAUVE,
+            enabled = cfg.gpuEnabled,
+            showInChip = cfg.showGpu,
+            intervalMs = cfg.gpuIntervalMs,
+            intervalOptions = INTERVAL_OPTIONS,
+            onEnabledChange = { onSettingsChange(cfg.copy(gpuEnabled = it)) },
+            onShowInChipChange = { onSettingsChange(cfg.copy(showGpu = it)) },
+            onIntervalChange = { onSettingsChange(cfg.copy(gpuIntervalMs = it)) },
+            unsupported = s.gpuUnsupported
+        )
+
+        ModuleCard(
             icon = ChipIcons.fps,
             name = "FPS",
             color = KamperTheme.GREEN,

@@ -1,6 +1,7 @@
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {
   Animated,
+  Dimensions,
   Easing,
   Platform,
   Pressable,
@@ -19,6 +20,7 @@ import {Kamper, showOverlay, hideOverlay} from 'react-native-kamper';
 import type {
   CpuInfo,
   FpsInfo,
+  GpuInfo,
   MemoryInfo,
   NetworkInfo,
   IssueInfo,
@@ -76,6 +78,7 @@ type NetworkData = NetworkInfo;
 type IssueData = IssueInfo;
 type JankData = JankInfo;
 type GcData = GcInfo;
+type GpuData = GpuInfo;
 type ThermalData = ThermalInfo;
 type JsMemoryData = JsMemoryInfo;
 type JsGcData = JsGcInfo;
@@ -773,8 +776,170 @@ function ThermalTab({thermal, running}: {thermal: ThermalData | null; running: b
   );
 }
 
+// ── GPU Stress Canvas ──────────────────────────────────────────────────────────
+const GPU_BALL_COUNT = 40;
+const GPU_BALL_SIZE = 60;
+const GPU_BALL_COLORS = [C.blue, C.green, C.yellow, C.peach, C.mauve, C.teal, C.red];
+const GPU_BOX_SIDE = Dimensions.get('window').width - 80;
+
+function GpuStressCanvas() {
+  const balls = useRef(
+    Array.from({length: GPU_BALL_COUNT}, (_, i) => ({
+      x: new Animated.Value(0),
+      y: new Animated.Value(0),
+      color: GPU_BALL_COLORS[i % GPU_BALL_COLORS.length],
+    }))
+  ).current;
+
+  useEffect(() => {
+    const maxX = GPU_BOX_SIDE - GPU_BALL_SIZE;
+    const maxY = GPU_BOX_SIDE - GPU_BALL_SIZE;
+    const loops = balls.map((ball, i) => {
+      const dur = 800 + (i * 137) % 1200;
+      const xLoop = Animated.loop(Animated.sequence([
+        Animated.timing(ball.x, {toValue: maxX, duration: dur, useNativeDriver: false, easing: Easing.inOut(Easing.quad)}),
+        Animated.timing(ball.x, {toValue: 0, duration: dur, useNativeDriver: false, easing: Easing.inOut(Easing.quad)}),
+      ]));
+      const yDur = Math.round(dur * 0.7);
+      const yLoop = Animated.loop(Animated.sequence([
+        Animated.timing(ball.y, {toValue: maxY, duration: yDur, useNativeDriver: false, easing: Easing.inOut(Easing.sin)}),
+        Animated.timing(ball.y, {toValue: 0, duration: yDur, useNativeDriver: false, easing: Easing.inOut(Easing.sin)}),
+      ]));
+      xLoop.start();
+      yLoop.start();
+      return {xLoop, yLoop};
+    });
+    return () => loops.forEach(l => { l.xLoop.stop(); l.yLoop.stop(); });
+  }, [balls]);
+
+  return (
+    <View style={s.gpuStressBox}>
+      {balls.map((ball, i) => (
+        <Animated.View
+          key={i}
+          style={{
+            position: 'absolute',
+            left: ball.x,
+            top: ball.y,
+            width: GPU_BALL_SIZE,
+            height: GPU_BALL_SIZE,
+            borderRadius: GPU_BALL_SIZE / 2,
+            backgroundColor: ball.color,
+            opacity: 0.85,
+          }}
+        />
+      ))}
+    </View>
+  );
+}
+
+// ── GPU Tab ────────────────────────────────────────────────────────────────────
+function GpuTab({gpu, running}: {gpu: GpuData | null; running: boolean}) {
+  const [stressing, setStressing] = useState(false);
+
+  return (
+    <View style={s.tabContent}>
+      <ScrollView
+        style={s.tabScroll}
+        contentContainerStyle={[s.scrollContent, {alignItems: 'center'}]}
+        showsVerticalScrollIndicator={false}>
+        <View style={s.fpsBig}>
+          <Text style={[s.fpsNum, {color: gpu ? C.mauve : C.muted, fontSize: 48}]}>
+            {gpu ? (gpu.utilization >= 0 ? `${gpu.utilization.toFixed(1)}%` : '—%') : '—'}
+          </Text>
+        </View>
+        <Text style={[s.fpsUnit, {marginBottom: 20}]}>GPU usage %</Text>
+        {gpu ? (
+          <>
+            <SectionTitle label="FREQUENCY" first />
+            <View style={s.metricWrap}>
+              <View style={s.metricRow}>
+                <Text style={s.metricLabel}>Cur Freq</Text>
+                <Text style={[s.metricValue, {color: C.mauve}]}>
+                  {gpu.curFreqKhz >= 0 ? `${(gpu.curFreqKhz / 1000).toFixed(0)} MHz` : '—'}
+                </Text>
+              </View>
+            </View>
+            <View style={s.metricWrap}>
+              <View style={s.metricRow}>
+                <Text style={s.metricLabel}>Max Freq</Text>
+                <Text style={[s.metricValue, {color: C.text}]}>
+                  {gpu.maxFreqKhz >= 0 ? `${(gpu.maxFreqKhz / 1000).toFixed(0)} MHz` : '—'}
+                </Text>
+              </View>
+            </View>
+            <SectionTitle label="MEMORY" />
+            <View style={s.metricWrap}>
+              <View style={s.metricRow}>
+                <Text style={s.metricLabel}>Used</Text>
+                <Text style={[s.metricValue, {color: C.peach}]}>
+                  {gpu.usedMemoryMb >= 0 ? `${gpu.usedMemoryMb.toFixed(0)} MB` : '—'}
+                </Text>
+              </View>
+            </View>
+            <View style={s.metricWrap}>
+              <View style={s.metricRow}>
+                <Text style={s.metricLabel}>Total</Text>
+                <Text style={[s.metricValue, {color: C.text}]}>
+                  {gpu.totalMemoryMb >= 0 ? `${gpu.totalMemoryMb.toFixed(0)} MB` : '—'}
+                </Text>
+              </View>
+            </View>
+            <SectionTitle label="BREAKDOWN" />
+            <View style={s.metricWrap}>
+              <View style={s.metricRow}>
+                <Text style={s.metricLabel}>App</Text>
+                <Text style={[s.metricValue, {color: C.mauve}]}>
+                  {gpu.appUtilization >= 0 ? `${gpu.appUtilization.toFixed(1)}%` : 'N/A'}
+                </Text>
+              </View>
+            </View>
+            <View style={s.metricWrap}>
+              <View style={s.metricRow}>
+                <Text style={s.metricLabel}>Renderer</Text>
+                <Text style={[s.metricValue, {color: C.blue}]}>
+                  {gpu.rendererUtilization >= 0 ? `${gpu.rendererUtilization.toFixed(1)}%` : 'N/A'}
+                </Text>
+              </View>
+            </View>
+            <View style={s.metricWrap}>
+              <View style={s.metricRow}>
+                <Text style={s.metricLabel}>Tiler</Text>
+                <Text style={[s.metricValue, {color: C.teal}]}>
+                  {gpu.tilerUtilization >= 0 ? `${gpu.tilerUtilization.toFixed(1)}%` : 'N/A'}
+                </Text>
+              </View>
+            </View>
+            <View style={s.metricWrap}>
+              <View style={s.metricRow}>
+                <Text style={s.metricLabel}>Compute</Text>
+                <Text style={[s.metricValue, {color: C.green}]}>
+                  {gpu.computeUtilization >= 0 ? `${gpu.computeUtilization.toFixed(1)}%` : 'N/A'}
+                </Text>
+              </View>
+            </View>
+          </>
+        ) : (
+          <Placeholder running={running} />
+        )}
+        {stressing && (
+          <View style={{marginTop: 20, alignItems: 'center'}}>
+            <GpuStressCanvas />
+          </View>
+        )}
+      </ScrollView>
+      <View style={s.footer}>
+        {running
+          ? <Btn label={stressing ? 'STOP STRESS' : 'STRESS GPU'} onPress={() => setStressing(v => !v)} />
+          : <Text style={s.footerHint}>Engine stopped</Text>
+        }
+      </View>
+    </View>
+  );
+}
+
 // ── App ────────────────────────────────────────────────────────────────────────
-const TABS = ['CPU', 'FPS', 'MEMORY', 'NETWORK', 'ISSUES', 'JANK', 'GC', 'THERMAL'];
+const TABS = ['CPU', 'GPU', 'FPS', 'MEMORY', 'NETWORK', 'ISSUES', 'JANK', 'GC', 'THERMAL'];
 
 export default function App() {
   const [activeTab, setActiveTab] = useState(0);
@@ -786,6 +951,7 @@ export default function App() {
   const [issues, setIssues]       = useState<IssueData[]>([]);
   const [jank, setJank]           = useState<JankData | null>(null);
   const [gc, setGc]               = useState<GcData | null>(null);
+  const [gpu, setGpu]             = useState<GpuData | null>(null);
   const [thermal, setThermal]     = useState<ThermalData | null>(null);
   const [jsMem, setJsMem]         = useState<JsMemoryData | null>(null);
   const [jsGc, setJsGc]           = useState<JsGcData | null>(null);
@@ -809,6 +975,7 @@ export default function App() {
       }),
       Kamper.on('jank',    (d: JankData)    => setJank(d)),
       Kamper.on('gc',       (d: GcData)       => setGc(d)),
+      Kamper.on('gpu',      (d: GpuData)      => setGpu(d)),
       Kamper.on('thermal',  (d: ThermalData)  => setThermal(d)),
       Kamper.on('jsMemory', (d: JsMemoryData) => setJsMem(d)),
       Kamper.on('jsGc',     (d: JsGcData)     => setJsGc(d)),
@@ -824,7 +991,7 @@ export default function App() {
       Kamper.stop();
       setRunning(false);
       setCpu(null); setFps(null); setMem(null); setNet(null); setIssues([]);
-      setJank(null); setGc(null); setThermal(null); setJsMem(null); setJsGc(null);
+      setJank(null); setGc(null); setGpu(null); setThermal(null); setJsMem(null); setJsGc(null);
       peakRxRef.current = 0; peakTxRef.current = 0;
     } else {
       Kamper.start();
@@ -874,9 +1041,10 @@ export default function App() {
 
       {/* Tab content */}
       {activeTab === 0 && <CpuTab     cpu={cpu} running={running} />}
-      {activeTab === 1 && <FpsTab     fps={fps} />}
-      {activeTab === 2 && <MemoryTab  mem={mem} jsMem={jsMem} running={running} />}
-      {activeTab === 3 && (
+      {activeTab === 1 && <GpuTab     gpu={gpu} running={running} />}
+      {activeTab === 2 && <FpsTab     fps={fps} />}
+      {activeTab === 3 && <MemoryTab  mem={mem} jsMem={jsMem} running={running} />}
+      {activeTab === 4 && (
         <NetworkTab
           net={net}
           peakRxRef={peakRxRef}
@@ -884,10 +1052,10 @@ export default function App() {
           running={running}
         />
       )}
-      {activeTab === 4 && <IssuesTab  issues={issues} onClear={() => setIssues([])} />}
-      {activeTab === 5 && <JankTab    jank={jank}    running={running} />}
-      {activeTab === 6 && <GcTab      gc={gc}        jsGc={jsGc}  running={running} />}
-      {activeTab === 7 && <ThermalTab thermal={thermal} running={running} />}
+      {activeTab === 5 && <IssuesTab  issues={issues} onClear={() => setIssues([])} />}
+      {activeTab === 6 && <JankTab    jank={jank}    running={running} />}
+      {activeTab === 7 && <GcTab      gc={gc}        jsGc={jsGc}  running={running} />}
+      {activeTab === 8 && <ThermalTab thermal={thermal} running={running} />}
     </SafeAreaView>
     </SafeAreaProvider>
   );
@@ -982,6 +1150,15 @@ const s = StyleSheet.create({
   btnDisabled:{opacity: 0.5},
   btnPressed: {opacity: 0.75},
   btnText:    {fontSize: 12, fontWeight: '700', color: C.text, letterSpacing: 0.5},
+
+  // GPU stress box
+  gpuStressBox: {
+    width: GPU_BOX_SIDE,
+    height: GPU_BOX_SIDE,
+    backgroundColor: '#0D0D1A',
+    borderRadius: 8,
+    overflow: 'hidden',
+  },
 
   // Misc
   placeholder: {fontSize: 13, color: C.muted, marginTop: 4},

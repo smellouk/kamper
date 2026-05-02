@@ -65,6 +65,18 @@ export type ThermalPayload = {
   temperatureC: number;
 };
 
+export type GpuPayload = {
+  utilization: number;
+  usedMemoryMb: number;
+  totalMemoryMb: number;
+  curFreqKhz: number;
+  maxFreqKhz: number;
+  appUtilization: number;
+  rendererUtilization: number;
+  tilerUtilization: number;
+  computeUtilization: number;
+};
+
 export type JsMemoryPayload = {
   usedMb: number;
   totalMb: number;
@@ -108,6 +120,7 @@ export interface Spec extends TurboModule {
   readonly onThermal: EventEmitter<ThermalPayload>;
   readonly onJsMemory: EventEmitter<JsMemoryPayload>;
   readonly onJsGc: EventEmitter<JsGcPayload>;
+  readonly onGpu: EventEmitter<GpuPayload>;
 }
 
 // Module name 'KamperModule' MUST match Android `KamperTurboModule.NAME`,

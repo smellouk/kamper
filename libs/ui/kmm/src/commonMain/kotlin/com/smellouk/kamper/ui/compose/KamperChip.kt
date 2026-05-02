@@ -138,9 +138,14 @@ internal fun KamperChip(
         val showJank    = settings.jankEnabled    && settings.showJank    && !state.jankUnsupported
         val showThermal = settings.thermalEnabled && settings.showThermal && !state.thermalUnsupported
         val showGc      = settings.gcEnabled      && settings.showGc      && !state.gcUnsupported
+        val showGpu     = settings.gpuEnabled     && settings.showGpu     && !state.gpuUnsupported
 
         Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
             if (showCpu) MetricRow(ChipIcons.cpu, KamperTheme.BLUE, "CPU", "${state.cpuPercent.formatDp(1)}%", mirrorLayout, fontSize)
+            if (showGpu) {
+                val gpuLabel = if (state.gpuUtilization < 0f) "—%" else "${state.gpuUtilization.formatDp(1)}%"
+                MetricRow(ChipIcons.gpu, KamperTheme.MAUVE, "GPU", gpuLabel, mirrorLayout, fontSize)
+            }
             if (settings.fpsEnabled && settings.showFps) MetricRow(ChipIcons.fps, KamperTheme.GREEN, "FPS", "${state.fps} fps", mirrorLayout, fontSize)
             if (settings.memoryEnabled && settings.showMemory) MetricRow(ChipIcons.mem, KamperTheme.PEACH, "MEM", "${state.memoryUsedMb.formatDp(0)} MB", mirrorLayout, fontSize)
             if (showNetwork) MetricRow(ChipIcons.net, KamperTheme.TEAL, "NET", netDisplay, mirrorLayout, fontSize)

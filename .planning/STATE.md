@@ -2,21 +2,21 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: executing
-stopped_at: Phase 23 UI-SPEC approved
-last_updated: "2026-05-01T22:38:38.607Z"
+status: ready_to_plan
+stopped_at: Phase 23 complete (2026-05-02)
+last_updated: "2026-05-02T17:45:00.000Z"
 progress:
-  total_phases: 25
-  completed_phases: 17
-  total_plans: 112
-  completed_plans: 86
-  percent: 77
+  total_phases: 24
+  completed_phases: 22
+  total_plans: 130
+  completed_plans: 122
+  percent: 94
 ---
 
 # GSD State
 
-**Date:** 2026-04-29
-**Status:** Ready to execute
+**Date:** 2026-05-02
+**Status:** Phase 23 Complete — Ready to Plan Phase 24
 
 ---
 
@@ -24,55 +24,63 @@ progress:
 
 | Field | Value |
 |-------|-------|
-| Branch | main |
+| Branch | phase/23-implement-gpu-module-for-all-platforms |
 | Milestone | v1.0 |
-| Current Phase | — |
-| Last Completed Phase | 19 — Claude-Friendly Repo |
-| Phases Completed | 01, 02, 03, 04, 05, 06, 07, 08, 09, 10, 11, 12, 13, 14, 15, 16, 18, 19 |
-| Phases Remaining | 17 (pending), 20 |
-| Completion | 18 / 20 phases |
+| Current Phase | 24 — log events (Perfetto UI) |
+| Last Completed Phase | 23 — GPU Module for all platforms |
+| Phases Completed | 01–16, 18–23 |
+| Phases Remaining | 17 (pending), 24 |
+| Completion | 22 / 24 phases |
 
-Progress: [██████████████████░░] 74/84 plans (88%)
+Progress: [█████████████████████░░░] 122/130 plans (94%)
 
 ---
 
-## Phase 19 Status (Plans 01–03)
+## Phase 23 Status (Plans 01–12)
 
-- **Status:** Complete (2026-04-29) — all 3 plans delivered, UAT 4/5 passed (1 minor auto-fixed)
-- **Context file:** `.planning/phases/19-make-repo-claude-friend-and-research-which-skill-we-could-of/`
-- **Scope:** CLAUDE.md + 3 Claude Code project skills
-  - Plan 01: `CLAUDE.md` — self-contained Claude/contributor reference (284 lines) ✓
-  - Plan 02: `.claude/skills/kamper-new-module/SKILL.md` — full 8-platform module scaffolder ✓
-  - Plan 03: `.claude/skills/kamper-check/SKILL.md` + `kamper-module-review/SKILL.md` + `settings.json` allowlist ✓
+- **Status:** Complete (2026-05-02) — all 12 plans delivered, UAT 9/9 passed
+- **Context file:** `.planning/phases/23-implement-gpu-module-for-all-platforms/`
+- **Scope:** Full GPU module across 8 platforms + KamperUI integration + all demo apps
+  - Plans 01–05: GpuModule library (commonMain, Android/JVM, macOS IOKit, iOS/tvOS UNSUPPORTED, JS/WASM UNSUPPORTED)
+  - Plan 06: KamperUI chip + panel GPU integration
+  - Plans 07–12 (gap-closure): GPU tab in all 7 demo apps (JVM, Web, Android, Compose, RN, iOS, tvOS, macOS)
+- **Also delivered this session (bug fixes):**
+  - iOS chip drag: center-based snap with smooth animation
+  - Thermal iOS/tvOS: NSProcessInfo.thermalState via cinterop
+  - Temperature display: range estimate when exact value unavailable
 
 ---
 
 ## Next Phase
 
-**Phase 20 — Open Source Cleanup** — Contribution guidelines, issue templates, open source readiness
+**Phase 24 — Event Logging (Perfetto UI)** — `logEvent`/`startEvent`/`endEvent`/`measureEvent` API, buffered 1000 records, Perfetto export, Sentry/Firebase/OTel fan-out
 
 ---
 
 ## Accumulated Context
 
-### Recent Decisions (Phase 19)
+### Recent Decisions (Phase 23)
 
-- CLAUDE.md supersedes CONTRIBUTING.md for commit/PR conventions (CONTRIBUTING.md references outdated git-flow workflow)
-- `.claude/settings.json` allowlist includes jvmTest/detekt/test/find but deliberately excludes `connectedAndroidTest` and `assembleXCFramework`
-- 3 skills defined: `kamper-new-module` (scaffolder), `kamper-check` (Gradle commands), `kamper-module-review` (convention audit)
-- `Bash(test:*)` POSIX allowlist entry was missing from initial 19-03 delivery; added in UAT auto-fix
+- GPU returns UNSUPPORTED on iOS/tvOS — IOAccelerator is private; TASK_POWER_INFO_V2 probed on-device, always returns 0 for sandboxed processes
+- GPU returns UNSUPPORTED on JS/WASM — Spectre mitigations block GPU APIs in browsers
+- macOS GPU via IOKit IOAccelerator PerformanceStatistics — utilization available, VRAM total not exposed via this path
+- JVM GPU via OSHI — partial data: VRAM total accessible, utilization always -1.0 (no OSHI API)
+- Android GPU via /sys/class/kgsl/kgsl-3d0/gpu_busy_percentage with /sys/class/devfreq Mali fallback
+- Thermal iOS/tvOS: NSProcessInfo.thermalState absent from KN bindings — bridged via cinterop def (mirrors macOS pattern)
+- Temperature display: when temperatureC = -1.0, show range estimate from thermal state (< 60°C / 60–75°C / 75–85°C etc.)
 
 ### Roadmap Evolution
 
-- Phase 21 added: Monorepo structure and clean up (renaming kamper/ to libs/) — structural refactor, deferred from Phase 20 discuss
-- Phase 22 added: manual testing all demo platforms, one by one
-- Phase 23 added: implement GPU module for all platforms
-- Phase 24 added: add the option log events which will allow to see them in perfetto UI
-- Phase 25 added: add the option log events which will allow to see them in perfetto UI
+- Phase 21 added: Monorepo structure and clean up (renaming kamper/ to libs/) ✓ Complete
+- Phase 22 added: manual testing all demo platforms ✓ Complete
+- Phase 23 added: implement GPU module for all platforms ✓ Complete
+- Phase 24 added: event logging API with Perfetto UI integration
+- Phase 25: duplicate of Phase 24 — to be removed in Phase 24 plan 10
 
 ### Blockers/Concerns
 
 - Phase 17 (Medium Article Series) was skipped — 5 plans exist but no summaries; still pending
+- Phase 25 is a duplicate of Phase 24 — scheduled for cleanup in 24-10
 
 ### Verification Debt (prior phases)
 
@@ -85,21 +93,9 @@ Progress: [██████████████████░░] 74/84 p
 
 ## Session Continuity
 
-Last session: 2026-05-01T21:52:55.319Z
-Stopped at: Phase 23 UI-SPEC approved
-Resume file: .planning/phases/23-implement-gpu-module-for-all-platforms/23-UI-SPEC.md
-
-### Phase 22 Progress
-
-| Plan | Name | Status |
-|------|------|--------|
-| 22-01 | JVM smoke test | PASS |
-| 22-02 | Android smoke test | PASS |
-| 22-03 | Compose desktop smoke test | PASS |
-| 22-04 | iOS smoke test | pending |
-| 22-05 | macOS smoke test | pending |
-| 22-06 | Web smoke test | pending |
-| 22-07 | React Native smoke test | pending |
+Last session: 2026-05-02T17:45:00Z
+Stopped at: Phase 23 complete, UAT 9/9 passed, ready to plan Phase 24
+Resume file: None
 
 ---
 
@@ -108,8 +104,8 @@ Resume file: .planning/phases/23-implement-gpu-module-for-all-platforms/23-UI-SP
 See: .planning/PROJECT.md (updated 2026-04-28)
 
 **Core value:** Performance monitoring that never crashes or destabilizes the host app
-**Current focus:** Phase 22 — manual-testing-all-demo-platforms-one-by-one
+**Current focus:** Phase 24 — event logging API with Perfetto UI integration
 
 ---
 
-*Updated: 2026-04-29*
+*Updated: 2026-05-02 after Phase 23*

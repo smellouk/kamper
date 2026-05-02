@@ -7,6 +7,8 @@ import com.smellouk.kamper.fps.FpsInfo
 import com.smellouk.kamper.fps.FpsModule
 import com.smellouk.kamper.gc.GcInfo
 import com.smellouk.kamper.gc.GcModule
+import com.smellouk.kamper.gpu.GpuInfo
+import com.smellouk.kamper.gpu.GpuModule
 import com.smellouk.kamper.issues.AnrConfig
 import com.smellouk.kamper.issues.IssueInfo
 import com.smellouk.kamper.issues.IssuesModule
@@ -21,6 +23,7 @@ import com.smellouk.kamper.thermal.ThermalModule
 import com.smellouk.kamper.jvm.ui.CpuPanel
 import com.smellouk.kamper.jvm.ui.FpsPanel
 import com.smellouk.kamper.jvm.ui.GcPanel
+import com.smellouk.kamper.jvm.ui.GpuPanel
 import com.smellouk.kamper.jvm.ui.IssuesPanel
 import com.smellouk.kamper.jvm.ui.JankPanel
 import com.smellouk.kamper.jvm.ui.MemoryPanel
@@ -49,6 +52,7 @@ fun main() {
 
 private class KamperDemoWindow : JFrame("K|JVM") {
     private val cpuPanel     = CpuPanel()
+    private val gpuPanel     = GpuPanel()
     private val fpsPanel     = FpsPanel()
     private val memoryPanel  = MemoryPanel()
     private val networkPanel = NetworkPanel()
@@ -69,6 +73,7 @@ private class KamperDemoWindow : JFrame("K|JVM") {
             font       = Font("SansSerif", Font.PLAIN, 13)
             tabLayoutPolicy = JTabbedPane.SCROLL_TAB_LAYOUT
             addTab("  CPU  ",     cpuPanel)
+            addTab("  GPU  ",     gpuPanel)
             addTab("  FPS  ",     fpsPanel)
             addTab("  Memory  ",  memoryPanel)
             addTab("  Network  ", networkPanel)
@@ -89,6 +94,7 @@ private class KamperDemoWindow : JFrame("K|JVM") {
     private fun setupKamper() {
         Kamper.apply {
             install(CpuModule)
+            install(GpuModule)
             install(FpsModule)
             install(MemoryModule())
             install(NetworkModule)
@@ -98,6 +104,7 @@ private class KamperDemoWindow : JFrame("K|JVM") {
             install(ThermalModule)
 
             addInfoListener<CpuInfo>     { cpuPanel.update(it) }
+            addInfoListener<GpuInfo>     { gpuPanel.update(it) }
             addInfoListener<FpsInfo>     { fpsPanel.update(it) }
             addInfoListener<MemoryInfo>  { memoryPanel.update(it) }
             addInfoListener<NetworkInfo> { networkPanel.update(it) }

@@ -47,7 +47,8 @@ internal object ThermalSection {
         if (info == ThermalInfo.UNSUPPORTED) {
             stateSpan.textContent      = "N/A"
             stateSpan.style.color      = "#7f849c"
-            throttlingSpan.textContent = "—"
+            stateSpan.style.fontSize   = "80px"
+            throttlingSpan.textContent = "N/A"
             stressBtn.disabled         = true
             stressBtn.textContent      = "Not supported in browser"
             return

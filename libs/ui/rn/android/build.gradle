@@ -60,6 +60,7 @@ dependencies {
         implementation project(':libs:modules:jank')
         implementation project(':libs:modules:gc')
         implementation project(':libs:modules:thermal')
+        implementation project(':libs:modules:gpu')
         implementation project(':libs:rn')
         debugImplementation project(':libs:ui:kmm')
     } else {
@@ -74,6 +75,7 @@ dependencies {
         implementation "com.smellouk.kamper:jank-module:$v"
         implementation "com.smellouk.kamper:gc-module:$v"
         implementation "com.smellouk.kamper:thermal-module:$v"
+        implementation "com.smellouk.kamper:gpu-module:$v"
         implementation "com.smellouk.kamper:rn:$v"
         debugImplementation "com.smellouk.kamper:kmm:$v"
     }

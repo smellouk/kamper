@@ -8,6 +8,8 @@ import com.smellouk.kamper.fps.FpsInfo
 import com.smellouk.kamper.fps.FpsModule
 import com.smellouk.kamper.gc.GcInfo
 import com.smellouk.kamper.gc.GcModule
+import com.smellouk.kamper.gpu.GpuInfo
+import com.smellouk.kamper.gpu.GpuModule
 import com.smellouk.kamper.issues.AnrConfig
 import com.smellouk.kamper.issues.IssueInfo
 import com.smellouk.kamper.issues.IssuesModule
@@ -52,6 +54,7 @@ class AppDelegate : NSObject, UIApplicationDelegateProtocol {
 
 class RootViewController : UIViewController(nibName = null, bundle = null) {
     private lateinit var cpuVC:     CpuViewController
+    private lateinit var gpuVC:     GpuViewController
     private lateinit var fpsVC:     FpsViewController
     private lateinit var memoryVC:  MemoryViewController
     private lateinit var networkVC: NetworkViewController
@@ -66,6 +69,7 @@ class RootViewController : UIViewController(nibName = null, bundle = null) {
         view.backgroundColor = Theme.BASE
 
         cpuVC     = CpuViewController()
+        gpuVC     = GpuViewController()
         fpsVC     = FpsViewController()
         memoryVC  = MemoryViewController()
         networkVC = NetworkViewController()
@@ -75,16 +79,17 @@ class RootViewController : UIViewController(nibName = null, bundle = null) {
         thermalVC = ThermalViewController()
 
         cpuVC.tabBarItem     = UITabBarItem(title = "CPU",     image = UIImage.systemImageNamed("cpu"),                            tag = 0)
-        fpsVC.tabBarItem     = UITabBarItem(title = "FPS",     image = UIImage.systemImageNamed("play.circle"),                    tag = 1)
-        memoryVC.tabBarItem  = UITabBarItem(title = "Memory",  image = UIImage.systemImageNamed("memorychip"),                     tag = 2)
-        networkVC.tabBarItem = UITabBarItem(title = "Network", image = UIImage.systemImageNamed("network"),                        tag = 3)
-        issuesVC.tabBarItem  = UITabBarItem(title = "Issues",  image = UIImage.systemImageNamed("exclamationmark.triangle"),       tag = 4)
-        jankVC.tabBarItem    = UITabBarItem(title = "Jank",    image = UIImage.systemImageNamed("chart.line.uptrend.xyaxis"),      tag = 5)
-        gcVC.tabBarItem      = UITabBarItem(title = "GC",      image = UIImage.systemImageNamed("arrow.triangle.2.circlepath"),    tag = 6)
-        thermalVC.tabBarItem = UITabBarItem(title = "Thermal", image = UIImage.systemImageNamed("thermometer"),                    tag = 7)
+        gpuVC.tabBarItem     = UITabBarItem(title = "GPU",     image = UIImage.systemImageNamed("display"),                        tag = 1)
+        fpsVC.tabBarItem     = UITabBarItem(title = "FPS",     image = UIImage.systemImageNamed("play.circle"),                    tag = 2)
+        memoryVC.tabBarItem  = UITabBarItem(title = "Memory",  image = UIImage.systemImageNamed("memorychip"),                     tag = 3)
+        networkVC.tabBarItem = UITabBarItem(title = "Network", image = UIImage.systemImageNamed("network"),                        tag = 4)
+        issuesVC.tabBarItem  = UITabBarItem(title = "Issues",  image = UIImage.systemImageNamed("exclamationmark.triangle"),       tag = 5)
+        jankVC.tabBarItem    = UITabBarItem(title = "Jank",    image = UIImage.systemImageNamed("chart.line.uptrend.xyaxis"),      tag = 6)
+        gcVC.tabBarItem      = UITabBarItem(title = "GC",      image = UIImage.systemImageNamed("arrow.triangle.2.circlepath"),    tag = 7)
+        thermalVC.tabBarItem = UITabBarItem(title = "Thermal", image = UIImage.systemImageNamed("thermometer"),                    tag = 8)
 
         tabVC = UITabBarController()
-        tabVC.setViewControllers(listOf(cpuVC, fpsVC, memoryVC, networkVC, issuesVC, jankVC, gcVC, thermalVC), animated = false)
+        tabVC.setViewControllers(listOf(cpuVC, gpuVC, fpsVC, memoryVC, networkVC, issuesVC, jankVC, gcVC, thermalVC), animated = false)
 
         val appearance = UITabBarAppearance()
         appearance.configureWithOpaqueBackground()
@@ -124,6 +129,7 @@ class RootViewController : UIViewController(nibName = null, bundle = null) {
     private fun setupKamper() {
         Kamper.apply {
             install(CpuModule)
+            install(GpuModule)
             install(FpsModule)
             install(MemoryModule())
             install(NetworkModule)
@@ -133,6 +139,7 @@ class RootViewController : UIViewController(nibName = null, bundle = null) {
             install(ThermalModule)
 
             addInfoListener<CpuInfo>     { info -> dispatch_async(dispatch_get_main_queue()) { if (cpuVC.isViewLoaded())     cpuVC.update(info) } }
+            addInfoListener<GpuInfo>     { info -> dispatch_async(dispatch_get_main_queue()) { if (gpuVC.isViewLoaded())     gpuVC.update(info) } }
             addInfoListener<FpsInfo>     { info -> dispatch_async(dispatch_get_main_queue()) { if (fpsVC.isViewLoaded())     fpsVC.update(info) } }
             addInfoListener<MemoryInfo>  { info -> dispatch_async(dispatch_get_main_queue()) { if (memoryVC.isViewLoaded()) memoryVC.update(info) } }
             addInfoListener<NetworkInfo> { info -> dispatch_async(dispatch_get_main_queue()) { if (networkVC.isViewLoaded()) networkVC.update(info) } }

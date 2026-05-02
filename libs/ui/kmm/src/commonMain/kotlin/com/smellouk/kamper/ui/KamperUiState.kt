@@ -27,7 +27,12 @@ data class KamperUiState(
     val thermalUnsupported: Boolean = false,
     val jankUnsupported: Boolean = false,
     val networkUnsupported: Boolean = false,
-    val gcUnsupported: Boolean = false
+    val gcUnsupported: Boolean = false,
+    val gpuUtilization: Float = 0f,
+    val gpuUsedMemoryMb: Float = -1f,
+    val gpuTotalMemoryMb: Float = -1f,
+    val gpuHistory: List<Float> = emptyList(),
+    val gpuUnsupported: Boolean = false
 ) {
     companion object {
         val EMPTY = KamperUiState(

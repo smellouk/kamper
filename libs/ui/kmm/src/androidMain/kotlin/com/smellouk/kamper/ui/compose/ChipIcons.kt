@@ -3,6 +3,7 @@ package com.smellouk.kamper.ui.compose
 // Android: Roboto + emoji fallback renders all of these correctly and allows tinting.
 internal actual object ChipIcons {
     actual val cpu = "⚙"
+    actual val gpu = "▣"
     actual val fps = "◎"
     actual val mem = "▦"
     actual val net = "↓"

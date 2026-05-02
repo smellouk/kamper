@@ -84,6 +84,17 @@
             text-transform: uppercase; letter-spacing: 1px;
             color: var(--overlay1); margin-bottom: 16px;
         }
+        .stat-rows { margin-top: 8px; }
+        .stat-row {
+            display: flex; align-items: center;
+            justify-content: space-between;
+            padding: 9px 0;
+            border-bottom: 1px solid var(--surface1);
+        }
+        .stat-row:last-child { border-bottom: none; padding-bottom: 0; }
+        .stat-label { font-size: 13px; color: var(--overlay1); }
+        .stat-value { font-size: 13px; font-family: monospace; color: var(--text); }
+        .card-footer { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
         .metric-row {
             display: flex; align-items: center; gap: 12px;
             padding: 9px 0;

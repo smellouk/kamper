@@ -33,6 +33,9 @@ import com.smellouk.kamper.network.NetworkModule
 import com.smellouk.kamper.thermal.ThermalConfig
 import com.smellouk.kamper.thermal.ThermalInfo
 import com.smellouk.kamper.thermal.ThermalModule
+import com.smellouk.kamper.gpu.GpuConfig
+import com.smellouk.kamper.gpu.GpuInfo
+import com.smellouk.kamper.gpu.GpuModule
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -73,6 +76,7 @@ internal class ModuleLifecycleManager(
     private var jankModule: PerformanceModule<JankConfig, JankInfo>? = null
     private var gcModule: PerformanceModule<GcConfig, GcInfo>? = null
     private var thermalModule: PerformanceModule<ThermalConfig, ThermalInfo>? = null
+    private var gpuModule: PerformanceModule<GpuConfig, GpuInfo>? = null
 
     private val cpuListener: InfoListener<CpuInfo> = listener@{ info ->
         if (info == CpuInfo.INVALID) return@listener
@@ -153,6 +157,22 @@ internal class ModuleLifecycleManager(
         }
         state.update { s ->
             s.copy(thermalState = info.state, isThrottling = info.isThrottling, thermalUnsupported = false)
+        }
+    }
+
+    private val gpuListener: InfoListener<GpuInfo> = listener@{ info ->
+        if (info == GpuInfo.INVALID) return@listener
+        if (info == GpuInfo.UNSUPPORTED) {
+            state.update { s -> s.copy(gpuUnsupported = true) }
+            return@listener
+        }
+        state.update { s ->
+            s.copy(
+                gpuUtilization   = info.utilization.toFloat(),
+                gpuUsedMemoryMb  = info.usedMemoryMb.toFloat(),
+                gpuTotalMemoryMb = info.totalMemoryMb.toFloat(),
+                gpuUnsupported   = false
+            )
         }
     }
 
@@ -302,6 +322,18 @@ internal class ModuleLifecycleManager(
         thermalModule = null
     }
 
+    private fun installGpu() {
+        val mod = GpuModule
+        engine.install(mod)
+        engine.addInfoListener(gpuListener)
+        gpuModule = mod
+    }
+
+    private fun uninstallGpu() {
+        gpuModule?.let { engine.uninstall(it) }
+        gpuModule = null
+    }
+
     private fun KamperUiSettings.issuesConfigKey() =
         "$issuesIntervalMs|$slowSpanEnabled|$slowSpanThresholdMs" +
         "|$droppedFramesEnabled|$droppedFrameThresholdMs|$droppedFrameConsecutiveThreshold" +
@@ -350,6 +382,10 @@ internal class ModuleLifecycleManager(
             !old.thermalEnabled && normalized.thermalEnabled -> installThermal()
             old.thermalEnabled && !normalized.thermalEnabled -> uninstallThermal()
         }
+        when {
+            !old.gpuEnabled && normalized.gpuEnabled -> installGpu()
+            old.gpuEnabled && !normalized.gpuEnabled -> uninstallGpu()
+        }
 
         if (state.value.engineRunning) {
             engine.stop()   // stop currently running instances cleanly
@@ -384,20 +420,23 @@ internal class ModuleLifecycleManager(
         if (s.jankEnabled) installJank()
         if (s.gcEnabled) installGc()
         if (s.thermalEnabled) installThermal()
+        if (s.gpuEnabled) installGpu()
 
         val probeCpu     = !s.cpuEnabled
         val probeNetwork = !s.networkEnabled
         val probeJank    = !s.jankEnabled
         val probeThermal = !s.thermalEnabled
+        val probeGpu     = !s.gpuEnabled
         if (probeCpu)     installCpu(s)
         if (probeNetwork) installNetwork(s)
         if (probeJank)    installJank()
         if (probeThermal) installThermal()
+        if (probeGpu)     installGpu()
 
         engine.start()
         state.update { it.copy(engineRunning = true) }
 
-        val anyProbe = probeCpu || probeNetwork || probeJank || probeThermal
+        val anyProbe = probeCpu || probeNetwork || probeJank || probeThermal || probeGpu
         if (anyProbe) {
             scope.launch {
                 delay(SUPPORT_PROBE_DELAY_MS)
@@ -405,6 +444,7 @@ internal class ModuleLifecycleManager(
                 if (probeNetwork) uninstallNetwork()
                 if (probeJank)    uninstallJank()
                 if (probeThermal) uninstallThermal()
+                if (probeGpu)     uninstallGpu()
                 if (state.value.engineRunning) { engine.stop(); engine.start() }
             }
         }
@@ -421,5 +461,6 @@ internal class ModuleLifecycleManager(
         jankModule = null
         gcModule = null
         thermalModule = null
+        gpuModule = null
     }
 }

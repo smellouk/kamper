@@ -4,12 +4,16 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.tabs.TabLayout
 import com.smellouk.kamper.Kamper
+import com.smellouk.kamper.api.Logger
+import com.smellouk.kamper.api.DEFAULT
 import com.smellouk.kamper.cpu.CpuInfo
 import com.smellouk.kamper.cpu.CpuModule
 import com.smellouk.kamper.fps.FpsInfo
 import com.smellouk.kamper.fps.FpsModule
 import com.smellouk.kamper.gc.GcInfo
 import com.smellouk.kamper.gc.GcModule
+import com.smellouk.kamper.gpu.GpuInfo
+import com.smellouk.kamper.gpu.GpuModule
 import com.smellouk.kamper.issues.AnrConfig
 import com.smellouk.kamper.issues.IssueInfo
 import com.smellouk.kamper.issues.IssuesModule
@@ -27,6 +31,7 @@ import com.smellouk.kamper.thermal.ThermalModule
 class MainActivity : AppCompatActivity() {
 
     private val cpuFragment     = CpuFragment()
+    private val gpuFragment     = GpuFragment()
     private val fpsFragment     = FpsFragment()
     private val memoryFragment  = MemoryFragment()
     private val networkFragment = NetworkFragment()
@@ -36,10 +41,10 @@ class MainActivity : AppCompatActivity() {
     private val thermalFragment = ThermalFragment()
 
     private val fragments  = listOf(
-        cpuFragment, fpsFragment, memoryFragment, networkFragment,
+        cpuFragment, gpuFragment, fpsFragment, memoryFragment, networkFragment,
         issuesFragment, jankFragment, gcFragment, thermalFragment
     )
-    private val tabTitles = listOf("CPU", "FPS", "Memory", "Network", "Issues", "Jank", "GC", "Thermal")
+    private val tabTitles = listOf("CPU", "GPU", "FPS", "Memory", "Network", "Issues", "Jank", "GC", "Thermal")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -77,6 +82,7 @@ class MainActivity : AppCompatActivity() {
         lifecycle.addObserver(Kamper)
         Kamper.apply {
             install(CpuModule)
+            install(GpuModule { logger = Logger.DEFAULT })
             install(FpsModule)
             install(MemoryModule(applicationContext))
             install(NetworkModule)
@@ -95,6 +101,7 @@ class MainActivity : AppCompatActivity() {
             )
 
             addInfoListener<CpuInfo>     { if (it != CpuInfo.INVALID)     cpuFragment.update(it) }
+            addInfoListener<GpuInfo>     { if (it != GpuInfo.INVALID)     gpuFragment.update(it) }
             addInfoListener<FpsInfo>     { if (it != FpsInfo.INVALID)     fpsFragment.update(it) }
             addInfoListener<MemoryInfo>  { if (it != MemoryInfo.INVALID)  memoryFragment.update(it) }
             addInfoListener<NetworkInfo> { if (it != NetworkInfo.INVALID) networkFragment.update(it) }

@@ -94,6 +94,7 @@ kotlin {
             implementation(project(":libs:modules:jank"))
             implementation(project(":libs:modules:gc"))
             implementation(project(":libs:modules:thermal"))
+            implementation(project(":libs:modules:gpu"))
             implementation(libs.kotlinx.coroutines.core)
             implementation(compose.runtime)
             implementation(compose.foundation)

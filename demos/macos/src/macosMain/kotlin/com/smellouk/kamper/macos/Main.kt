@@ -6,6 +6,8 @@ import com.smellouk.kamper.cpu.CpuInfo
 import com.smellouk.kamper.cpu.CpuModule
 import com.smellouk.kamper.fps.FpsInfo
 import com.smellouk.kamper.fps.FpsModule
+import com.smellouk.kamper.gpu.GpuInfo
+import com.smellouk.kamper.gpu.GpuModule
 import com.smellouk.kamper.gc.GcInfo
 import com.smellouk.kamper.gc.GcModule
 import com.smellouk.kamper.issues.AnrConfig
@@ -22,6 +24,7 @@ import com.smellouk.kamper.thermal.ThermalModule
 import com.smellouk.kamper.macos.ui.ActionTarget
 import com.smellouk.kamper.macos.ui.CpuView
 import com.smellouk.kamper.macos.ui.FpsView
+import com.smellouk.kamper.macos.ui.GpuView
 import com.smellouk.kamper.macos.ui.GcView
 import com.smellouk.kamper.macos.ui.IssuesView
 import com.smellouk.kamper.macos.ui.JankView
@@ -63,6 +66,7 @@ class KamperDemoWindow : NSWindow(
     defer = false
 ) {
     private val cpuView     = CpuView(NSMakeRect(0.0, 0.0, 0.0, 0.0))
+    private val gpuView     = GpuView(NSMakeRect(0.0, 0.0, 0.0, 0.0))
     private val fpsView     = FpsView(NSMakeRect(0.0, 0.0, 0.0, 0.0))
     private val memoryView  = MemoryView(NSMakeRect(0.0, 0.0, 0.0, 0.0))
     private val networkView = NetworkView(NSMakeRect(0.0, 0.0, 0.0, 0.0))
@@ -132,6 +136,7 @@ class KamperDemoWindow : NSWindow(
         }
 
         addTab("CPU",     cpuView)
+        addTab("GPU",     gpuView)
         addTab("FPS",     fpsView)
         addTab("Memory",  memoryView)
         addTab("Network", networkView)
@@ -141,15 +146,16 @@ class KamperDemoWindow : NSWindow(
         addTab("Thermal", thermalView)
 
         val seg = NSSegmentedControl()
-        seg.segmentCount = 8
+        seg.segmentCount = 9
         seg.setLabel("CPU",     forSegment = 0)
-        seg.setLabel("FPS",     forSegment = 1)
-        seg.setLabel("Memory",  forSegment = 2)
-        seg.setLabel("Network", forSegment = 3)
-        seg.setLabel("Issues",  forSegment = 4)
-        seg.setLabel("Jank",    forSegment = 5)
-        seg.setLabel("GC",      forSegment = 6)
-        seg.setLabel("Thermal", forSegment = 7)
+        seg.setLabel("GPU",     forSegment = 1)
+        seg.setLabel("FPS",     forSegment = 2)
+        seg.setLabel("Memory",  forSegment = 3)
+        seg.setLabel("Network", forSegment = 4)
+        seg.setLabel("Issues",  forSegment = 5)
+        seg.setLabel("Jank",    forSegment = 6)
+        seg.setLabel("GC",      forSegment = 7)
+        seg.setLabel("Thermal", forSegment = 8)
         seg.selectedSegment = 0
         seg.segmentStyle = NSSegmentStyleRounded
         seg.trackingMode = NSSegmentSwitchTrackingSelectOne
@@ -166,6 +172,7 @@ class KamperDemoWindow : NSWindow(
     private fun setupKamper() {
         Kamper.apply {
             install(CpuModule)
+            install(GpuModule)
             install(FpsModule)
             install(MemoryModule())
             install(NetworkModule)
@@ -175,6 +182,7 @@ class KamperDemoWindow : NSWindow(
             install(ThermalModule)
 
             addInfoListener<CpuInfo>     { cpuView.update(it) }
+            addInfoListener<GpuInfo>     { gpuView.update(it) }
             addInfoListener<FpsInfo>     { fpsView.update(it) }
             addInfoListener<MemoryInfo>  { memoryView.update(it) }
             addInfoListener<NetworkInfo> { networkView.update(it) }

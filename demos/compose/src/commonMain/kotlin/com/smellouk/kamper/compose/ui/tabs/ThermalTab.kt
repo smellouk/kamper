@@ -87,8 +87,21 @@ fun ThermalTab(info: ThermalInfo, modifier: Modifier = Modifier) {
         ) {
             ThermalStatRow(
                 label = "Temperature",
-                value = if (info == ThermalInfo.INVALID || info.temperatureC < 0) "—"
-                        else (info.temperatureC * 10).roundToInt().let { "${it / 10}.${it % 10} °C" }
+                value = when {
+                    info == ThermalInfo.INVALID -> "—"
+                    info.temperatureC >= 0 ->
+                        (info.temperatureC * 10).roundToInt().let { "${it / 10}.${it % 10} °C" }
+                    else -> when (info.state) {
+                        ThermalState.NONE        -> "< 60 °C"
+                        ThermalState.LIGHT       -> "60 – 75 °C"
+                        ThermalState.MODERATE    -> "75 – 85 °C"
+                        ThermalState.SEVERE      -> "85 – 95 °C"
+                        ThermalState.CRITICAL,
+                        ThermalState.EMERGENCY,
+                        ThermalState.SHUTDOWN    -> "> 95 °C"
+                        else                     -> "—"
+                    }
+                }
             )
             HorizontalDivider(color = KamperColors.surface0, thickness = 1.dp)
             ThermalStatRow(

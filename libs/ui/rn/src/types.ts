@@ -48,6 +48,18 @@ export interface GcInfo {
   gcCount: number;
 }
 
+export interface GpuInfo {
+  utilization: number;
+  usedMemoryMb: number;
+  totalMemoryMb: number;
+  curFreqKhz: number;
+  maxFreqKhz: number;
+  appUtilization: number;
+  rendererUtilization: number;
+  tilerUtilization: number;
+  computeUtilization: number;
+}
+
 export interface ThermalInfo {
   state: string;
   isThrottling: boolean;
@@ -81,6 +93,7 @@ export interface KamperConfig {
   jank?: boolean;
   gc?: boolean;
   thermal?: boolean;
+  gpu?: boolean;
   jsMemory?: boolean;
   jsGc?: boolean;
   jsCrash?: boolean;

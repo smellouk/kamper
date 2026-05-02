@@ -44,6 +44,11 @@ internal fun ActivityTab(
     val thermalUnsupported  by remember { derivedStateOf { s.thermalUnsupported } }
     val jankUnsupported     by remember { derivedStateOf { s.jankUnsupported } }
     val gcUnsupported       by remember { derivedStateOf { s.gcUnsupported } }
+    val gpuUtilization      by remember { derivedStateOf { s.gpuUtilization } }
+    val gpuUsedMemoryMb     by remember { derivedStateOf { s.gpuUsedMemoryMb } }
+    val gpuTotalMemoryMb    by remember { derivedStateOf { s.gpuTotalMemoryMb } }
+    val gpuHistory          by remember { derivedStateOf { s.gpuHistory } }
+    val gpuUnsupported      by remember { derivedStateOf { s.gpuUnsupported } }
 
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         if (cfg.cpuEnabled) {
@@ -57,6 +62,35 @@ internal fun ActivityTab(
                 extra       = null,
                 dimmed      = !cfg.showCpu,
                 unsupported = isCpuUnsupported
+            )
+        }
+        if (cfg.gpuEnabled) {
+            val isGpuUnsupported = gpuUnsupported
+            val memText = when {
+                isGpuUnsupported -> null
+                gpuUsedMemoryMb >= 0f && gpuTotalMemoryMb >= 0f ->
+                    "${gpuUsedMemoryMb.formatDp(0)} MB / ${gpuTotalMemoryMb.formatDp(0)} MB"
+                gpuUsedMemoryMb >= 0f -> "${gpuUsedMemoryMb.formatDp(0)} MB"
+                gpuTotalMemoryMb >= 0f -> "— / ${gpuTotalMemoryMb.formatDp(0)} MB"
+                else -> null
+            }
+            MetricCard(
+                title       = "GPU",
+                current     = when {
+                    isGpuUnsupported    -> "Unsupported"
+                    gpuUtilization < 0f -> "—%"
+                    else                -> "${gpuUtilization.formatDp(1)}%"
+                },
+                fraction    = if (isGpuUnsupported || gpuUtilization < 0f) {
+                    0f
+                } else {
+                    (gpuUtilization / 100f).coerceIn(0f, 1f)
+                },
+                color       = KamperTheme.MAUVE,
+                history     = if (isGpuUnsupported) emptyList() else gpuHistory,
+                extra       = memText,
+                dimmed      = !cfg.showGpu,
+                unsupported = isGpuUnsupported
             )
         }
         if (cfg.fpsEnabled) {
