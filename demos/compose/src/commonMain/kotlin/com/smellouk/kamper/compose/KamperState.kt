@@ -8,6 +8,8 @@ import com.smellouk.kamper.cpu.CpuInfo
 import com.smellouk.kamper.fps.FpsInfo
 import com.smellouk.kamper.gpu.GpuInfo
 import com.smellouk.kamper.gc.GcInfo
+import com.smellouk.kamper.api.UserEventInfo
+import com.smellouk.kamper.compose.ui.tabs.EventEntry
 import com.smellouk.kamper.issues.Issue
 import com.smellouk.kamper.jank.JankInfo
 import com.smellouk.kamper.memory.MemoryInfo
@@ -23,6 +25,7 @@ class KamperState {
     var networkInfo by mutableStateOf(NetworkInfo.INVALID)
     var isRunning by mutableStateOf(false)
     val issues = mutableStateListOf<Issue>()
+    val userEvents = mutableStateListOf<EventEntry>()
     var jankInfo by mutableStateOf(JankInfo.INVALID)
     var gcInfo by mutableStateOf(GcInfo.INVALID)
     var thermalInfo by mutableStateOf(ThermalInfo.INVALID)
@@ -33,8 +36,18 @@ class KamperState {
     }
 
     fun clearIssues() = issues.clear()
+
+    fun addUserEvent(info: UserEventInfo) {
+        userEvents.add(0, EventEntry(info, currentTimeMs()))
+        if (userEvents.size > 200) userEvents.removeAt(userEvents.size - 1)
+    }
+
+    fun clearUserEvents() = userEvents.clear()
 }
 
+expect val appTitle: String
+
+expect fun currentTimeMs(): Long
 expect fun KamperState.initialize(scope: CoroutineScope)
 expect fun startKamper()
 expect fun stopKamper()

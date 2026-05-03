@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/color_base">
+
+    <!-- Footer pinned to bottom — horizontally scrollable preset buttons -->
+    <HorizontalScrollView
+        android:id="@+id/footer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="@color/color_mantle"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:gravity="center_vertical">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnPresetUserLogin"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:text="user_login"
+                android:textSize="12sp"
+                android:textColor="@color/color_subtext"
+                app:strokeColor="@color/color_subtext"
+                app:backgroundTint="@color/color_surface0" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnPresetPurchase"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:text="purchase"
+                android:textSize="12sp"
+                android:textColor="@color/color_subtext"
+                app:strokeColor="@color/color_subtext"
+                app:backgroundTint="@color/color_surface0" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnPresetScreenView"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:text="screen_view"
+                android:textSize="12sp"
+                android:textColor="@color/color_subtext"
+                app:strokeColor="@color/color_subtext"
+                app:backgroundTint="@color/color_surface0" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnPresetVideoPlayback"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="video_playback"
+                android:textSize="12sp"
+                android:textColor="@color/color_blue"
+                app:strokeColor="@color/color_blue"
+                app:backgroundTint="@color/color_surface0" />
+
+        </LinearLayout>
+    </HorizontalScrollView>
+
+    <!-- Input bar: above footer — custom event text field + Log CTA -->
+    <LinearLayout
+        android:id="@+id/inputBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/footer"
+        android:background="@color/color_mantle"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/customEventInput"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="Event name"
+            android:textColor="@color/color_text"
+            android:textColorHint="@color/color_muted"
+            android:background="@color/color_surface1"
+            android:padding="8dp"
+            android:inputType="text"
+            android:imeOptions="actionDone"
+            android:maxLines="1" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnLog"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="Log"
+            android:textColor="@color/color_teal"
+            app:strokeColor="@color/color_teal"
+            app:backgroundTint="@color/color_surface0" />
+
+    </LinearLayout>
+
+    <!-- Section label above the list -->
+    <TextView
+        android:id="@+id/sectionLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:paddingStart="20dp"
+        android:paddingTop="20dp"
+        android:paddingBottom="4dp"
+        android:text="Logged Events"
+        android:textColor="@color/color_subtext"
+        android:textSize="12sp"
+        android:textStyle="bold" />
+
+    <!-- Event list fills remaining vertical space -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/eventsList"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/sectionLabel"
+        android:layout_above="@id/inputBar"
+        android:clipToPadding="false"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp" />
+
+    <!-- Empty state overlaid on list area -->
+    <TextView
+        android:id="@+id/emptyText"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/sectionLabel"
+        android:layout_above="@id/inputBar"
+        android:gravity="center"
+        android:text="No events logged yet"
+        android:textColor="@color/color_muted"
+        android:textSize="14sp"
+        android:visibility="gone" />
+
+</RelativeLayout>

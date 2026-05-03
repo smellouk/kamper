@@ -1,5 +1,6 @@
 package com.smellouk.kamper.jvm.ui
 
+import com.smellouk.kamper.Kamper
 import com.smellouk.kamper.jank.JankInfo
 import com.smellouk.kamper.jvm.ui.Theme.applyStyle
 import java.awt.BorderLayout
@@ -62,6 +63,7 @@ class JankPanel : JPanel(BorderLayout(0, 0)) {
         }
 
         simulateButton.addActionListener {
+            Kamper.logEvent("jank_simulate")
             SwingUtilities.invokeLater {
                 val end = System.currentTimeMillis() + 200
                 while (System.currentTimeMillis() < end) {}

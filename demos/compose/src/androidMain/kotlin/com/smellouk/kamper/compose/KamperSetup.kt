@@ -2,6 +2,7 @@ package com.smellouk.kamper.compose
 
 import android.content.Context
 import com.smellouk.kamper.Kamper
+import com.smellouk.kamper.api.UserEventInfo
 import com.smellouk.kamper.cpu.CpuInfo
 import com.smellouk.kamper.cpu.CpuModule
 import com.smellouk.kamper.fps.FpsInfo
@@ -23,6 +24,8 @@ import com.smellouk.kamper.thermal.ThermalInfo
 import com.smellouk.kamper.thermal.ThermalModule
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+
+actual val appTitle: String = "K|Android|Compose"
 
 internal var appContext: Context? = null
 
@@ -49,7 +52,8 @@ actual fun KamperState.initialize(scope: CoroutineScope) {
     Kamper.addInfoListener<IssueInfo>   { info -> scope.launch { addIssue(info.issue) } }
     Kamper.addInfoListener<JankInfo>    { info -> if (info != JankInfo.INVALID && info != JankInfo.UNSUPPORTED) scope.launch { jankInfo = info } }
     Kamper.addInfoListener<GcInfo>      { info -> if (info != GcInfo.INVALID) scope.launch { gcInfo = info } }
-    Kamper.addInfoListener<ThermalInfo> { info -> if (info != ThermalInfo.INVALID) scope.launch { thermalInfo = info } }
+    Kamper.addInfoListener<ThermalInfo>    { info -> if (info != ThermalInfo.INVALID) scope.launch { thermalInfo = info } }
+    Kamper.addInfoListener<UserEventInfo>  { info -> if (info != UserEventInfo.INVALID) scope.launch { addUserEvent(info) } }
 }
 
 actual fun startKamper() = Kamper.start()
@@ -60,3 +64,5 @@ actual fun disposeKamper() {
 }
 
 actual fun platformSupportsAppTraffic(): Boolean = true
+
+actual fun currentTimeMs(): Long = System.currentTimeMillis()

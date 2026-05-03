@@ -15,6 +15,8 @@ internal object Tracks {
     const val GC      = 6
     const val THERMAL = 7
     const val GPU     = 8
+    const val EVENTS  = 9   // Phase 24 D-19: named event track, NOT in ALL (different descriptor)
+    const val ISSUES  = 10  // Named event track for issues, NOT in ALL (different descriptor)
 
     val ALL = listOf(
         CPU     to "CPU %",

@@ -1,5 +1,6 @@
 package com.smellouk.kamper.jvm.ui
 
+import com.smellouk.kamper.Kamper
 import com.smellouk.kamper.gpu.GpuInfo
 import java.awt.AlphaComposite
 import java.awt.BorderLayout
@@ -167,11 +168,13 @@ class GpuPanel : JPanel(BorderLayout(0, 0)) {
     }
 
     private fun startStress() {
+        Kamper.logEvent("gpu_stress_start")
         stressButton.text = "STOP STRESS"
         stressTimer = Timer(REPAINT_INTERVAL_MS) { stressCanvas.repaint() }.also { it.start() }
     }
 
     private fun stopStress() {
+        Kamper.logEvent("gpu_stress_stop")
         stressTimer?.stop()
         stressTimer = null
         stressButton.text = "STRESS GPU"

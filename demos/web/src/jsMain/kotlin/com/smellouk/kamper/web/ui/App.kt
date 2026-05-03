@@ -125,6 +125,7 @@ internal object App {
     }
 
     private fun start() {
+        Kamper.logEvent("kamper_start")
         running = true
         Kamper.start()
         statusDot.className = "status-indicator running"
@@ -133,6 +134,7 @@ internal object App {
     }
 
     private fun stop() {
+        Kamper.logEvent("kamper_stop")
         running = false
         Kamper.stop()
         statusDot.className = "status-indicator"

@@ -89,6 +89,11 @@ export type JsGcPayload = {
   gcPauseMsDelta: number;
 };
 
+export type UserEventPayload = {
+  name: string;
+  durationMs?: number;
+};
+
 // ─── TurboModule Spec ─────────────────────────────────────────────────────────
 
 export interface Spec extends TurboModule {
@@ -107,6 +112,11 @@ export interface Spec extends TurboModule {
   beginSpan(label: string, thresholdMs: number): void;
   endSpan(label: string): void;
 
+  // Event logging — records a named event for tracing/Perfetto
+  logEvent(name: string): void;
+  startEvent(name: string): number;
+  endEvent(tokenId: number): void;
+
   // Codegen emitter properties — generate `emitOnCpu(WritableMap)` style
   // methods on the spec base class for both Android (Kotlin) and iOS (ObjC++).
   // Use Codegen EventEmitter (not the legacy event emitter pattern deprecated for TurboModules).
@@ -121,6 +131,7 @@ export interface Spec extends TurboModule {
   readonly onJsMemory: EventEmitter<JsMemoryPayload>;
   readonly onJsGc: EventEmitter<JsGcPayload>;
   readonly onGpu: EventEmitter<GpuPayload>;
+  readonly onUserEvent: EventEmitter<UserEventPayload>;
 }
 
 // Module name 'KamperModule' MUST match Android `KamperTurboModule.NAME`,

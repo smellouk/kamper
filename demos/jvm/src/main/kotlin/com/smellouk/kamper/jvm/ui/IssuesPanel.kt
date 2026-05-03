@@ -1,5 +1,6 @@
 package com.smellouk.kamper.jvm.ui
 
+import com.smellouk.kamper.Kamper
 import com.smellouk.kamper.issues.Issue
 import com.smellouk.kamper.issues.IssueSpans
 import com.smellouk.kamper.issues.IssueType
@@ -64,6 +65,7 @@ class IssuesPanel : JPanel(BorderLayout(0, 0)) {
         val clearBtn    = JButton("Clear").applyStyle(Theme.SURFACE0)
 
         slowSpanBtn.addActionListener {
+            Kamper.logEvent("issue_slow_span")
             Executors.newSingleThreadExecutor().submit {
                 IssueSpans.measure("jvm-demo-op", thresholdMs = 300L) {
                     Thread.sleep(800)
@@ -71,10 +73,14 @@ class IssuesPanel : JPanel(BorderLayout(0, 0)) {
             }
         }
         crashBtn.addActionListener {
+            Kamper.logEvent("issue_crash_trigger")
             Thread { throw RuntimeException("Demo crash from K|JVM") }
                 .also { it.isDaemon = true; it.start() }
         }
-        clearBtn.addActionListener { clearIssues() }
+        clearBtn.addActionListener {
+            Kamper.logEvent("issues_clear")
+            clearIssues()
+        }
 
         return JPanel().apply {
             background = Theme.MANTLE

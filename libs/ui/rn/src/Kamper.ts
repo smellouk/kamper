@@ -15,6 +15,7 @@ import type {
   ThermalInfo,
   JsMemoryInfo,
   JsGcInfo,
+  UserEventInfo,
   KamperConfig,
 } from './types';
 
@@ -42,6 +43,7 @@ export type KamperEventMap = {
   thermal: ThermalInfo;
   jsMemory: JsMemoryInfo;
   jsGc: JsGcInfo;
+  userEvent: UserEventInfo;
 };
 
 export type KamperSubscription = { remove(): void };
@@ -59,6 +61,7 @@ const EVENT_TO_PROP: Record<keyof KamperEventMap, string> = {
   thermal: 'onThermal',
   jsMemory: 'onJsMemory',
   jsGc: 'onJsGc',
+  userEvent: 'onUserEvent',
 };
 
 /**
@@ -170,6 +173,21 @@ export const Kamper = {
   /** Close a named span opened with beginSpan. */
   endSpan(label: string): void {
     NativeKamperModule.endSpan(label);
+  },
+
+  /** Log a named event for tracing (e.g. Perfetto). */
+  logEvent(name: string): void {
+    NativeKamperModule.logEvent(name);
+  },
+
+  /** Start a timed event; returns an opaque token ID to pass to endEvent. */
+  startEvent(name: string): number {
+    return NativeKamperModule.startEvent(name);
+  },
+
+  /** End a timed event started with startEvent. */
+  endEvent(tokenId: number): void {
+    NativeKamperModule.endEvent(tokenId);
   },
 } as const;
 

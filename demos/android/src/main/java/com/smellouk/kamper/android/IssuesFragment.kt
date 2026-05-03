@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.card.MaterialCardView
+import com.smellouk.kamper.Kamper
 import com.smellouk.kamper.issues.Issue
 import com.smellouk.kamper.issues.IssueSpans
 import com.smellouk.kamper.issues.IssueType
@@ -40,12 +41,30 @@ class IssuesFragment : Fragment() {
         recyclerView?.layoutManager = LinearLayoutManager(requireContext())
         recyclerView?.adapter = adapter
 
-        view.findViewById<View>(R.id.btnSlowSpan).setOnClickListener { triggerSlowSpan() }
-        view.findViewById<View>(R.id.btnBlockUi).setOnClickListener { triggerAnr() }
-        view.findViewById<View>(R.id.btnCrash).setOnClickListener { triggerCrash() }
-        view.findViewById<View>(R.id.btnMemory).setOnClickListener { triggerMemoryPressure() }
-        view.findViewById<View>(R.id.btnStrictMode).setOnClickListener { triggerStrictIo() }
-        view.findViewById<View>(R.id.btnClearIssues).setOnClickListener { clearIssues() }
+        view.findViewById<View>(R.id.btnSlowSpan).setOnClickListener {
+            Kamper.logEvent("issue_slow_span")
+            triggerSlowSpan()
+        }
+        view.findViewById<View>(R.id.btnBlockUi).setOnClickListener {
+            Kamper.logEvent("issue_anr_trigger")
+            triggerAnr()
+        }
+        view.findViewById<View>(R.id.btnCrash).setOnClickListener {
+            Kamper.logEvent("issue_crash_trigger")
+            triggerCrash()
+        }
+        view.findViewById<View>(R.id.btnMemory).setOnClickListener {
+            Kamper.logEvent("issue_memory_pressure")
+            triggerMemoryPressure()
+        }
+        view.findViewById<View>(R.id.btnStrictMode).setOnClickListener {
+            Kamper.logEvent("issue_strict_mode")
+            triggerStrictIo()
+        }
+        view.findViewById<View>(R.id.btnClearIssues).setOnClickListener {
+            Kamper.logEvent("issues_clear")
+            clearIssues()
+        }
 
         updateEmptyState()
     }

@@ -1,6 +1,7 @@
 @file:OptIn(kotlinx.cinterop.ExperimentalForeignApi::class, kotlinx.cinterop.BetaInteropApi::class)
 package com.smellouk.kamper.ios.ui
 
+import com.smellouk.kamper.Kamper
 import com.smellouk.kamper.network.NetworkInfo
 import kotlinx.cinterop.*
 import platform.Foundation.*
@@ -98,6 +99,7 @@ class NetworkViewController : UIViewController(nibName = null, bundle = null) {
     }
 
     private fun triggerTest() {
+        Kamper.logEvent("network_download_test")
         statusLabel.text = "Fetching…"
         val url = NSURL.URLWithString("https://connectivitycheck.gstatic.com/generate_204") ?: return
         NSURLSession.sharedSession.dataTaskWithURL(url) { _, response, error ->

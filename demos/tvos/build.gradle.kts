@@ -2,6 +2,52 @@ plugins {
     alias(libs.plugins.kotlin.multiplatform)
 }
 
+tasks.register("assembleTvosSimulatorApp") {
+    dependsOn("linkDebugExecutableTvosSimulatorArm64")
+    val kexe = layout.buildDirectory.file("bin/tvosSimulatorArm64/debugExecutable/tvos.kexe")
+    val bundleDir = layout.buildDirectory.dir("KamperTVOS.app")
+    inputs.file(kexe)
+    outputs.dir(bundleDir)
+    doLast {
+        val bundle = bundleDir.get().asFile
+        bundle.mkdirs()
+        val exe = bundle.resolve("KamperTVOS")
+        kexe.get().asFile.copyTo(exe, overwrite = true)
+        exe.setExecutable(true)
+        bundle.resolve("Info.plist").writeText("""
+            <?xml version="1.0" encoding="UTF-8"?>
+            <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+            <plist version="1.0">
+            <dict>
+                <key>CFBundleExecutable</key>
+                <string>KamperTVOS</string>
+                <key>CFBundleIdentifier</key>
+                <string>com.smellouk.kamper.tvos</string>
+                <key>CFBundleName</key>
+                <string>K|tvOS</string>
+                <key>CFBundleDisplayName</key>
+                <string>K|tvOS</string>
+                <key>CFBundleVersion</key>
+                <string>1</string>
+                <key>CFBundleShortVersionString</key>
+                <string>1.0</string>
+                <key>CFBundlePackageType</key>
+                <string>APPL</string>
+                <key>CFBundleSupportedPlatforms</key>
+                <array>
+                    <string>AppleTVSimulator</string>
+                </array>
+                <key>MinimumOSVersion</key>
+                <string>17.0</string>
+                <key>UIRequiredDeviceCapabilities</key>
+                <array>
+                    <string>arm64</string>
+                </array>
+            </dict>
+            </plist>
+        """.trimIndent())
+    }
+}
 
 kotlin {
     tvosArm64 {

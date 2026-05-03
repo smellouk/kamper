@@ -43,4 +43,26 @@ class SentryConfigBuilderTest {
         @Suppress("USELESS_IS_CHECK")
         assertTrue(module is SentryIntegrationModule)
     }
+
+    @Test
+    fun `Builder defaults forwardEvents to true per D-25`() {
+        val cfg = SentryConfig.Builder().build("https://test@sentry.io/10")
+        assertTrue(cfg.forwardEvents)
+    }
+
+    @Test
+    fun `Builder honors forwardEvents false`() {
+        val cfg = SentryConfig.Builder().apply {
+            forwardEvents = false
+        }.build("https://test@sentry.io/11")
+        assertFalse(cfg.forwardEvents)
+    }
+
+    @Test
+    fun `toString includes forwardEvents`() {
+        val cfg = SentryConfig.Builder().build("https://secret@sentry.io/12")
+        val s = cfg.toString()
+        assertTrue(s.contains("forwardEvents=true"), "Expected forwardEvents=true in toString: $s")
+        assertFalse(s.contains("secret"), "DSN must be redacted in toString: $s")
+    }
 }

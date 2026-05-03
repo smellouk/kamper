@@ -24,18 +24,20 @@ public data class SentryConfig(
     val forwardIssues: Boolean,
     val forwardCpuAbove: Float?,
     val forwardMemoryAbove: Float?,
-    val forwardFps: Boolean
+    val forwardFps: Boolean,
+    val forwardEvents: Boolean
 ) {
     // Override to prevent the Sentry DSN (which embeds credentials) from appearing in
     // logs, crash reports, or test failure output via the data class auto-generated toString().
     override fun toString(): String =
         "SentryConfig(dsn=<redacted>, forwardIssues=$forwardIssues, " +
         "forwardCpuAbove=$forwardCpuAbove, forwardMemoryAbove=$forwardMemoryAbove, " +
-        "forwardFps=$forwardFps)"
+        "forwardFps=$forwardFps, forwardEvents=$forwardEvents)"
 
     public companion object {
         public val DEFAULT_FORWARD_ISSUES: Boolean = false
         public val DEFAULT_FORWARD_FPS: Boolean = false
+        public const val DEFAULT_FORWARD_EVENTS: Boolean = true
     }
 
     @KamperDslMarker
@@ -44,6 +46,7 @@ public data class SentryConfig(
         public var forwardCpuAbove: Float? = null
         public var forwardMemoryAbove: Float? = null
         public var forwardFps: Boolean = DEFAULT_FORWARD_FPS
+        public var forwardEvents: Boolean = DEFAULT_FORWARD_EVENTS
 
         internal fun build(dsn: String): SentryConfig =
             SentryConfig(
@@ -51,7 +54,8 @@ public data class SentryConfig(
                 forwardIssues = forwardIssues,
                 forwardCpuAbove = forwardCpuAbove,
                 forwardMemoryAbove = forwardMemoryAbove,
-                forwardFps = forwardFps
+                forwardFps = forwardFps,
+                forwardEvents = forwardEvents
             )
     }
 }

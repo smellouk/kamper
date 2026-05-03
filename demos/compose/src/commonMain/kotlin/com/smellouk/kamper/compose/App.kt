@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.sp
 import com.smellouk.kamper.compose.ui.KamperColors
 import com.smellouk.kamper.compose.ui.KamperTheme
 import com.smellouk.kamper.compose.ui.tabs.CpuTab
+import com.smellouk.kamper.compose.ui.tabs.EventsTab
 import com.smellouk.kamper.compose.ui.tabs.FpsTab
 import com.smellouk.kamper.compose.ui.tabs.GpuTab
 import com.smellouk.kamper.compose.ui.tabs.GcTab
@@ -80,7 +81,7 @@ private fun Header(isRunning: Boolean) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "K|Compose",
+                text = appTitle,
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
                 color = KamperColors.lavender
@@ -100,7 +101,7 @@ private fun Header(isRunning: Boolean) {
 @Composable
 private fun KamperContent(state: KamperState) {
     var selectedTab by remember { mutableIntStateOf(0) }
-    val tabs = listOf("CPU", "GPU", "FPS", "Memory", "Network", "Issues", "Jank", "GC", "Thermal")
+    val tabs = listOf("CPU", "GPU", "FPS", "Memory", "Events", "Network", "Issues", "Jank", "GC", "Thermal")
 
     Column(modifier = Modifier.fillMaxSize()) {
         PrimaryScrollableTabRow(
@@ -137,11 +138,12 @@ private fun KamperContent(state: KamperState) {
                 1 -> GpuTab(info = state.gpuInfo)
                 2 -> FpsTab(info = state.fpsInfo)
                 3 -> MemoryTab(info = state.memoryInfo)
-                4 -> NetworkTab(info = state.networkInfo, showAppTrafficSection = platformSupportsAppTraffic())
-                5 -> IssuesTab(issues = state.issues, onClear = { state.clearIssues() })
-                6 -> JankTab(info = state.jankInfo)
-                7 -> GcTab(info = state.gcInfo)
-                8 -> ThermalTab(info = state.thermalInfo)
+                4 -> EventsTab(userEvents = state.userEvents, onClear = { state.clearUserEvents() })
+                5 -> NetworkTab(info = state.networkInfo, showAppTrafficSection = platformSupportsAppTraffic())
+                6 -> IssuesTab(issues = state.issues, onClear = { state.clearIssues() })
+                7 -> JankTab(info = state.jankInfo)
+                8 -> GcTab(info = state.gcInfo)
+                9 -> ThermalTab(info = state.thermalInfo)
             }
         }
     }

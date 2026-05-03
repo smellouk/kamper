@@ -1,6 +1,7 @@
 @file:OptIn(kotlinx.cinterop.ExperimentalForeignApi::class, kotlinx.cinterop.BetaInteropApi::class)
 package com.smellouk.kamper.macos.ui
 
+import com.smellouk.kamper.Kamper
 import com.smellouk.kamper.network.NetworkInfo
 import kotlinx.cinterop.*
 import kotlinx.coroutines.CoroutineScope
@@ -96,6 +97,7 @@ class NetworkView : NSView {
     }
 
     private fun triggerDownload() {
+        Kamper.logEvent("network_download_test")
         statusLabel.stringValue = "Fetching 20 MB…"
         downloadButton.setEnabled(false)
         val url = NSURL.URLWithString("https://speed.cloudflare.com/__down?bytes=20000000") ?: return

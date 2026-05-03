@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.google.android.material.button.MaterialButton
+import com.smellouk.kamper.Kamper
 import com.smellouk.kamper.jank.JankInfo
 
 class JankFragment : Fragment() {
@@ -43,6 +44,7 @@ class JankFragment : Fragment() {
 
     // Block the main thread briefly to force dropped frames
     private fun simulateJank() {
+        Kamper.logEvent("jank_simulate")
         val end = System.nanoTime() + 200_000_000L
         @Suppress("ControlFlowWithEmptyBody")
         while (System.nanoTime() < end) {}

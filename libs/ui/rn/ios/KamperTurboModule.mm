@@ -1,52 +1,52 @@
 // KamperTurboModule.mm
 // ObjC++ implementation of NativeKamperModuleSpec — TurboModule for iOS.
 //
-// Ports demos/react-native/ios/KamperNative/KamperModule.mm (Legacy Bridge —
-// event emitter + legacy export macros) to the New Architecture pattern.
-//
-// Per D-04: New Arch only.
-// Per D-06: payload shapes preserved verbatim from KamperModule.mm.
-// Per D-08: per-module config parsed from Codegen-generated SpecStartConfig.
-// Per D-10/D-11: showOverlay/hideOverlay dispatch to main queue (UIKit thread rule).
-//
-// iOS scope (Pitfall 2 in 14-RESEARCH.md):
-// Kamper.xcframework only exports cpu/fps/memory/network. The TurboModule spec
-// declares 8 events but only 4 emit native data on iOS. The other 4
-// (onIssue/onJank/onGc/onThermal) are Codegen-generated empty emitters that
-// never fire on iOS — JS hooks for those metrics return null/empty arrays
-// when running on iOS. This is documented in KamperConfig JSDoc.
+// iOS scope: Kamper.xcframework exports engine + cpu/fps/memory/network + KamperUi.
+// onIssue/onJank/onGc/onThermal/onGpu never fire on iOS.
+// onUserEvent IS supported — logEvent/startEvent/endEvent delegate to
+// KamperKamper.shared and emit directly to JS.
+// showOverlay/hideOverlay delegate to KamperKamperUi.shared (DEBUG only).
+// JS-side metrics (jsMemory, jsGc, crash, spans) are stubs only.
 
 #import "KamperTurboModule.h"
 #import <Kamper/Kamper.h>
+#include <time.h>
+
+static BOOL boolFlag(NSDictionary *config, NSString *key) {
+    id val = config[key];
+    return (val == nil || [val boolValue]);
+}
+
+static int64_t monotonicNs(void) {
+    struct timespec ts;
+    clock_gettime(CLOCK_REALTIME, &ts);
+    return (int64_t)ts.tv_sec * 1000000000LL + ts.tv_nsec;
+}
 
 @implementation KamperTurboModule {
     KamperKamperBridge *_bridge;
+    NSMutableDictionary<NSNumber *, KamperEventToken *> *_tokenMap;
+    int _nextTokenId;
 }
 
-// ─── Per-module config helper (D-08) ─────────────────────────────────────
-// Codegen generates a C++ struct (SpecStartConfig) with optional<bool> fields
-// matching the JS object keys. Read each flag with
-// `if (auto opt = config.fieldName()) { return *opt; }` else default true.
-// (Codegen field-accessor names: cpu(), fps(), memory(), network(), issues(),
-// jank(), gc(), thermal() — matching JS KamperConfig keys verbatim.)
-
-static BOOL flagOrTrue(folly::Optional<bool> opt) {
-    return opt ? *opt : YES;
+- (instancetype)init {
+    if (self = [super init]) {
+        _tokenMap = [NSMutableDictionary dictionary];
+        _nextTokenId = 0;
+    }
+    return self;
 }
 
-// ─── start(config) — wire 4 iOS-supported listeners ──────────────────────
-- (void)start:(JS::NativeKamperModule::SpecStartConfig &)config {
+- (void)start:(NSDictionary *)config {
     if (_bridge) return;
 
-    BOOL cpuEnabled     = flagOrTrue(config.cpu());
-    BOOL fpsEnabled     = flagOrTrue(config.fps());
-    BOOL memoryEnabled  = flagOrTrue(config.memory());
-    BOOL networkEnabled = flagOrTrue(config.network());
-    // issues/jank/gc/thermal flags are read but ignored on iOS (XCFramework
-    // doesn't export those modules — see file header comment).
+    BOOL cpuEnabled     = boolFlag(config, @"cpu");
+    BOOL fpsEnabled     = boolFlag(config, @"fps");
+    BOOL memoryEnabled  = boolFlag(config, @"memory");
+    BOOL networkEnabled = boolFlag(config, @"network");
 
     _bridge = [[KamperKamperBridge alloc] init];
-    __weak typeof(self) ws = self;
+    __weak KamperTurboModule *ws = self;
 
     [_bridge
         setupOnCpu:^(KamperCpuInfo *info) {
@@ -63,9 +63,7 @@ static BOOL flagOrTrue(folly::Optional<bool> opt) {
         onFps:^(KamperFpsInfo *info) {
             if (!fpsEnabled) return;
             if ([info isEqual:KamperFpsInfoCompanion.shared.INVALID]) return;
-            [ws emitOnFps:@{
-                @"fps": @(info.fps)
-            }];
+            [ws emitOnFps:@{@"fps": @(info.fps)}];
         }
         onMemory:^(KamperMemoryInfo *info) {
             if (!memoryEnabled) return;
@@ -82,7 +80,6 @@ static BOOL flagOrTrue(folly::Optional<bool> opt) {
         }
         onNetwork:^(KamperNetworkInfo *info) {
             if (!networkEnabled) return;
-            // Double INVALID guard — established pattern from KamperModule.mm lines 52-53.
             if ([info isEqual:KamperNetworkInfoCompanion.shared.INVALID] ||
                 [info isEqual:KamperNetworkInfoCompanion.shared.NOT_SUPPORTED]) return;
             [ws emitOnNetwork:@{
@@ -95,29 +92,10 @@ static BOOL flagOrTrue(folly::Optional<bool> opt) {
     [_bridge start];
 }
 
-// ─── stop ────────────────────────────────────────────────────────────────
-// Exact lifecycle pattern from KamperModule.mm lines 64-67.
 - (void)stop {
     [_bridge stop]; [_bridge clear]; _bridge = nil;
+    [_tokenMap removeAllObjects];
 }
-
-// ─── Overlay (D-10, D-11) ────────────────────────────────────────────────
-// Pitfall 3: KamperUi.attach()/detach() touch UIKit (UIWindow/UIApplication).
-// MUST run on main queue — TurboModule methods may be invoked off the main
-// thread.
-//
-// Kotlin/Native ObjC binding: `KamperUi.show()` (a member of `actual object KamperUi`
-// in package com.smellouk.kamper.ui) is exposed as an instance method on
-// `KamperKamperUi.shared` (Kotlin/Native module-name prefix `Kamper` + class
-// `KamperUi` + `.shared` companion accessor for `object`).
-//
-// VERIFY at first build: if symbol not found, run `nm -gU
-// kamper/xcframework/build/XCFrameworks/release/Kamper.xcframework/ios-arm64/Kamper.framework/Kamper
-// | grep -i kamperui` to find the actual exported name. Likely alternatives:
-//   - KamperKamperUi.shared show   <- primary attempt (used below)
-//   - KamperKamperUiKt show
-//   - KamperKamperUi show          (some KMP versions inline `.shared`)
-// Adjust this file accordingly if the build error gives the correct symbol.
 
 - (void)showOverlay {
 #if DEBUG
@@ -135,16 +113,48 @@ static BOOL flagOrTrue(folly::Optional<bool> opt) {
 #endif
 }
 
-// ─── TurboModule JSI bridge (REQUIRED for New Arch) ──────────────────────
-// Codegen autogenerates NativeKamperModuleSpecJSI — this method tells the
-// RN runtime which JSI implementation class to instantiate.
+// JS-side metrics — no native backing on iOS, stubs required by the spec.
+- (void)reportJsMemory:(double)usedMb totalMb:(double)totalMb {}
+- (void)reportJsGc:(double)count pauseMs:(double)pauseMs {}
+- (void)reportCrash:(NSString *)message stack:(NSString *)stack isFatal:(BOOL)isFatal {}
+- (void)beginSpan:(NSString *)label thresholdMs:(double)thresholdMs {}
+- (void)endSpan:(NSString *)label {}
+
+- (void)logEvent:(NSString *)name {
+    [KamperKamper.shared logEventName:name];
+    __weak KamperTurboModule *ws = self;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [ws emitOnUserEvent:@{@"name": name}];
+    });
+}
+
+- (NSNumber *)startEvent:(NSString *)name {
+    KamperEventToken *token = [KamperKamper.shared startEventName:name];
+    NSNumber *tid = @(++_nextTokenId);
+    _tokenMap[tid] = token;
+    return tid;
+}
+
+- (void)endEvent:(double)tokenId {
+    NSNumber *tid = @((int)tokenId);
+    KamperEventToken *token = _tokenMap[tid];
+    if (!token) return;
+    [_tokenMap removeObjectForKey:tid];
+    int64_t nowNs = monotonicNs();
+    [KamperKamper.shared endEventToken:token];
+    int64_t durationMs = (nowNs - token.startNs) / 1000000LL;
+    NSString *name = token.name;
+    __weak KamperTurboModule *ws = self;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [ws emitOnUserEvent:@{@"name": name, @"durationMs": @(durationMs)}];
+    });
+}
+
 - (std::shared_ptr<facebook::react::TurboModule>)
     getTurboModule:(const facebook::react::ObjCTurboModule::InitParams &)params {
     return std::make_shared<facebook::react::NativeKamperModuleSpecJSI>(params);
 }
 
-// Module name — MUST match Android KamperTurboModule.NAME and JS
-// TurboModuleRegistry.getEnforcing<Spec>('KamperModule').
 + (NSString *)moduleName {
     return @"KamperModule";
 }

@@ -22,6 +22,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.smellouk.kamper.Kamper
 import com.smellouk.kamper.jank.JankInfo
 import com.smellouk.kamper.compose.ui.KamperColors
 import kotlinx.coroutines.launch
@@ -99,6 +100,7 @@ fun JankTab(info: JankInfo, modifier: Modifier = Modifier) {
             Spacer(Modifier.weight(1f))
             Button(
                 onClick = {
+                    Kamper.logEvent("jank_simulate")
                     scope.launch {
                         val end = TimeSource.Monotonic.markNow() + 200.milliseconds
                         while (end.hasNotPassedNow()) {}

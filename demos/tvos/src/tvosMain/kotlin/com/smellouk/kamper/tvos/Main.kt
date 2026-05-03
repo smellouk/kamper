@@ -21,6 +21,7 @@ import com.smellouk.kamper.network.NetworkInfo
 import com.smellouk.kamper.network.NetworkModule
 import com.smellouk.kamper.thermal.ThermalInfo
 import com.smellouk.kamper.thermal.ThermalModule
+import com.smellouk.kamper.api.UserEventInfo
 import com.smellouk.kamper.tvos.ui.*
 import kotlinx.cinterop.*
 import platform.CoreGraphics.CGRectMake
@@ -51,13 +52,14 @@ class AppDelegate : NSObject {
     }
 }
 
-private val TAB_TITLES = listOf("CPU", "GPU", "FPS", "Memory", "Network", "Issues", "Jank", "GC", "Thermal")
+private val TAB_TITLES = listOf("CPU", "GPU", "FPS", "Memory", "Events", "Network", "Issues", "Jank", "GC", "Thermal")
 
 class RootViewController : UIViewController(nibName = null, bundle = null) {
     private lateinit var cpuVC:     CpuViewController
     private lateinit var gpuVC:     GpuViewController
     private lateinit var fpsVC:     FpsViewController
     private lateinit var memoryVC:  MemoryViewController
+    private lateinit var eventsVC:  EventsViewController
     private lateinit var networkVC: NetworkViewController
     private lateinit var issuesVC:  IssuesViewController
     private lateinit var jankVC:    JankViewController
@@ -77,12 +79,13 @@ class RootViewController : UIViewController(nibName = null, bundle = null) {
         gpuVC     = GpuViewController()
         fpsVC     = FpsViewController()
         memoryVC  = MemoryViewController()
+        eventsVC  = EventsViewController()
         networkVC = NetworkViewController()
         issuesVC  = IssuesViewController()
         jankVC    = JankViewController()
         gcVC      = GcViewController()
         thermalVC = ThermalViewController()
-        children  = listOf(cpuVC, gpuVC, fpsVC, memoryVC, networkVC, issuesVC, jankVC, gcVC, thermalVC)
+        children  = listOf(cpuVC, gpuVC, fpsVC, memoryVC, eventsVC, networkVC, issuesVC, jankVC, gcVC, thermalVC)
 
         val seg = UISegmentedControl(items = TAB_TITLES)
         seg.selectedSegmentIndex = 0
@@ -152,8 +155,9 @@ class RootViewController : UIViewController(nibName = null, bundle = null) {
             addInfoListener<CpuInfo>     { info -> dispatch_async(dispatch_get_main_queue()) { if (cpuVC.isViewLoaded())     cpuVC.update(info) } }
             addInfoListener<GpuInfo>     { info -> dispatch_async(dispatch_get_main_queue()) { if (gpuVC.isViewLoaded())     gpuVC.update(info) } }
             addInfoListener<FpsInfo>     { info -> dispatch_async(dispatch_get_main_queue()) { if (fpsVC.isViewLoaded())     fpsVC.update(info) } }
-            addInfoListener<MemoryInfo>  { info -> dispatch_async(dispatch_get_main_queue()) { if (memoryVC.isViewLoaded()) memoryVC.update(info) } }
-            addInfoListener<NetworkInfo> { info -> dispatch_async(dispatch_get_main_queue()) { if (networkVC.isViewLoaded()) networkVC.update(info) } }
+            addInfoListener<MemoryInfo>    { info -> dispatch_async(dispatch_get_main_queue()) { if (memoryVC.isViewLoaded())  memoryVC.update(info) } }
+            addInfoListener<UserEventInfo> { info -> dispatch_async(dispatch_get_main_queue()) { if (eventsVC.isViewLoaded())  eventsVC.addEvent(info) } }
+            addInfoListener<NetworkInfo>   { info -> dispatch_async(dispatch_get_main_queue()) { if (networkVC.isViewLoaded()) networkVC.update(info) } }
             addInfoListener<IssueInfo>   { info -> dispatch_async(dispatch_get_main_queue()) { if (issuesVC.isViewLoaded()) issuesVC.addIssue(info.issue) } }
             addInfoListener<JankInfo>    { info -> dispatch_async(dispatch_get_main_queue()) { if (jankVC.isViewLoaded())    jankVC.update(info) } }
             addInfoListener<GcInfo>      { info -> dispatch_async(dispatch_get_main_queue()) { if (gcVC.isViewLoaded())      gcVC.update(info) } }

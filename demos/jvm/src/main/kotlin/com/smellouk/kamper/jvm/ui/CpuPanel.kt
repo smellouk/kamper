@@ -1,5 +1,6 @@
 package com.smellouk.kamper.jvm.ui
 
+import com.smellouk.kamper.Kamper
 import com.smellouk.kamper.cpu.CpuInfo
 import com.smellouk.kamper.jvm.ui.Theme.applyStyle
 import java.awt.BorderLayout
@@ -58,11 +59,13 @@ class CpuPanel : JPanel(BorderLayout(0, 0)) {
 
         loadButton.addActionListener {
             if (loadExecutor == null) {
+                Kamper.logEvent("cpu_load_start")
                 loadExecutor = Executors.newFixedThreadPool(LOAD_THREADS)
                 repeat(LOAD_THREADS) { loadExecutor?.submit(::spinLoop) }
                 loadButton.text = "Stop CPU Load"
                 loadButton.applyStyle(Theme.RED)
             } else {
+                Kamper.logEvent("cpu_load_stop")
                 loadExecutor?.shutdownNow()
                 loadExecutor = null
                 loadButton.text = "Start CPU Load"

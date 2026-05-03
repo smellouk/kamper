@@ -10,6 +10,7 @@ import com.smellouk.kamper.api.KamperEvent
 import com.smellouk.kamper.api.Logger
 import com.smellouk.kamper.api.Performance
 import com.smellouk.kamper.api.PerformanceModule
+import com.smellouk.kamper.api.UserEventInfo
 import com.smellouk.kamper.api.currentPlatform
 import kotlin.reflect.KClass
 
@@ -26,6 +27,13 @@ open class Engine {
     // Visible for testing
     @PublishedApi
     internal val mapListeners: MutableMap<KClass<*>, MutableList<InfoListener<*>>> = mutableMapOf()
+
+    // Phase 24 D-08/D-11: thread-safe circular event buffer.
+    @PublishedApi
+    internal val eventBufferLock: EngineEventLock = EngineEventLock()
+
+    @PublishedApi
+    internal val eventBuffer: ArrayDeque<EventRecord> = ArrayDeque()
 
     // Visible for testing
     @PublishedApi
@@ -45,6 +53,9 @@ open class Engine {
         // addInfoListener<ValidationInfo> would silently log "Can't add listener"
         // (RESEARCH Pitfall 1).
         mapListeners[ValidationInfo::class] = mutableListOf()
+        // UserEventInfo likewise has no PerformanceModule; seed it so
+        // addInfoListener<UserEventInfo> works without install().
+        mapListeners[UserEventInfo::class] = mutableListOf()
     }
 
     open fun start() {
@@ -80,9 +91,11 @@ open class Engine {
             }
         performanceList.clear()
         mapListeners.clear()
-        // Re-seed ValidationInfo slot after clear so addInfoListener<ValidationInfo>
-        // continues to work across full clear+install cycles.
+        // Re-seed non-module listener slots so addInfoListener continues to work
+        // across full clear+install cycles.
         mapListeners[ValidationInfo::class] = mutableListOf()
+        mapListeners[UserEventInfo::class] = mutableListOf()
+        eventBufferLock.withLock { eventBuffer.clear() }
     }
 
     inline fun <reified I : Info> addInfoListener(noinline listener: InfoListener<I>): Engine {
@@ -143,6 +156,141 @@ open class Engine {
                 )
             }
         }
+    }
+
+    /**
+     * Phase 24 D-01. Buffer a named instant event and dispatch a
+     * `KamperEvent(moduleName="event")` to integrations.
+     *
+     * No-op when [KamperConfig.eventsEnabled] is `false` (D-06).
+     */
+    fun logEvent(name: String) {
+        if (!config.eventsEnabled) return
+        val tsNs = engineCurrentTimeNs()
+        bufferEvent(EventRecord(tsNs, name, durationNs = null))
+        dispatchEvent(name = name, timestampNs = tsNs, durationMs = null)
+    }
+
+    /**
+     * Phase 24 D-02. Begin a duration event. Returns an [EventToken] consumed by
+     * [endEvent]. Returns a sentinel token (with startNs=0) when events are disabled —
+     * endEvent on that sentinel is a safe no-op.
+     */
+    fun startEvent(name: String): EventToken {
+        if (!config.eventsEnabled) return EventToken(name, startNs = 0L)
+        return EventToken(name = name, startNs = engineCurrentTimeNs())
+    }
+
+    /**
+     * Phase 24 D-03. Complete a duration event started by [startEvent]. Computes
+     * `durationNs = engineCurrentTimeNs() - token.startNs`, buffers an [EventRecord],
+     * and dispatches a `KamperEvent` carrying the duration in milliseconds.
+     *
+     * No-op when events are disabled or when token.startNs is 0 (the sentinel).
+     */
+    fun endEvent(token: EventToken) {
+        if (!config.eventsEnabled || token.startNs == 0L) return
+        val nowNs = engineCurrentTimeNs()
+        val durationNs = nowNs - token.startNs
+        bufferEvent(EventRecord(token.startNs, token.name, durationNs))
+        dispatchEvent(
+            name = token.name,
+            timestampNs = token.startNs,
+            durationMs = durationNs / NS_PER_MS
+        )
+    }
+
+    /**
+     * Phase 24 D-04. Run [block], surrounding it with [startEvent] / [endEvent].
+     * The token is closed in a `finally` so durations are recorded even when [block]
+     * throws — the exception is then re-raised to the caller.
+     *
+     * Inline so `block` is captured zero-allocation; calls only public Engine APIs
+     * (no @PublishedApi member access required from the call site).
+     */
+    inline fun <T> measureEvent(name: String, block: () -> T): T {
+        val token = startEvent(name)
+        return try {
+            block()
+        } finally {
+            endEvent(token)
+        }
+    }
+
+    /**
+     * Phase 24 D-07. Emit a Journey-style summary of the event buffer to [logger].
+     * Format:
+     * ```
+     * ===> Kamper Events: begin
+     *     [timestampNs=12345] user_login
+     *     [timestampNs=12345] purchase
+     *     [timestampNs=12345] video_playback (1024 ms)
+     * worst duration: video_playback, 1024 ms
+     * total events: 3
+     * <=== Kamper Events: end
+     * ```
+     *
+     * Empty buffer renders the header/footer with `total events: 0` and no body.
+     */
+    fun dumpEvents() {
+        val snapshot = eventBufferLock.withLock { eventBuffer.toList() }
+        val sb = StringBuilder()
+        sb.append("===> Kamper Events: begin\n")
+        snapshot.forEach { e ->
+            val durMs = e.durationNs?.let { it / NS_PER_MS }
+            if (durMs != null) {
+                sb.append("    [timestampNs=").append(e.timestampNs)
+                    .append("] ").append(e.name).append(" (").append(durMs).append(" ms)\n")
+            } else {
+                sb.append("    [timestampNs=").append(e.timestampNs)
+                    .append("] ").append(e.name).append('\n')
+            }
+        }
+        val worst = snapshot.filter { it.durationNs != null }
+            .maxByOrNull { it.durationNs!! }
+        if (worst != null) {
+            val worstMs = worst.durationNs!! / NS_PER_MS
+            sb.append("worst duration: ").append(worst.name)
+                .append(", ").append(worstMs).append(" ms\n")
+        }
+        sb.append("total events: ").append(snapshot.size).append('\n')
+        sb.append("<=== Kamper Events: end")
+        logger.log(sb.toString())
+    }
+
+    /**
+     * Phase 24 D-10. Snapshot of the current event buffer; does NOT clear the buffer.
+     * Called by `RecordingManager.exportTrace()` to fold custom events into the
+     * Perfetto trace.
+     */
+    /**
+     * Phase 24 D-10. Snapshot of the current event buffer. Called by
+     * [com.smellouk.kamper.ui.RecordingManager] to fold custom events into the
+     * Perfetto trace at export time.
+     */
+    fun drainEvents(): List<EventRecord> = eventBufferLock.withLock { eventBuffer.toList() }
+
+    private fun bufferEvent(record: EventRecord) {
+        eventBufferLock.withLock {
+            if (eventBuffer.size >= EVENT_BUFFER_CAPACITY) eventBuffer.removeFirst()
+            eventBuffer.addLast(record)
+        }
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    private fun dispatchEvent(name: String, timestampNs: Long, durationMs: Long?) {
+        val info = UserEventInfo(name, durationMs)
+        // Push to direct listeners (addInfoListener<UserEventInfo> subscribers).
+        (mapListeners[UserEventInfo::class] as? MutableList<InfoListener<UserEventInfo>>)
+            ?.forEach { it.invoke(info) }
+        if (integrationList.isEmpty()) return
+        val event = KamperEvent(
+            moduleName = "event",
+            timestampMs = timestampNs / NS_PER_MS,
+            platform = currentPlatform,
+            info = info
+        )
+        dispatchToIntegrations(event)
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -247,5 +395,7 @@ open class Engine {
     private companion object {
         private const val VALIDATION_THRESHOLD_MS: Long = 10_000L
         private const val MS_PER_SECOND: Long = 1_000L
+        private const val EVENT_BUFFER_CAPACITY: Int = 1000
+        private const val NS_PER_MS: Long = 1_000_000L
     }
 }

@@ -55,6 +55,7 @@ internal fun KamperPanel(
     onStopEngine: () -> Unit,
     onRestartEngine: () -> Unit,
     onDismiss: () -> Unit,
+    onClearEvents: () -> Unit = {},
     // When non-negative, tab selection is driven externally (by KamperPanelActivity on TV).
     externalTab: Int = -1,
     onTabChange: ((Int) -> Unit)? = null,
@@ -136,11 +137,13 @@ internal fun KamperPanel(
                 Row(modifier = Modifier.fillMaxWidth()) {
                     PanelTab("Activity",  selectedTab == 0) { selectTab(0) }
                     Spacer(Modifier.width(14.dp))
-                    PanelTab("Perfetto",  selectedTab == 1) { selectTab(1) }
+                    PanelTab("Events",    selectedTab == 1) { selectTab(1) }
                     Spacer(Modifier.width(14.dp))
                     PanelTab("Issues",    selectedTab == 2) { selectTab(2) }
                     Spacer(Modifier.width(14.dp))
-                    PanelTab("Settings",  selectedTab == 3) { selectTab(3) }
+                    PanelTab("Perfetto",  selectedTab == 3) { selectTab(3) }
+                    Spacer(Modifier.width(14.dp))
+                    PanelTab("Settings",  selectedTab == 4) { selectTab(4) }
                     Spacer(Modifier.weight(1f))
                 }
 
@@ -153,7 +156,9 @@ internal fun KamperPanel(
                 ) {
                     when (selectedTab) {
                         0    -> ActivityTab(state = state, settings = settings)
-                        1    -> PerfettoTab(
+                        1    -> EventsTab(events = s.events, onClear = onClearEvents)
+                        2    -> IssuesTab(issues = s.issues, onClear = onClearIssues)
+                        3    -> PerfettoTab(
                             isRecording = recording,
                             sampleCount = sampleCount,
                             maxRecordingSamples = maxRecordingSamples,
@@ -161,7 +166,6 @@ internal fun KamperPanel(
                             onStopRecording = onStopRecording,
                             onExportTrace = onExportTrace
                         )
-                        2    -> IssuesTab(issues = s.issues, onClear = onClearIssues)
                         else -> SettingsTab(
                             s = s,
                             cfg = cfg,

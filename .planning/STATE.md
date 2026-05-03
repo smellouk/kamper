@@ -2,21 +2,21 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: ready_to_plan
-stopped_at: Phase 23 complete (2026-05-02)
-last_updated: "2026-05-02T17:45:00.000Z"
+status: complete
+stopped_at: Phase 24 UAT complete — milestone v1.0 delivered (2026-05-03)
+last_updated: "2026-05-03T00:00:00Z"
 progress:
   total_phases: 24
-  completed_phases: 22
+  completed_phases: 23
   total_plans: 130
-  completed_plans: 122
-  percent: 94
+  completed_plans: 130
+  percent: 100
 ---
 
 # GSD State
 
-**Date:** 2026-05-02
-**Status:** Phase 23 Complete — Ready to Plan Phase 24
+**Date:** 2026-05-03
+**Status:** Milestone v1.0 Complete — Phase 24 UAT passed (10/10)
 
 ---
 
@@ -24,50 +24,48 @@ progress:
 
 | Field | Value |
 |-------|-------|
-| Branch | phase/23-implement-gpu-module-for-all-platforms |
+| Branch | phase/24-log-events-perfetto |
 | Milestone | v1.0 |
-| Current Phase | 24 — log events (Perfetto UI) |
-| Last Completed Phase | 23 — GPU Module for all platforms |
-| Phases Completed | 01–16, 18–23 |
-| Phases Remaining | 17 (pending), 24 |
-| Completion | 22 / 24 phases |
+| Current Phase | None — milestone complete |
+| Last Completed Phase | 24 — log events (Perfetto UI) |
+| Phases Completed | 01–16, 18–24 |
+| Phases Remaining | 17 (pending/skipped — Medium Articles) |
+| Completion | 23 / 24 phases |
 
-Progress: [█████████████████████░░░] 122/130 plans (94%)
-
----
-
-## Phase 23 Status (Plans 01–12)
-
-- **Status:** Complete (2026-05-02) — all 12 plans delivered, UAT 9/9 passed
-- **Context file:** `.planning/phases/23-implement-gpu-module-for-all-platforms/`
-- **Scope:** Full GPU module across 8 platforms + KamperUI integration + all demo apps
-  - Plans 01–05: GpuModule library (commonMain, Android/JVM, macOS IOKit, iOS/tvOS UNSUPPORTED, JS/WASM UNSUPPORTED)
-  - Plan 06: KamperUI chip + panel GPU integration
-  - Plans 07–12 (gap-closure): GPU tab in all 7 demo apps (JVM, Web, Android, Compose, RN, iOS, tvOS, macOS)
-- **Also delivered this session (bug fixes):**
-  - iOS chip drag: center-based snap with smooth animation
-  - Thermal iOS/tvOS: NSProcessInfo.thermalState via cinterop
-  - Temperature display: range estimate when exact value unavailable
+Progress: [████████████████████████] 130/130 plans (100%)
 
 ---
 
-## Next Phase
+## Phase 24 Status (Plans 01–10)
 
-**Phase 24 — Event Logging (Perfetto UI)** — `logEvent`/`startEvent`/`endEvent`/`measureEvent` API, buffered 1000 records, Perfetto export, Sentry/Firebase/OTel fan-out
+- **Status:** Complete (2026-05-03) — all 10 plans delivered, UAT 10/10 passed
+- **Context file:** `.planning/phases/24-add-the-option-log-events-which-will-allow-to-see-them-in-pe/`
+- **Scope:** Custom event logging API + Perfetto export + Sentry/Firebase/OTel fan-out
+  - Plans 01–04: UserEventInfo, EngineEventLock, Engine event API (logEvent/startEvent/endEvent/measureEvent), 1000-record buffer
+  - Plans 05–07: Integration fan-out — Sentry breadcrumbs, Firebase Crashlytics log, OpenTelemetry spans
+  - Plan 08: Perfetto export — EVENTS named track (TYPE_INSTANT + TYPE_SLICE_BEGIN/END)
+  - Plan 09: Android demo EventsFragment with preset events + custom event input
+  - Plan 10: Phase 25 duplicate cleanup + STATE.md sync
+
+---
+
+## Milestone v1.0 Delivery
+
+All active phases complete. Phase 17 (Medium Articles) remains at 0/5 — intentionally deferred.
 
 ---
 
 ## Accumulated Context
 
-### Recent Decisions (Phase 23)
+### Recent Decisions (Phase 24)
 
-- GPU returns UNSUPPORTED on iOS/tvOS — IOAccelerator is private; TASK_POWER_INFO_V2 probed on-device, always returns 0 for sandboxed processes
-- GPU returns UNSUPPORTED on JS/WASM — Spectre mitigations block GPU APIs in browsers
-- macOS GPU via IOKit IOAccelerator PerformanceStatistics — utilization available, VRAM total not exposed via this path
-- JVM GPU via OSHI — partial data: VRAM total accessible, utilization always -1.0 (no OSHI API)
-- Android GPU via /sys/class/kgsl/kgsl-3d0/gpu_busy_percentage with /sys/class/devfreq Mali fallback
-- Thermal iOS/tvOS: NSProcessInfo.thermalState absent from KN bindings — bridged via cinterop def (mirrors macOS pattern)
-- Temperature display: when temperatureC = -1.0, show range estimate from thermal state (< 60°C / 60–75°C / 75–85°C etc.)
+- Event buffer capped at 1000 records (ring buffer semantics — oldest dropped on overflow)
+- `eventsEnabled` defaults to `true` in `KamperConfig`; opt-out per consumer
+- Sentry fan-out: instant events → breadcrumb, duration events → breadcrumb with "(N ms)" suffix
+- Firebase fan-out: all events → `RecordLog` with "kamper.event: <name>" prefix
+- OTel fan-out: instant events are no-ops (no span); duration events → `recordSpan` with timestamps
+- Perfetto export: EVENTS track (id=8) uses named-track descriptor; TYPE_INSTANT for instant, TYPE_SLICE_BEGIN+END for duration
+- Phase 25 was a duplicate of Phase 24 — removed in Plan 24-10
 
 ### Roadmap Evolution
 
@@ -93,8 +91,8 @@ Progress: [█████████████████████░░
 
 ## Session Continuity
 
-Last session: 2026-05-02T17:45:00Z
-Stopped at: Phase 23 complete, UAT 9/9 passed, ready to plan Phase 24
+Last session: 2026-05-03T00:00:00Z
+Stopped at: Phase 24 UAT complete (10/10 passed) — milestone v1.0 delivered
 Resume file: None
 
 ---
@@ -104,8 +102,8 @@ Resume file: None
 See: .planning/PROJECT.md (updated 2026-04-28)
 
 **Core value:** Performance monitoring that never crashes or destabilizes the host app
-**Current focus:** Phase 24 — event logging API with Perfetto UI integration
+**Current focus:** Milestone v1.0 complete — ready for release or next milestone
 
 ---
 
-*Updated: 2026-05-02 after Phase 23*
+*Updated: 2026-05-03 after Phase 24 (milestone v1.0 complete)*

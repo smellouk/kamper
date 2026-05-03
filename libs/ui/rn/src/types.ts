@@ -78,6 +78,11 @@ export interface JsGcInfo {
   gcPauseMsDelta: number;
 }
 
+export interface UserEventInfo {
+  name: string;
+  durationMs?: number;
+}
+
 /**
  * KamperConfig — per-module enable flags (D-08).
  * All flags default to `true` when undefined; pass `false` to disable a module.

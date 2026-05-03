@@ -1,6 +1,7 @@
 @file:OptIn(kotlinx.cinterop.ExperimentalForeignApi::class, kotlinx.cinterop.BetaInteropApi::class)
 package com.smellouk.kamper.macos.ui
 
+import com.smellouk.kamper.Kamper
 import com.smellouk.kamper.cpu.CpuInfo
 import kotlinx.cinterop.*
 import kotlinx.coroutines.CoroutineScope
@@ -75,6 +76,7 @@ class CpuView : NSView {
 
     private fun toggleLoad() {
         if (!loadActive) {
+            Kamper.logEvent("cpu_load_start")
             loadActive = true
             loadButton.title = "Stop CPU Load"
             loadJobs = (0 until 4).map {
@@ -84,6 +86,7 @@ class CpuView : NSView {
                 }
             }
         } else {
+            Kamper.logEvent("cpu_load_stop")
             loadActive = false
             loadButton.title = "Start CPU Load"
             loadJobs.forEach { it.cancel() }

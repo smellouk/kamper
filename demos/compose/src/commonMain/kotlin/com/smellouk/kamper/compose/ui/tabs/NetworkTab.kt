@@ -23,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.smellouk.kamper.Kamper
 import com.smellouk.kamper.network.NetworkInfo
 import com.smellouk.kamper.compose.performNetworkTest
 import com.smellouk.kamper.compose.ui.KamperColors
@@ -134,6 +135,7 @@ fun NetworkTab(
             Button(
                 onClick = {
                     if (!isDownloading) {
+                        Kamper.logEvent("network_download_test")
                         scope.launch {
                             isDownloading = true
                             performNetworkTest { status -> downloadStatus = status }

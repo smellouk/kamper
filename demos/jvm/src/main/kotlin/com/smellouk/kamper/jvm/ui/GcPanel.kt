@@ -1,5 +1,6 @@
 package com.smellouk.kamper.jvm.ui
 
+import com.smellouk.kamper.Kamper
 import com.smellouk.kamper.gc.GcInfo
 import com.smellouk.kamper.jvm.ui.Theme.applyStyle
 import java.awt.BorderLayout
@@ -61,6 +62,7 @@ class GcPanel : JPanel(BorderLayout(0, 0)) {
         }
 
         simulateButton.addActionListener {
+            Kamper.logEvent("gc_simulate")
             Thread {
                 repeat(200_000) { ByteArray(1024) }
                 System.gc()

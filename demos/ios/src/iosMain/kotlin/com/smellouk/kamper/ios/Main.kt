@@ -21,6 +21,7 @@ import com.smellouk.kamper.network.NetworkInfo
 import com.smellouk.kamper.network.NetworkModule
 import com.smellouk.kamper.thermal.ThermalInfo
 import com.smellouk.kamper.thermal.ThermalModule
+import com.smellouk.kamper.api.UserEventInfo
 import com.smellouk.kamper.ios.ui.*
 import com.smellouk.kamper.ui.KamperUi
 import kotlinx.cinterop.*
@@ -57,6 +58,7 @@ class RootViewController : UIViewController(nibName = null, bundle = null) {
     private lateinit var gpuVC:     GpuViewController
     private lateinit var fpsVC:     FpsViewController
     private lateinit var memoryVC:  MemoryViewController
+    private lateinit var eventsVC:  EventsViewController
     private lateinit var networkVC: NetworkViewController
     private lateinit var issuesVC:  IssuesViewController
     private lateinit var jankVC:    JankViewController
@@ -72,6 +74,7 @@ class RootViewController : UIViewController(nibName = null, bundle = null) {
         gpuVC     = GpuViewController()
         fpsVC     = FpsViewController()
         memoryVC  = MemoryViewController()
+        eventsVC  = EventsViewController()
         networkVC = NetworkViewController()
         issuesVC  = IssuesViewController()
         jankVC    = JankViewController()
@@ -82,14 +85,15 @@ class RootViewController : UIViewController(nibName = null, bundle = null) {
         gpuVC.tabBarItem     = UITabBarItem(title = "GPU",     image = UIImage.systemImageNamed("display"),                        tag = 1)
         fpsVC.tabBarItem     = UITabBarItem(title = "FPS",     image = UIImage.systemImageNamed("play.circle"),                    tag = 2)
         memoryVC.tabBarItem  = UITabBarItem(title = "Memory",  image = UIImage.systemImageNamed("memorychip"),                     tag = 3)
-        networkVC.tabBarItem = UITabBarItem(title = "Network", image = UIImage.systemImageNamed("network"),                        tag = 4)
-        issuesVC.tabBarItem  = UITabBarItem(title = "Issues",  image = UIImage.systemImageNamed("exclamationmark.triangle"),       tag = 5)
-        jankVC.tabBarItem    = UITabBarItem(title = "Jank",    image = UIImage.systemImageNamed("chart.line.uptrend.xyaxis"),      tag = 6)
-        gcVC.tabBarItem      = UITabBarItem(title = "GC",      image = UIImage.systemImageNamed("arrow.triangle.2.circlepath"),    tag = 7)
-        thermalVC.tabBarItem = UITabBarItem(title = "Thermal", image = UIImage.systemImageNamed("thermometer"),                    tag = 8)
+        eventsVC.tabBarItem  = UITabBarItem(title = "Events",  image = UIImage.systemImageNamed("star.circle"),                    tag = 4)
+        networkVC.tabBarItem = UITabBarItem(title = "Network", image = UIImage.systemImageNamed("network"),                        tag = 5)
+        issuesVC.tabBarItem  = UITabBarItem(title = "Issues",  image = UIImage.systemImageNamed("exclamationmark.triangle"),       tag = 6)
+        jankVC.tabBarItem    = UITabBarItem(title = "Jank",    image = UIImage.systemImageNamed("chart.line.uptrend.xyaxis"),      tag = 7)
+        gcVC.tabBarItem      = UITabBarItem(title = "GC",      image = UIImage.systemImageNamed("arrow.triangle.2.circlepath"),    tag = 8)
+        thermalVC.tabBarItem = UITabBarItem(title = "Thermal", image = UIImage.systemImageNamed("thermometer"),                    tag = 9)
 
         tabVC = UITabBarController()
-        tabVC.setViewControllers(listOf(cpuVC, gpuVC, fpsVC, memoryVC, networkVC, issuesVC, jankVC, gcVC, thermalVC), animated = false)
+        tabVC.setViewControllers(listOf(cpuVC, gpuVC, fpsVC, memoryVC, eventsVC, networkVC, issuesVC, jankVC, gcVC, thermalVC), animated = false)
 
         val appearance = UITabBarAppearance()
         appearance.configureWithOpaqueBackground()
@@ -141,8 +145,9 @@ class RootViewController : UIViewController(nibName = null, bundle = null) {
             addInfoListener<CpuInfo>     { info -> dispatch_async(dispatch_get_main_queue()) { if (cpuVC.isViewLoaded())     cpuVC.update(info) } }
             addInfoListener<GpuInfo>     { info -> dispatch_async(dispatch_get_main_queue()) { if (gpuVC.isViewLoaded())     gpuVC.update(info) } }
             addInfoListener<FpsInfo>     { info -> dispatch_async(dispatch_get_main_queue()) { if (fpsVC.isViewLoaded())     fpsVC.update(info) } }
-            addInfoListener<MemoryInfo>  { info -> dispatch_async(dispatch_get_main_queue()) { if (memoryVC.isViewLoaded()) memoryVC.update(info) } }
-            addInfoListener<NetworkInfo> { info -> dispatch_async(dispatch_get_main_queue()) { if (networkVC.isViewLoaded()) networkVC.update(info) } }
+            addInfoListener<MemoryInfo>     { info -> dispatch_async(dispatch_get_main_queue()) { if (memoryVC.isViewLoaded())  memoryVC.update(info) } }
+            addInfoListener<UserEventInfo>  { info -> dispatch_async(dispatch_get_main_queue()) { if (eventsVC.isViewLoaded())  eventsVC.addEvent(info) } }
+            addInfoListener<NetworkInfo>    { info -> dispatch_async(dispatch_get_main_queue()) { if (networkVC.isViewLoaded()) networkVC.update(info) } }
             addInfoListener<IssueInfo>   { info -> dispatch_async(dispatch_get_main_queue()) { if (issuesVC.isViewLoaded()) issuesVC.addIssue(info.issue) } }
             addInfoListener<JankInfo>    { info -> dispatch_async(dispatch_get_main_queue()) { if (jankVC.isViewLoaded())    jankVC.update(info) } }
             addInfoListener<GcInfo>      { info -> dispatch_async(dispatch_get_main_queue()) { if (gcVC.isViewLoaded())      gcVC.update(info) } }

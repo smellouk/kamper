@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.google.android.material.button.MaterialButton
+import com.smellouk.kamper.Kamper
 import com.smellouk.kamper.gc.GcInfo
 
 class GcFragment : Fragment() {
@@ -43,6 +44,7 @@ class GcFragment : Fragment() {
 
     // Allocate and discard large arrays to pressure the GC
     private fun simulateGc() {
+        Kamper.logEvent("gc_simulate")
         Thread {
             repeat(200_000) { ByteArray(1024) }
         }.apply { isDaemon = true; start() }

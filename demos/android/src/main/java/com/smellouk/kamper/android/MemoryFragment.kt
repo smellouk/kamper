@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import com.smellouk.kamper.Kamper
 import com.smellouk.kamper.memory.MemoryInfo
 import com.smellouk.kamper.android.views.MetricRowView
 
@@ -37,9 +38,11 @@ class MemoryFragment : Fragment() {
         lowMemBadge = view.findViewById(R.id.lowMemBadge)
 
         view.findViewById<View>(R.id.allocButton).setOnClickListener {
+            Kamper.logEvent("memory_alloc_32mb")
             allocations.add(ByteArray(32 * 1024 * 1024))
         }
         view.findViewById<View>(R.id.gcButton).setOnClickListener {
+            Kamper.logEvent("memory_gc")
             allocations.clear(); System.gc()
         }
     }

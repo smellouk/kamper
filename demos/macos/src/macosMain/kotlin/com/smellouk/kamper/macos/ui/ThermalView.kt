@@ -1,6 +1,7 @@
 @file:OptIn(kotlinx.cinterop.ExperimentalForeignApi::class, kotlinx.cinterop.BetaInteropApi::class)
 package com.smellouk.kamper.macos.ui
 
+import com.smellouk.kamper.Kamper
 import com.smellouk.kamper.thermal.ThermalInfo
 import com.smellouk.kamper.thermal.ThermalState
 import kotlinx.cinterop.*
@@ -107,6 +108,7 @@ class ThermalView : NSView {
 
     private fun toggleStress() {
         if (!stressActive) {
+            Kamper.logEvent("thermal_stress_start")
             stressActive = true
             stressButton.title = "Stop CPU Stress"
             stressJobs = (0 until 4).map {
@@ -116,6 +118,7 @@ class ThermalView : NSView {
                 }
             }
         } else {
+            Kamper.logEvent("thermal_stress_stop")
             stressActive = false
             stressButton.title = "Start CPU Stress"
             stressJobs.forEach { it.cancel() }

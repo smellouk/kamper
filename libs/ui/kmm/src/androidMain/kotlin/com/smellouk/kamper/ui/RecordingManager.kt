@@ -1,5 +1,6 @@
 package com.smellouk.kamper.ui
 
+import com.smellouk.kamper.EventRecord
 import java.io.OutputStream
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -45,20 +46,33 @@ internal class RecordingManager(
         _isRecording.value = false
     }
 
-    fun exportTrace(): ByteArray {
+    /**
+     * Encodes the current recording buffer as a Perfetto trace ByteArray.
+     * [events] and [issues] are folded into their respective named event tracks.
+     * Both default to empty for backward compatibility.
+     */
+    fun exportTrace(
+        events: List<EventRecord> = emptyList(),
+        issues: List<IssueRecord> = emptyList()
+    ): ByteArray {
         val snapshot = synchronized(bufferLock) { recordingBuffer.toList() }
-        return PerfettoExporter.export(snapshot)
+        return PerfettoExporter.export(snapshot, events, issues)
     }
 
     /**
      * Streams the current recording buffer to [out] as a gzip-compressed Perfetto trace.
+     * [events] and [issues] are folded into their respective named event tracks.
      * The caller owns [out] (typically a [java.io.FileOutputStream]) and must close it
      * after this method returns. Memory-efficient alternative to [exportTrace] for long
      * recordings — does not hold the protobuf bytes in memory.
      */
-    fun exportTraceToFile(out: OutputStream) {
+    fun exportTraceToFile(
+        out: OutputStream,
+        events: List<EventRecord> = emptyList(),
+        issues: List<IssueRecord> = emptyList()
+    ) {
         val snapshot = synchronized(bufferLock) { recordingBuffer.toList() }
-        PerfettoExporter.exportToFile(snapshot, out)
+        PerfettoExporter.exportToFile(snapshot, events, issues, out)
     }
 
     fun clearRecording() {

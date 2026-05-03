@@ -30,11 +30,9 @@ Pod::Spec.new do |s|
   s.source_files = 'ios/*.{h,m,mm}'
 
   # Vendored Kamper.xcframework — built by Gradle (see script_phases).
-  # Path is relative to where this podspec is consumed from. When a consumer app
-  # at e.g. demos/react-native/ios/Podfile references this pod via
-  #   pod 'react-native-kamper', :path => '../../../../libs/ui/rn'
-  # CocoaPods evaluates `vendored_frameworks` relative to this podspec's location
-  # (libs/ui/rn/), so we point UP one level to reach libs/, then DOWN to libs/xcframework.
+  # Use File.expand_path from __FILE__ so the path resolves correctly whether
+  # this podspec is consumed via a direct :path declaration or via a node_modules
+  # symlink (where relative paths would otherwise resolve against the symlink target).
   s.vendored_frameworks = '../xcframework/build/XCFrameworks/release/Kamper.xcframework'
 
   # New Architecture dependency macro — replaces the legacy React-Core dependency.

@@ -1,5 +1,6 @@
 package com.smellouk.kamper.web.ui
 
+import com.smellouk.kamper.Kamper
 import com.smellouk.kamper.cpu.CpuInfo
 import org.w3c.dom.HTMLElement
 
@@ -55,9 +56,11 @@ internal object CpuSection {
         var stressJob: Any? = null
         loadBtn.onclick = {
             if (stressJob == null) {
+                Kamper.logEvent("cpu_load_start")
                 stressJob = startCpuStress()
                 loadBtn.textContent = "Stop CPU Load"
             } else {
+                Kamper.logEvent("cpu_load_stop")
                 stopCpuStress(stressJob!!)
                 stressJob = null
                 loadBtn.textContent = "Start CPU Load"

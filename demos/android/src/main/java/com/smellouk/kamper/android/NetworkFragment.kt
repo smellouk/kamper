@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import com.smellouk.kamper.Kamper
 import com.smellouk.kamper.network.NetworkInfo
 import com.smellouk.kamper.android.views.MetricRowView
 import java.net.URL
@@ -90,6 +91,7 @@ class NetworkFragment : Fragment() {
     }
 
     private fun triggerDownload() {
+        Kamper.logEvent("network_download_test")
         val act = activity ?: return
         statusText?.text = "Fetching 20 MB…"
         downloadButton?.isEnabled = false

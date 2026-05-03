@@ -1,6 +1,7 @@
 @file:OptIn(kotlinx.cinterop.ExperimentalForeignApi::class, kotlinx.cinterop.BetaInteropApi::class)
 package com.smellouk.kamper.ios.ui
 
+import com.smellouk.kamper.Kamper
 import com.smellouk.kamper.cpu.CpuInfo
 import kotlinx.cinterop.*
 import kotlinx.coroutines.*
@@ -66,6 +67,7 @@ class CpuViewController : UIViewController(nibName = null, bundle = null) {
 
     private fun toggleLoad() {
         if (!loadActive) {
+            Kamper.logEvent("cpu_load_start")
             loadActive = true
             loadButton.setTitle("Stop CPU Load", forState = UIControlStateNormal)
             loadJobs = (0 until 4).map {
@@ -75,6 +77,7 @@ class CpuViewController : UIViewController(nibName = null, bundle = null) {
                 }
             }
         } else {
+            Kamper.logEvent("cpu_load_stop")
             loadActive = false
             loadButton.setTitle("Start CPU Load", forState = UIControlStateNormal)
             loadJobs.forEach { it.cancel() }

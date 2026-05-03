@@ -10,7 +10,7 @@ fun main() = application {
     val windowState = rememberWindowState(size = DpSize(820.dp, 640.dp))
     Window(
         onCloseRequest = ::exitApplication,
-        title = "K|Compose",
+        title = appTitle,
         state = windowState
     ) {
         App()

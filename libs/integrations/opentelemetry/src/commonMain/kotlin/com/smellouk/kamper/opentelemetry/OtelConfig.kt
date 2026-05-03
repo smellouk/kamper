@@ -15,6 +15,9 @@ import com.smellouk.kamper.api.KamperDslMarker
  * @property forwardCpu When true, CpuInfo events become OTLP gauge `kamper.cpu.usage`.
  * @property forwardMemory When true, MemoryInfo events become OTLP gauge `kamper.memory.usage`.
  * @property forwardFps When true, FpsInfo events become OTLP gauge `kamper.fps.value`.
+ * @property forwardEvents When true, duration `UserEventInfo` events become OTLP spans. Defaults
+ *                         to `true` (D-29). Instant events (durationMs == null) are always no-ops
+ *                         for OTel regardless of this flag (D-31).
  * @property exportIntervalSeconds Minimum interval between OTLP exports in seconds (default 30).
  */
 public data class OtelConfig(
@@ -23,6 +26,7 @@ public data class OtelConfig(
     val forwardCpu: Boolean,
     val forwardMemory: Boolean,
     val forwardFps: Boolean,
+    val forwardEvents: Boolean,
     val exportIntervalSeconds: Long
 ) {
     // Override to prevent the OTLP auth token from appearing in logs, crash reports, or
@@ -31,10 +35,12 @@ public data class OtelConfig(
         "OtelConfig(otlpEndpointUrl=$otlpEndpointUrl, " +
         "otlpAuthToken=${if (otlpAuthToken != null) "<redacted>" else "null"}, " +
         "forwardCpu=$forwardCpu, forwardMemory=$forwardMemory, forwardFps=$forwardFps, " +
+        "forwardEvents=$forwardEvents, " +
         "exportIntervalSeconds=$exportIntervalSeconds)"
 
     public companion object {
         public val DEFAULT_INTERVAL_SECONDS: Long = 30L
+        public const val DEFAULT_FORWARD_EVENTS: Boolean = true
     }
 
     @KamperDslMarker
@@ -43,6 +49,7 @@ public data class OtelConfig(
         public var forwardCpu: Boolean = false
         public var forwardMemory: Boolean = false
         public var forwardFps: Boolean = false
+        public var forwardEvents: Boolean = DEFAULT_FORWARD_EVENTS
         public var exportIntervalSeconds: Long = DEFAULT_INTERVAL_SECONDS
 
         internal fun build(otlpEndpointUrl: String): OtelConfig =
@@ -52,6 +59,7 @@ public data class OtelConfig(
                 forwardCpu = forwardCpu,
                 forwardMemory = forwardMemory,
                 forwardFps = forwardFps,
+                forwardEvents = forwardEvents,
                 exportIntervalSeconds = exportIntervalSeconds
             )
     }

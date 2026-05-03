@@ -1,6 +1,7 @@
 @file:OptIn(kotlinx.cinterop.ExperimentalForeignApi::class, kotlinx.cinterop.BetaInteropApi::class)
 package com.smellouk.kamper.ios.ui
 
+import com.smellouk.kamper.Kamper
 import com.smellouk.kamper.issues.Issue
 import com.smellouk.kamper.issues.IssueSpans
 import com.smellouk.kamper.issues.IssueType
@@ -123,6 +124,7 @@ class IssuesViewController : UIViewController(nibName = null, bundle = null) {
     }
 
     private fun clearIssues() {
+        Kamper.logEvent("issues_clear")
         issues.clear()
         refresh()
     }
@@ -140,6 +142,7 @@ class IssuesViewController : UIViewController(nibName = null, bundle = null) {
 
     @OptIn(ExperimentalForeignApi::class)
     private fun triggerSlowSpan() {
+        Kamper.logEvent("issue_slow_span")
         CoroutineScope(Dispatchers.Default).launch {
             IssueSpans.measure("ios-demo-op", thresholdMs = 300L) {
                 usleep(800_000u)
@@ -148,6 +151,7 @@ class IssuesViewController : UIViewController(nibName = null, bundle = null) {
     }
 
     private fun triggerCrash() {
+        Kamper.logEvent("issue_crash_trigger")
         val ts = (NSDate.date().timeIntervalSince1970 * 1000).toLong()
         addIssue(Issue(
             id = "demo-crash-$ts",

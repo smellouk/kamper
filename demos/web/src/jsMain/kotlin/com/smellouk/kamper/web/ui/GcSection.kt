@@ -1,5 +1,6 @@
 package com.smellouk.kamper.web.ui
 
+import com.smellouk.kamper.Kamper
 import com.smellouk.kamper.gc.GcInfo
 import kotlinx.browser.document
 import org.w3c.dom.HTMLButtonElement
@@ -38,6 +39,7 @@ internal object GcSection {
                 simulateBtn = button("btn btn-action") {
                     textContent = "Simulate GC"
                     onclick = {
+                        Kamper.logEvent("gc_simulate")
                         repeat(200_000) { js("new Array(100)") }
                         null
                     }

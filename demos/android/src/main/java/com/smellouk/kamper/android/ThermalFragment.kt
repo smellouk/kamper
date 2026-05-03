@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.google.android.material.button.MaterialButton
+import com.smellouk.kamper.Kamper
 import com.smellouk.kamper.thermal.ThermalInfo
 import com.smellouk.kamper.thermal.ThermalState
 
@@ -65,6 +66,7 @@ class ThermalFragment : Fragment() {
     private fun toggleStress() {
         isStressing = !isStressing
         if (isStressing) {
+            Kamper.logEvent("thermal_stress_start")
             simulateButton?.text = "Stop CPU Stress"
             val cores = Runtime.getRuntime().availableProcessors()
             repeat(cores) {
@@ -74,6 +76,7 @@ class ThermalFragment : Fragment() {
                 }.apply { isDaemon = true; start() }
             }
         } else {
+            Kamper.logEvent("thermal_stress_stop")
             simulateButton?.text = "Start CPU Stress"
         }
     }

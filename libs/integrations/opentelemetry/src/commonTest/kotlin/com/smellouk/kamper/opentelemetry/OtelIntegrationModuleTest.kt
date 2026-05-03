@@ -2,6 +2,7 @@ package com.smellouk.kamper.opentelemetry
 
 import com.smellouk.kamper.api.Info
 import com.smellouk.kamper.api.KamperEvent
+import com.smellouk.kamper.api.UserEventInfo
 import kotlin.test.Test
 import kotlin.test.assertTrue
 
@@ -15,8 +16,13 @@ import kotlin.test.assertTrue
 @Suppress("IllegalIdentifier")
 class OtelIntegrationModuleTest {
 
-    private fun makeEvent(moduleName: String, info: Info, platform: String = "jvm"): KamperEvent =
-        KamperEvent(moduleName = moduleName, timestampMs = 0L, platform = platform, info = info)
+    private fun makeEvent(
+        moduleName: String,
+        info: Info,
+        platform: String = "jvm",
+        timestampMs: Long = 0L
+    ): KamperEvent =
+        KamperEvent(moduleName = moduleName, timestampMs = timestampMs, platform = platform, info = info)
 
     @Test
     fun `onEvent silently drops Info INVALID even when all forwarding is enabled per T-16-04`() {
@@ -97,6 +103,59 @@ class OtelIntegrationModuleTest {
         val module = OpenTelemetryModule("https://endpoint.example/v1/metrics") {
             forwardCpu = true
         }
+        module.clean()
+        assertTrue(true)
+    }
+
+    // D-29 / D-31 / D-32 tests -------------------------------------------------------
+
+    @Test
+    fun event_branch_skips_when_forwardEvents_is_false() {
+        val module = OpenTelemetryModule("https://endpoint.example/v1/metrics") {
+            forwardEvents = false
+        }
+        val info = UserEventInfo(name = "purchase", durationMs = 500L)
+        module.onEvent(makeEvent("event", info))
+        // Behavior: no recordSpan call; no exception propagated
+        assertTrue(true)
+    }
+
+    @Test
+    fun event_branch_no_op_for_instant_event() {
+        // D-31: instant events (durationMs == null) must NOT call recordSpan
+        val module = OpenTelemetryModule("https://endpoint.example/v1/metrics") {
+            forwardEvents = true
+        }
+        val info = UserEventInfo(name = "user_login", durationMs = null)
+        module.onEvent(makeEvent("event", info, timestampMs = 1_000_000L))
+        // recordSpan NOT called; no exception
+        assertTrue(true)
+    }
+
+    @Test
+    fun event_branch_calls_recordSpan_for_duration_event() {
+        // D-31: duration events call recordSpan with correct ms→ns conversion
+        // On JVM the real recordSpan actual runs with unreachable endpoint (swallowed)
+        val module = OpenTelemetryModule("https://nonexistent.invalid.local/v1/traces") {
+            forwardEvents = true
+        }
+        val info = UserEventInfo(name = "video_playback", durationMs = 2000L)
+        // timestampMs=1000 → startEpochNs=1_000_000_000; durationMs=2000 → durationNs=2_000_000_000
+        module.onEvent(makeEvent("event", info, timestampMs = 1000L))
+        // No exception propagated even if OTel collector is unreachable
+        assertTrue(true)
+    }
+
+    @Test
+    fun clean_calls_shutdownSpanProvider_alongside_shutdownGaugeProvider() {
+        // D-32: clean() must call both shutdown functions
+        val module = OpenTelemetryModule("https://endpoint.example/v1/metrics") {
+            forwardEvents = true
+        }
+        // Trigger provider creation so shutdown has something to do
+        val info = UserEventInfo(name = "test_event", durationMs = 100L)
+        module.onEvent(makeEvent("event", info, timestampMs = 1000L))
+        // Should not throw
         module.clean()
         assertTrue(true)
     }

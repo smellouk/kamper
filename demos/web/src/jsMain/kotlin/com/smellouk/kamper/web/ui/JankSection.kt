@@ -1,5 +1,6 @@
 package com.smellouk.kamper.web.ui
 
+import com.smellouk.kamper.Kamper
 import com.smellouk.kamper.jank.JankInfo
 import kotlinx.browser.document
 import org.w3c.dom.HTMLButtonElement
@@ -38,6 +39,7 @@ internal object JankSection {
                 simulateBtn = button("btn btn-action") {
                     textContent = "Simulate Jank"
                     onclick = {
+                        Kamper.logEvent("jank_simulate")
                         val end = kotlin.js.Date().getTime() + 200
                         while (kotlin.js.Date().getTime() < end) { /* busy wait */ }
                         null

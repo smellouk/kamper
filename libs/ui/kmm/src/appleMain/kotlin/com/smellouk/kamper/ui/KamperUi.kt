@@ -75,7 +75,14 @@ actual object KamperUi {
         if (!config.isEnabled) return
         val repo = KamperUiRepository(maxRecordingSamples = config.maxRecordingSamples.coerceAtLeast(100))
             .also { repository = it }
-        val rootVC = UIApplication.sharedApplication.keyWindow?.rootViewController ?: return
+        // keyWindow is deprecated on iOS 15+; prefer the scene-based lookup so the
+        // overlay works in React Native apps where the window may not be key.
+        val windowScene = UIApplication.sharedApplication.connectedScenes
+            .firstOrNull { it is UIWindowScene } as? UIWindowScene
+        val rootVC = (windowScene?.windows?.firstOrNull { (it as? UIWindow)?.isKeyWindow() == true } as? UIWindow)
+            ?.rootViewController
+            ?: UIApplication.sharedApplication.keyWindow?.rootViewController
+            ?: return
 
         UIScreen.mainScreen.bounds.useContents {
             screenW = size.width

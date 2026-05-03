@@ -1,5 +1,6 @@
 package com.smellouk.kamper.jvm.ui
 
+import com.smellouk.kamper.Kamper
 import com.smellouk.kamper.memory.MemoryInfo
 import com.smellouk.kamper.jvm.ui.Theme.applyStyle
 import java.awt.BorderLayout
@@ -70,8 +71,15 @@ class MemoryPanel : JPanel(BorderLayout(0, 0)) {
             }, BorderLayout.EAST)
         }
 
-        allocButton.addActionListener { allocations.add(ByteArray(32 * 1024 * 1024)) }
-        gcButton.addActionListener    { allocations.clear(); System.gc() }
+        allocButton.addActionListener {
+            Kamper.logEvent("memory_alloc_32mb")
+            allocations.add(ByteArray(32 * 1024 * 1024))
+        }
+        gcButton.addActionListener {
+            Kamper.logEvent("memory_gc")
+            allocations.clear()
+            System.gc()
+        }
 
         add(rows, BorderLayout.CENTER)
         add(footer, BorderLayout.SOUTH)

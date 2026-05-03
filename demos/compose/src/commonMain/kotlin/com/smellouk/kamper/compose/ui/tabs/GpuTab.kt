@@ -36,6 +36,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.smellouk.kamper.Kamper
 import com.smellouk.kamper.compose.ui.KamperColors
 import com.smellouk.kamper.gpu.GpuInfo
 import kotlinx.coroutines.isActive
@@ -176,7 +177,11 @@ fun GpuTab(info: GpuInfo, modifier: Modifier = Modifier) {
                 }
                 Spacer(Modifier.height(12.dp))
                 Button(
-                    onClick = { isStressing = !isStressing },
+                    onClick = {
+                        if (isStressing) Kamper.logEvent("gpu_stress_stop")
+                        else Kamper.logEvent("gpu_stress_start")
+                        isStressing = !isStressing
+                    },
                     colors = ButtonDefaults.buttonColors(containerColor = KamperColors.surface1),
                     shape = RoundedCornerShape(8.dp)
                 ) {

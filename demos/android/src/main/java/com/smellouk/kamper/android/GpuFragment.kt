@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.google.android.material.button.MaterialButton
+import com.smellouk.kamper.Kamper
 import com.smellouk.kamper.gpu.GpuInfo
 
 class GpuFragment : Fragment() {
@@ -66,12 +67,14 @@ class GpuFragment : Fragment() {
     }
 
     private fun startStress() {
+        Kamper.logEvent("gpu_stress_start")
         isStressing = true
         stressView?.start()
         stressButton?.text = "STOP STRESS"
     }
 
     private fun stopStress() {
+        Kamper.logEvent("gpu_stress_stop")
         isStressing = false
         stressView?.stop()
         stressButton?.text = "STRESS GPU"

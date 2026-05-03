@@ -2,7 +2,10 @@ package com.smellouk.kamper.firebase
 
 import com.smellouk.kamper.api.Info
 import com.smellouk.kamper.api.KamperEvent
+import com.smellouk.kamper.api.UserEventInfo
 import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 /**
@@ -12,6 +15,10 @@ import kotlin.test.assertTrue
  *   - INVALID is dropped before any platform call (T-16-04).
  *   - Disabled forwarding is honored (D-10).
  *   - Pathological Info.toString() does not propagate (T-16-02).
+ *
+ * For event tests (D-28), a logSink seam captures the message string passed to
+ * recordLog on JVM, since the JVM actual is a no-op. This verifies routing and
+ * message format without requiring a live Crashlytics SDK.
  *
  * Live device verification is in 18-VALIDATION.md Manual-Only Verifications.
  */
@@ -74,5 +81,57 @@ class FirebaseIntegrationModuleTest {
         val module = FirebaseModule { forwardIssues = true }
         module.clean()
         assertTrue(true)
+    }
+
+    // -------------------------------------------------------------------------
+    // Phase 24 D-28: "event" branch tests
+    // -------------------------------------------------------------------------
+
+    @Test
+    fun event_branch_skips_when_forwardEvents_is_false() {
+        var captured: String? = null
+        val module = FirebaseIntegrationModule(
+            config = FirebaseConfig.Builder().apply { forwardEvents = false }.build(),
+            logSink = { captured = it }
+        )
+        val info = UserEventInfo("purchase", null)
+        module.onEvent(makeEvent("event", info))
+        assertNull(captured, "logSink must not be called when forwardEvents=false")
+    }
+
+    @Test
+    fun event_branch_skips_when_info_is_not_UserEventInfo() {
+        var captured: String? = null
+        val module = FirebaseIntegrationModule(
+            config = FirebaseConfig.Builder().apply { forwardEvents = true }.build(),
+            logSink = { captured = it }
+        )
+        val nonUserEventInfo = object : Info { override fun toString() = "not-user-event" }
+        module.onEvent(makeEvent("event", nonUserEventInfo))
+        assertNull(captured, "logSink must not be called when info is not UserEventInfo")
+    }
+
+    @Test
+    fun event_branch_emits_log_for_instant_event() {
+        var captured: String? = null
+        val module = FirebaseIntegrationModule(
+            config = FirebaseConfig.Builder().apply { forwardEvents = true }.build(),
+            logSink = { captured = it }
+        )
+        val info = UserEventInfo("purchase", null)
+        module.onEvent(makeEvent("event", info))
+        assertEquals("kamper.event: purchase", captured)
+    }
+
+    @Test
+    fun event_branch_emits_log_with_duration_suffix_for_duration_event() {
+        var captured: String? = null
+        val module = FirebaseIntegrationModule(
+            config = FirebaseConfig.Builder().apply { forwardEvents = true }.build(),
+            logSink = { captured = it }
+        )
+        val info = UserEventInfo("video", 1024L)
+        module.onEvent(makeEvent("event", info))
+        assertEquals("kamper.event: video (1024 ms)", captured)
     }
 }

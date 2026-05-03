@@ -28,6 +28,10 @@ import com.smellouk.kamper.gpu.GpuInfo
 import com.smellouk.kamper.gpu.GpuModule
 import com.smellouk.kamper.thermal.ThermalInfo
 import com.smellouk.kamper.thermal.ThermalModule
+import com.smellouk.kamper.EventToken
+import com.smellouk.kamper.api.UserEventInfo
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.atomic.AtomicInteger
 import com.smellouk.kamper.rn.JsGcInfo
 import com.smellouk.kamper.rn.JsGcModule
 import com.smellouk.kamper.rn.JsIssueInfo
@@ -78,6 +82,12 @@ class KamperTurboModule(reactContext: ReactApplicationContext) :
 
     // ─── start(config) — install enabled modules + wire all listeners ────
     override fun start(config: ReadableMap) {
+        // Reset before re-installing: stop running coroutines, then clear all listeners and
+        // modules. Without this, repeated start()/stop() cycles (including React Strict Mode's
+        // double-invocation of effects) accumulate duplicate listeners, causing each event to
+        // fire twice.
+        Kamper.stop()
+        Kamper.clear()
         Kamper.apply {
             // Module installation gated by per-module flag (D-08).
             if (config.flag("cpu"))     install(CpuModule)
@@ -223,6 +233,14 @@ class KamperTurboModule(reactContext: ReactApplicationContext) :
                     putString("threadName", "js")
                 })
             }
+
+            addInfoListener<UserEventInfo> { info ->
+                if (info == UserEventInfo.INVALID) return@addInfoListener
+                emitOnUserEvent(Arguments.createMap().apply {
+                    putString("name", info.name)
+                    info.durationMs?.let { putDouble("durationMs", it.toDouble()) }
+                })
+            }
         }
         Kamper.start()
     }
@@ -262,6 +280,8 @@ class KamperTurboModule(reactContext: ReactApplicationContext) :
 
     // ─── Span tracking — routes JS spans into IssueSpans ─────────────────
     private val activeSpans = java.util.concurrent.ConcurrentHashMap<String, ActiveSpan>()
+    private val tokenMap = ConcurrentHashMap<Int, EventToken>()
+    private val tokenIdCounter = AtomicInteger(0)
 
     override fun beginSpan(label: String, thresholdMs: Double) {
         activeSpans[label] = IssueSpans.begin(label, thresholdMs.toLong())
@@ -269,6 +289,21 @@ class KamperTurboModule(reactContext: ReactApplicationContext) :
 
     override fun endSpan(label: String) {
         activeSpans.remove(label)?.end()
+    }
+
+    // ─── Event logging ────────────────────────────────────────────────────
+    override fun logEvent(name: String) {
+        Kamper.logEvent(name)
+    }
+
+    override fun startEvent(name: String): Double {
+        val id = tokenIdCounter.incrementAndGet()
+        tokenMap[id] = Kamper.startEvent(name)
+        return id.toDouble()
+    }
+
+    override fun endEvent(tokenId: Double) {
+        tokenMap.remove(tokenId.toInt())?.let { Kamper.endEvent(it) }
     }
 
     companion object {

@@ -1,5 +1,6 @@
 package com.smellouk.kamper.ui
 
+import com.smellouk.kamper.EventRecord
 import java.io.ByteArrayOutputStream
 import java.io.OutputStream
 import java.util.zip.GZIPOutputStream
@@ -74,20 +75,39 @@ internal class ProtoWriter(private val out: OutputStream) {
 //   TracePacket.timestamp_clock_id     = 58 (uint32, 6=BOOTTIME)
 //   TrackDescriptor.uuid               = 1  (uint64)
 //   TrackDescriptor.name               = 2  (string)
-//   TrackDescriptor.counter            = 8  (empty message → counter track)
+//   TrackDescriptor.counter            = 8  (empty message → counter track; OMIT for event track)
 //   TrackEvent.track_uuid              = 11 (uint64)
 //   TrackEvent.type                    = 9  (int32, 4=TYPE_COUNTER)
 //   TrackEvent.double_value            = 44 (double — counter_value_field oneof)
+//   D-21: TrackEvent.type values: TYPE_SLICE_BEGIN=1, TYPE_SLICE_END=2, TYPE_INSTANT=3
+//   D-21: TrackEvent.name             = 23 (string — event name for INSTANT + BEGIN packets only)
 
 internal object PerfettoExporter {
 
     private const val SEQ_ID = 1
     private const val CLOCK_BOOTTIME = 6
 
-    /** Backward-compatible ByteArray export. Used by tests and any in-memory caller. */
-    fun export(samples: List<RecordedSample>): ByteArray {
+    // D-21: TrackEvent.type values for named event tracks
+    private const val TRACK_EVENT_TYPE_SLICE_BEGIN: Int = 1
+    private const val TRACK_EVENT_TYPE_SLICE_END: Int = 2
+    private const val TRACK_EVENT_TYPE_INSTANT: Int = 3
+
+    // D-21: TrackEvent.name field number (proto field 23)
+    private const val TRACK_EVENT_NAME_FIELD: Int = 23
+
+    private const val MS_TO_NS: Long = 1_000_000L
+
+    /**
+     * Backward-compatible ByteArray export. Used by tests and any in-memory caller.
+     * The [events] and [issues] parameters default to empty for backward compatibility.
+     */
+    fun export(
+        samples: List<RecordedSample>,
+        events: List<EventRecord> = emptyList(),
+        issues: List<IssueRecord> = emptyList()
+    ): ByteArray {
         val baos = ByteArrayOutputStream()
-        writeTrace(samples, baos)
+        writeTrace(samples, events, issues, baos)
         return baos.toByteArray()
     }
 
@@ -96,17 +116,34 @@ internal object PerfettoExporter {
      * The caller owns [out] and is responsible for opening/closing it; this method
      * wraps it in a [GZIPOutputStream] internally and finishes the gzip stream before
      * returning (so the gzip footer/checksum is always present).
+     * The [events] and [issues] parameters default to empty for backward compatibility.
      */
-    fun exportToFile(samples: List<RecordedSample>, out: OutputStream) {
+    fun exportToFile(
+        samples: List<RecordedSample>,
+        events: List<EventRecord> = emptyList(),
+        issues: List<IssueRecord> = emptyList(),
+        out: OutputStream
+    ) {
         GZIPOutputStream(out.buffered()).use { gzip ->
-            writeTrace(samples, gzip)
+            writeTrace(samples, events, issues, gzip)
         }
     }
 
-    private fun writeTrace(samples: List<RecordedSample>, sink: OutputStream) {
+    private fun writeTrace(
+        samples: List<RecordedSample>,
+        events: List<EventRecord>,
+        issues: List<IssueRecord>,
+        sink: OutputStream
+    ) {
         val root = ProtoWriter(sink)
 
-        // Emit one TrackDescriptor per metric track
+        // Events track first so it appears at the top in Perfetto UI
+        if (events.isNotEmpty()) writeEventPackets(root, events)
+
+        // Issues track below Events
+        if (issues.isNotEmpty()) writeIssuePackets(root, issues)
+
+        // Emit one TrackDescriptor per metric (counter) track
         Tracks.ALL.forEach { (trackId, trackName) ->
             root.message(1) {              // Trace.packet
                 uint32(10, SEQ_ID)
@@ -128,6 +165,114 @@ internal object PerfettoExporter {
                     uint64(11, sample.trackId.toLong())
                     uint32(9, 4)           // TYPE_COUNTER
                     double(44, sample.value)
+                }
+            }
+        }
+    }
+
+    /**
+     * Emit the "Events" track descriptor (D-18) and one packet per [EventRecord] (D-16/D-17).
+     * Extracted to keep [writeTrace] under the 60-line detekt limit.
+     */
+    private fun writeEventPackets(root: ProtoWriter, events: List<EventRecord>) {
+        // Track descriptor — D-18: NO counter{} sub-message → named event track
+        root.message(1) {                               // Trace.packet
+            uint32(10, SEQ_ID)
+            message(60) {                               // track_descriptor
+                uint64(1, Tracks.EVENTS.toLong())       // uuid = 9
+                string(2, "Events")                     // name
+                // No message(8) {} — absence of counter{} makes it a named event track
+            }
+        }
+        // Event packets
+        events.forEach { event -> writeEventRecord(root, event) }
+    }
+
+    private fun writeEventRecord(root: ProtoWriter, event: EventRecord) {
+        val dur = event.durationNs
+        if (dur == null) {
+            // D-16: TYPE_INSTANT — one packet with name (field 23)
+            root.message(1) {
+                uint64(8, event.timestampNs)
+                uint32(10, SEQ_ID)
+                uint32(58, CLOCK_BOOTTIME)
+                message(11) {                               // track_event
+                    uint64(11, Tracks.EVENTS.toLong())      // track_uuid
+                    uint32(9, TRACK_EVENT_TYPE_INSTANT)     // type = 3
+                    string(TRACK_EVENT_NAME_FIELD, event.name)
+                }
+            }
+        } else {
+            // D-17: TYPE_SLICE_BEGIN at timestampNs — with name (field 23)
+            root.message(1) {
+                uint64(8, event.timestampNs)
+                uint32(10, SEQ_ID)
+                uint32(58, CLOCK_BOOTTIME)
+                message(11) {
+                    uint64(11, Tracks.EVENTS.toLong())
+                    uint32(9, TRACK_EVENT_TYPE_SLICE_BEGIN) // type = 1
+                    string(TRACK_EVENT_NAME_FIELD, event.name)
+                }
+            }
+            // D-17 + Pitfall 4: TYPE_SLICE_END at timestampNs + durationNs — NO name
+            root.message(1) {
+                uint64(8, event.timestampNs + dur)
+                uint32(10, SEQ_ID)
+                uint32(58, CLOCK_BOOTTIME)
+                message(11) {
+                    uint64(11, Tracks.EVENTS.toLong())
+                    uint32(9, TRACK_EVENT_TYPE_SLICE_END)   // type = 2
+                    // No name field — name only on BEGIN, per D-17 + Pitfall 4
+                }
+            }
+        }
+    }
+
+    private fun writeIssuePackets(root: ProtoWriter, issues: List<IssueRecord>) {
+        root.message(1) {
+            uint32(10, SEQ_ID)
+            message(60) {                               // track_descriptor
+                uint64(1, Tracks.ISSUES.toLong())       // uuid = 10
+                string(2, "Issues")
+                // No message(8) {} — absence of counter{} makes it a named event track
+            }
+        }
+        issues.forEach { record -> writeIssueRecord(root, record) }
+    }
+
+    private fun writeIssueRecord(root: ProtoWriter, record: IssueRecord) {
+        val issue = record.issue
+        val dur = issue.durationMs?.times(MS_TO_NS)
+        val name = "${issue.type.name} [${issue.severity.name}]"
+        if (dur == null) {
+            root.message(1) {
+                uint64(8, record.timestampNs)
+                uint32(10, SEQ_ID)
+                uint32(58, CLOCK_BOOTTIME)
+                message(11) {
+                    uint64(11, Tracks.ISSUES.toLong())
+                    uint32(9, TRACK_EVENT_TYPE_INSTANT)
+                    string(TRACK_EVENT_NAME_FIELD, name)
+                }
+            }
+        } else {
+            root.message(1) {
+                uint64(8, record.timestampNs)
+                uint32(10, SEQ_ID)
+                uint32(58, CLOCK_BOOTTIME)
+                message(11) {
+                    uint64(11, Tracks.ISSUES.toLong())
+                    uint32(9, TRACK_EVENT_TYPE_SLICE_BEGIN)
+                    string(TRACK_EVENT_NAME_FIELD, name)
+                }
+            }
+            root.message(1) {
+                uint64(8, record.timestampNs + dur)
+                uint32(10, SEQ_ID)
+                uint32(58, CLOCK_BOOTTIME)
+                message(11) {
+                    uint64(11, Tracks.ISSUES.toLong())
+                    uint32(9, TRACK_EVENT_TYPE_SLICE_END)
                 }
             }
         }

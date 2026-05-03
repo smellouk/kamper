@@ -1,6 +1,7 @@
 package com.smellouk.kamper.compose
 
 import com.smellouk.kamper.Kamper
+import com.smellouk.kamper.api.UserEventInfo
 import com.smellouk.kamper.ui.KamperUi
 import com.smellouk.kamper.cpu.CpuInfo
 import com.smellouk.kamper.cpu.CpuModule
@@ -23,6 +24,8 @@ import com.smellouk.kamper.thermal.ThermalInfo
 import com.smellouk.kamper.thermal.ThermalModule
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+
+actual val appTitle: String = "K|iOS|Compose"
 
 actual fun KamperState.initialize(scope: CoroutineScope) {
     Kamper.install(CpuModule)
@@ -47,6 +50,7 @@ actual fun KamperState.initialize(scope: CoroutineScope) {
     Kamper.addInfoListener<GcInfo>      { info -> if (info != GcInfo.INVALID) scope.launch { gcInfo = info } }
     Kamper.addInfoListener<ThermalInfo> { info -> if (info != ThermalInfo.INVALID) scope.launch { thermalInfo = info } }
 
+    Kamper.addInfoListener<UserEventInfo> { info -> if (info != UserEventInfo.INVALID) scope.launch { addUserEvent(info) } }
     IosCrashBridge.onCrash = { issue -> scope.launch { addIssue(issue) } }
 }
 
@@ -62,3 +66,8 @@ actual fun disposeKamper() {
 }
 
 actual fun platformSupportsAppTraffic(): Boolean = false
+
+actual fun currentTimeMs(): Long {
+    val ts = platform.posix.clock_gettime_nsec_np(platform.posix.CLOCK_REALTIME.toUInt())
+    return (ts / 1_000_000u).toLong()
+}

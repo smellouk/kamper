@@ -20,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.smellouk.kamper.Kamper
 import com.smellouk.kamper.memory.MemoryInfo
 import com.smellouk.kamper.compose.ui.KamperColors
 import com.smellouk.kamper.compose.ui.MetricRow
@@ -91,6 +92,7 @@ fun MemoryTab(info: MemoryInfo, modifier: Modifier = Modifier) {
             Spacer(Modifier.weight(1f))
             Button(
                 onClick = {
+                    Kamper.logEvent("memory_alloc_32mb")
                     allocations.value.add(ByteArray(32 * 1024 * 1024))
                     allocationCount.value++
                 },
@@ -103,6 +105,7 @@ fun MemoryTab(info: MemoryInfo, modifier: Modifier = Modifier) {
             Spacer(Modifier.width(8.dp))
             Button(
                 onClick = {
+                    Kamper.logEvent("memory_gc")
                     allocations.value.clear()
                     allocationCount.value = 0
                     gc()

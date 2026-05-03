@@ -10,6 +10,7 @@ internal expect class KamperUiRepository {
     val maxRecordingSamples: Int
     fun updateSettings(s: KamperUiSettings)
     fun clearIssues()
+    fun clearEvents()
     fun startRecording()
     fun stopRecording()
     fun exportTrace(): ByteArray

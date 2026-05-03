@@ -67,6 +67,10 @@ RCT_EXPORT_METHOD(stop) {
     _kamperBridge = nil;
 }
 
+RCT_EXPORT_METHOD(beginSpan:(NSString *)label thresholdMs:(double)thresholdMs) {}
+RCT_EXPORT_METHOD(endSpan:(NSString *)label) {}
+RCT_EXPORT_METHOD(logEvent:(NSString *)name) {}
+
 RCT_EXPORT_METHOD(addListener:(NSString *)eventName) {}
 RCT_EXPORT_METHOD(removeListeners:(double)count) {}
 

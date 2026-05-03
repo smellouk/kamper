@@ -21,10 +21,12 @@ import com.smellouk.kamper.network.NetworkInfo
 import com.smellouk.kamper.network.NetworkModule
 import com.smellouk.kamper.thermal.ThermalInfo
 import com.smellouk.kamper.thermal.ThermalModule
+import com.smellouk.kamper.api.UserEventInfo
 import com.smellouk.kamper.macos.ui.ActionTarget
 import com.smellouk.kamper.macos.ui.CpuView
 import com.smellouk.kamper.macos.ui.FpsView
 import com.smellouk.kamper.macos.ui.GpuView
+import com.smellouk.kamper.macos.ui.EventsView
 import com.smellouk.kamper.macos.ui.GcView
 import com.smellouk.kamper.macos.ui.IssuesView
 import com.smellouk.kamper.macos.ui.JankView
@@ -69,6 +71,7 @@ class KamperDemoWindow : NSWindow(
     private val gpuView     = GpuView(NSMakeRect(0.0, 0.0, 0.0, 0.0))
     private val fpsView     = FpsView(NSMakeRect(0.0, 0.0, 0.0, 0.0))
     private val memoryView  = MemoryView(NSMakeRect(0.0, 0.0, 0.0, 0.0))
+    private val eventsView  = EventsView(NSMakeRect(0.0, 0.0, 0.0, 0.0))
     private val networkView = NetworkView(NSMakeRect(0.0, 0.0, 0.0, 0.0))
     private val issuesView  = IssuesView(NSMakeRect(0.0, 0.0, 0.0, 0.0))
     private val jankView    = JankView(NSMakeRect(0.0, 0.0, 0.0, 0.0))
@@ -139,6 +142,7 @@ class KamperDemoWindow : NSWindow(
         addTab("GPU",     gpuView)
         addTab("FPS",     fpsView)
         addTab("Memory",  memoryView)
+        addTab("Events",  eventsView)
         addTab("Network", networkView)
         addTab("Issues",  issuesView)
         addTab("Jank",    jankView)
@@ -146,16 +150,17 @@ class KamperDemoWindow : NSWindow(
         addTab("Thermal", thermalView)
 
         val seg = NSSegmentedControl()
-        seg.segmentCount = 9
+        seg.segmentCount = 10
         seg.setLabel("CPU",     forSegment = 0)
         seg.setLabel("GPU",     forSegment = 1)
         seg.setLabel("FPS",     forSegment = 2)
         seg.setLabel("Memory",  forSegment = 3)
-        seg.setLabel("Network", forSegment = 4)
-        seg.setLabel("Issues",  forSegment = 5)
-        seg.setLabel("Jank",    forSegment = 6)
-        seg.setLabel("GC",      forSegment = 7)
-        seg.setLabel("Thermal", forSegment = 8)
+        seg.setLabel("Events",  forSegment = 4)
+        seg.setLabel("Network", forSegment = 5)
+        seg.setLabel("Issues",  forSegment = 6)
+        seg.setLabel("Jank",    forSegment = 7)
+        seg.setLabel("GC",      forSegment = 8)
+        seg.setLabel("Thermal", forSegment = 9)
         seg.selectedSegment = 0
         seg.segmentStyle = NSSegmentStyleRounded
         seg.trackingMode = NSSegmentSwitchTrackingSelectOne
@@ -184,8 +189,9 @@ class KamperDemoWindow : NSWindow(
             addInfoListener<CpuInfo>     { cpuView.update(it) }
             addInfoListener<GpuInfo>     { gpuView.update(it) }
             addInfoListener<FpsInfo>     { fpsView.update(it) }
-            addInfoListener<MemoryInfo>  { memoryView.update(it) }
-            addInfoListener<NetworkInfo> { networkView.update(it) }
+            addInfoListener<MemoryInfo>    { memoryView.update(it) }
+            addInfoListener<UserEventInfo> { eventsView.addEvent(it) }
+            addInfoListener<NetworkInfo>   { networkView.update(it) }
             addInfoListener<IssueInfo>   { issuesView.addIssue(it.issue) }
             addInfoListener<JankInfo>    { jankView.update(it) }
             addInfoListener<GcInfo>      { gcView.update(it) }
@@ -212,7 +218,7 @@ class HeaderView : NSView {
         Theme.SURFACE0.setFill()
         NSBezierPath.bezierPathWithRect(NSMakeRect(0.0, 0.0, w, 1.0)).fill()
 
-        val title = "Kamper Performance Monitor"
+        val title = "K|macOS"
         val attrs: Map<Any?, Any?> = mapOf(NSFontAttributeName to Theme.HEADER_FONT, NSForegroundColorAttributeName to Theme.BLUE)
         val strSize = (title as NSString).sizeWithAttributes(attrs)
         val strW = strSize.useContents { width }
@@ -221,7 +227,7 @@ class HeaderView : NSView {
         val ty = (h - strH) / 2
         (title as NSString).drawAtPoint(NSMakePoint(tx, ty), withAttributes = attrs)
 
-        val dotX = (w + strW) / 2 + 8
+        val dotX = tx + strW + 8
         val dotY = (h - 8.0) / 2.0
         Theme.GREEN.setFill()
         NSBezierPath.bezierPathWithOvalInRect(NSMakeRect(dotX, dotY, 8.0, 8.0)).fill()

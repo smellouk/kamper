@@ -383,7 +383,7 @@ Plans:
 | 21. Monorepo Clean-up   | 4/4 | Complete    | 2026-04-29 |
 | 22. Manual Demo Testing | 8/8 | Complete    | 2026-05-02 |
 | 23. GPU Module          | 12/12 | Complete  | 2026-05-02 |
-| 24. Log Events (Perfetto) | 0/10 | Not started | - |
+| 24. Log Events (Perfetto) | 10/10 | Complete | 2026-05-03 |
 
 ### Phase 21: Monorepo structure and clean up (e.g. renaming kamper/ to libs/) is a structural refactor
 
@@ -443,14 +443,14 @@ Plans:
 **Plans:** 10 plans
 
 Plans:
-- [ ] 24-01-PLAN.md — Wave 0: Test scaffolds for EngineEventTest, UserEventInfoTest, PerfettoExporterEventTest (3 @Ignore'd files)
-- [ ] 24-02-PLAN.md — Wave 1: UserEventInfo data class in libs/api commonMain (D-13, D-14)
-- [ ] 24-03-PLAN.md — Wave 1: EngineEventLock + engineCurrentTimeNs expect/actuals across 8 KMP source sets (D-08, D-11)
-- [ ] 24-04-PLAN.md — Wave 2: Engine event API (logEvent/startEvent/endEvent/measureEvent/dumpEvents/drainEvents) + KamperConfig.eventsEnabled + EventRecord/EventToken (D-01..D-12)
-- [ ] 24-05-PLAN.md — Wave 3: Sentry integration — forwardEvents + "event" branch (D-25, D-26)
-- [ ] 24-06-PLAN.md — Wave 3: Firebase integration — forwardEvents + RecordLog expect/actuals + "event" branch (D-27, D-28)
-- [ ] 24-07-PLAN.md — Wave 3: OpenTelemetry integration — forwardEvents + RecordSpan expect/actuals + "event" branch + clean() shutdownSpanProvider (D-29, D-30, D-31, D-32)
-- [ ] 24-08-PLAN.md — Wave 3: Perfetto export — Tracks.EVENTS=8, PerfettoExporter named-event-track encoding, RecordingManager + KamperUiRepository wiring (D-16..D-21)
-- [ ] 24-09-PLAN.md — Wave 4: Android demo — EventsFragment + fragment_events.xml + item_event.xml + MainActivity (D-22, D-23, D-24); includes human-verify checkpoint
-- [ ] 24-10-PLAN.md — Wave 4: Phase 25 ROADMAP cleanup — remove duplicate entry + sync STATE.md (D-33)
+- [x] 24-01-PLAN.md — Wave 0: Test scaffolds for EngineEventTest, UserEventInfoTest, PerfettoExporterEventTest (3 @Ignore'd files)
+- [x] 24-02-PLAN.md — Wave 1: UserEventInfo data class in libs/api commonMain (D-13, D-14)
+- [x] 24-03-PLAN.md — Wave 1: EngineEventLock + engineCurrentTimeNs expect/actuals across 8 KMP source sets (D-08, D-11)
+- [x] 24-04-PLAN.md — Wave 2: Engine event API (logEvent/startEvent/endEvent/measureEvent/dumpEvents/drainEvents) + KamperConfig.eventsEnabled + EventRecord/EventToken (D-01..D-12)
+- [x] 24-05-PLAN.md — Wave 3: Sentry integration — forwardEvents + "event" branch (D-25, D-26)
+- [x] 24-06-PLAN.md — Wave 3: Firebase integration — forwardEvents + RecordLog expect/actuals + "event" branch (D-27, D-28)
+- [x] 24-07-PLAN.md — Wave 3: OpenTelemetry integration — forwardEvents + RecordSpan expect/actuals + "event" branch + clean() shutdownSpanProvider (D-29, D-30, D-31, D-32)
+- [x] 24-08-PLAN.md — Wave 3: Perfetto export — Tracks.EVENTS=8, PerfettoExporter named-event-track encoding, RecordingManager + KamperUiRepository wiring (D-16..D-21)
+- [x] 24-09-PLAN.md — Wave 4: Android demo — EventsFragment + fragment_events.xml + item_event.xml + MainActivity (D-22, D-23, D-24); includes human-verify checkpoint
+- [x] 24-10-PLAN.md — Wave 4: Phase 25 ROADMAP cleanup — remove duplicate entry + sync STATE.md (D-33)
 

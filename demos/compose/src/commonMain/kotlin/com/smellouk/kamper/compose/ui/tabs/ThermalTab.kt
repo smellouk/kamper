@@ -26,6 +26,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.smellouk.kamper.Kamper
 import com.smellouk.kamper.thermal.ThermalInfo
 import com.smellouk.kamper.thermal.ThermalState
 import com.smellouk.kamper.compose.ui.KamperColors
@@ -122,6 +123,7 @@ fun ThermalTab(info: ThermalInfo, modifier: Modifier = Modifier) {
             Button(
                 onClick = {
                     if (!isStressRunning) {
+                        Kamper.logEvent("thermal_stress_start")
                         isStressRunning = true
                         stressJob = scope.launch(Dispatchers.Default) {
                             var s = 0.0
@@ -130,6 +132,7 @@ fun ThermalTab(info: ThermalInfo, modifier: Modifier = Modifier) {
                             }
                         }
                     } else {
+                        Kamper.logEvent("thermal_stress_stop")
                         stressJob?.cancel()
                         stressJob = null
                         isStressRunning = false

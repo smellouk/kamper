@@ -1,5 +1,6 @@
 package com.smellouk.kamper.web.ui
 
+import com.smellouk.kamper.Kamper
 import com.smellouk.kamper.memory.MemoryInfo
 import org.w3c.dom.HTMLElement
 
@@ -42,12 +43,16 @@ internal object MemorySection {
         controls.button("btn btn-action") {
             textContent = "Alloc 8 MB"
             onclick = {
+                Kamper.logEvent("memory_alloc_32mb")
                 allocations.add(ByteArray(8 * 1024 * 1024))
             }
         }
         controls.button("btn btn-action") {
             textContent = "Free"
-            onclick = { allocations.clear() }
+            onclick = {
+                Kamper.logEvent("memory_gc")
+                allocations.clear()
+            }
         }
     }
 

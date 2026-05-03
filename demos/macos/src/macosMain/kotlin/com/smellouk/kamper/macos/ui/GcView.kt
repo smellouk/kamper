@@ -1,6 +1,7 @@
 @file:OptIn(kotlinx.cinterop.ExperimentalForeignApi::class, kotlinx.cinterop.BetaInteropApi::class)
 package com.smellouk.kamper.macos.ui
 
+import com.smellouk.kamper.Kamper
 import com.smellouk.kamper.gc.GcInfo
 import kotlinx.cinterop.*
 import kotlinx.coroutines.CoroutineScope
@@ -97,6 +98,7 @@ class GcView : NSView {
     }
 
     private fun simulateGc() {
+        Kamper.logEvent("gc_simulate")
         CoroutineScope(Dispatchers.Default).launch {
             repeat(200_000) { ByteArray(1024) }
         }

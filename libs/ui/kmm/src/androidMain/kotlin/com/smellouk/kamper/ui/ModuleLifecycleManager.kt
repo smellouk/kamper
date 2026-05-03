@@ -128,9 +128,14 @@ internal class ModuleLifecycleManager(
         state.update { s -> s.copy(downloadMbps = v, downloadHistory = netHist.toList(), networkUnsupported = false) }
     }
 
+    private val issueRecords: MutableList<IssueRecord> = mutableListOf()
+
     private val issuesListener: InfoListener<IssueInfo> = listener@{ info ->
         if (info == IssueInfo.INVALID) return@listener
+        val record = IssueRecord(info.issue, android.os.SystemClock.elapsedRealtimeNanos())
         synchronized(issuesList) {
+            issueRecords.add(0, record)
+            if (issueRecords.size > MAX_ISSUES) issueRecords.removeAt(issueRecords.size - 1)
             issuesList.add(0, info.issue)
             if (issuesList.size > MAX_ISSUES) issuesList.removeAt(issuesList.size - 1)
             saveIssues()
@@ -229,11 +234,14 @@ internal class ModuleLifecycleManager(
 
     fun clearIssues() {
         synchronized(issuesList) {
+            issueRecords.clear()
             issuesList.clear()
             saveIssues()
         }
         state.update { it.copy(issues = emptyList(), unreadIssueCount = 0) }
     }
+
+    fun snapshotIssueRecords(): List<IssueRecord> = synchronized(issuesList) { issueRecords.toList() }
 
     // ── FPS (Choreographer-based on Android) ──────────────────────────────────
 

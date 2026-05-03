@@ -1,6 +1,7 @@
 @file:OptIn(kotlinx.cinterop.ExperimentalForeignApi::class, kotlinx.cinterop.BetaInteropApi::class)
 package com.smellouk.kamper.macos.ui
 
+import com.smellouk.kamper.Kamper
 import com.smellouk.kamper.gpu.GpuInfo
 import kotlinx.cinterop.*
 import platform.AppKit.*
@@ -176,9 +177,11 @@ class GpuView : NSView {
     private fun toggleStress() {
         isStressing = !isStressing
         if (isStressing) {
+            Kamper.logEvent("gpu_stress_start")
             stressView.start()
             stressButton.title = "Stop Stress"
         } else {
+            Kamper.logEvent("gpu_stress_stop")
             stressView.stop()
             stressButton.title = "Stress GPU"
         }

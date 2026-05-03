@@ -1,5 +1,6 @@
 package com.smellouk.kamper.web.ui
 
+import com.smellouk.kamper.Kamper
 import com.smellouk.kamper.issues.Issue
 import com.smellouk.kamper.issues.IssueSpans
 import com.smellouk.kamper.issues.IssueType
@@ -22,6 +23,7 @@ internal object IssuesSection {
             style.color = "#89b4fa"
             style.borderColor = "#89b4fa"
             onclick = {
+                Kamper.logEvent("issue_slow_span")
                 IssueSpans.measure("web-demo-op", thresholdMs = 300L) {
                     val end = kotlin.js.Date().getTime() + 800
                     while (kotlin.js.Date().getTime() < end) { /* busy wait */ }
@@ -31,7 +33,11 @@ internal object IssuesSection {
         }
         controls.button("btn btn-action") {
             textContent = "Clear"
-            onclick = { clearIssues(); null }
+            onclick = {
+                Kamper.logEvent("issues_clear")
+                clearIssues()
+                null
+            }
         }
 
         // Crash detection requires window.onerror — not wired in the JS Issues actual.

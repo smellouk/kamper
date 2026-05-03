@@ -53,6 +53,7 @@ class KamperPanelActivity : AppCompatActivity() {
                     onStopEngine         = { repo.stopEngine() },
                     onRestartEngine      = { repo.restartEngine() },
                     onDismiss            = ::finish,
+                    onClearEvents        = { repo.clearEvents() },
                     externalTab          = selectedTab,
                     onTabChange          = { selectedTab = it },
                     isTv                 = isLeanback
@@ -104,6 +105,6 @@ class KamperPanelActivity : AppCompatActivity() {
     }
 
     private companion object {
-        const val TAB_COUNT = 4
+        const val TAB_COUNT = 5
     }
 }

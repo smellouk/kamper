@@ -1,6 +1,7 @@
 @file:OptIn(kotlinx.cinterop.ExperimentalForeignApi::class, kotlinx.cinterop.BetaInteropApi::class)
 package com.smellouk.kamper.macos.ui
 
+import com.smellouk.kamper.Kamper
 import com.smellouk.kamper.memory.MemoryInfo
 import kotlinx.cinterop.*
 import platform.AppKit.*
@@ -16,8 +17,14 @@ class MemoryView : NSView {
     private val lowMemLabel = NSTextField.labelWithString("").apply { font = Theme.LABEL_FONT; textColor = Theme.RED; translatesAutoresizingMaskIntoConstraints = false }
 
     private val allocations = mutableListOf<ByteArray>()
-    private val allocTarget = ActionTarget { allocations.add(ByteArray(32 * 1024 * 1024)) }
-    private val freeTarget  = ActionTarget { allocations.clear() }
+    private val allocTarget = ActionTarget {
+        Kamper.logEvent("memory_alloc_32mb")
+        allocations.add(ByteArray(32 * 1024 * 1024))
+    }
+    private val freeTarget = ActionTarget {
+        Kamper.logEvent("memory_gc")
+        allocations.clear()
+    }
     private val allocButton = makeButton("Alloc 32 MB", allocTarget)
     private val freeButton  = makeButton("Free", freeTarget)
 

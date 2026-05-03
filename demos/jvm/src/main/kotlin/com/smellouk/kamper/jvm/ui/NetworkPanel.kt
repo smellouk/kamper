@@ -1,5 +1,6 @@
 package com.smellouk.kamper.jvm.ui
 
+import com.smellouk.kamper.Kamper
 import com.smellouk.kamper.network.NetworkInfo
 import com.smellouk.kamper.jvm.ui.Theme.applyStyle
 import java.awt.BorderLayout
@@ -95,6 +96,7 @@ class NetworkPanel : JPanel(BorderLayout(0, 0)) {
     }
 
     private fun triggerDownload() {
+        Kamper.logEvent("network_download_test")
         statusLabel.text = "Fetching 20 MB…"
         downloadButton.isEnabled = false
         Executors.newSingleThreadExecutor().submit {

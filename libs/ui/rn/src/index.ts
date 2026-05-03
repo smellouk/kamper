@@ -23,12 +23,16 @@ export { useThermal } from './hooks/useThermal';
 export type {
   CpuInfo,
   FpsInfo,
+  GpuInfo,
   MemoryInfo,
   NetworkInfo,
   IssueInfo,
   JankInfo,
   GcInfo,
   ThermalInfo,
+  JsMemoryInfo,
+  JsGcInfo,
+  UserEventInfo,
   KamperConfig,
 } from './types';
 

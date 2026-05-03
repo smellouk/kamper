@@ -20,10 +20,12 @@ import com.smellouk.kamper.network.NetworkInfo
 import com.smellouk.kamper.network.NetworkModule
 import com.smellouk.kamper.thermal.ThermalInfo
 import com.smellouk.kamper.thermal.ThermalModule
+import com.smellouk.kamper.api.UserEventInfo
 import com.smellouk.kamper.jvm.ui.CpuPanel
 import com.smellouk.kamper.jvm.ui.FpsPanel
 import com.smellouk.kamper.jvm.ui.GcPanel
 import com.smellouk.kamper.jvm.ui.GpuPanel
+import com.smellouk.kamper.jvm.ui.EventsPanel
 import com.smellouk.kamper.jvm.ui.IssuesPanel
 import com.smellouk.kamper.jvm.ui.JankPanel
 import com.smellouk.kamper.jvm.ui.MemoryPanel
@@ -55,6 +57,7 @@ private class KamperDemoWindow : JFrame("K|JVM") {
     private val gpuPanel     = GpuPanel()
     private val fpsPanel     = FpsPanel()
     private val memoryPanel  = MemoryPanel()
+    private val eventsPanel  = EventsPanel()
     private val networkPanel = NetworkPanel()
     private val issuesPanel  = IssuesPanel()
     private val jankPanel    = JankPanel()
@@ -76,6 +79,7 @@ private class KamperDemoWindow : JFrame("K|JVM") {
             addTab("  GPU  ",     gpuPanel)
             addTab("  FPS  ",     fpsPanel)
             addTab("  Memory  ",  memoryPanel)
+            addTab("  Events  ",  eventsPanel)
             addTab("  Network  ", networkPanel)
             addTab("  Issues  ",  issuesPanel)
             addTab("  Jank  ",    jankPanel)
@@ -106,8 +110,9 @@ private class KamperDemoWindow : JFrame("K|JVM") {
             addInfoListener<CpuInfo>     { cpuPanel.update(it) }
             addInfoListener<GpuInfo>     { gpuPanel.update(it) }
             addInfoListener<FpsInfo>     { fpsPanel.update(it) }
-            addInfoListener<MemoryInfo>  { memoryPanel.update(it) }
-            addInfoListener<NetworkInfo> { networkPanel.update(it) }
+            addInfoListener<MemoryInfo>     { memoryPanel.update(it) }
+            addInfoListener<UserEventInfo>  { eventsPanel.addEvent(it) }
+            addInfoListener<NetworkInfo>    { networkPanel.update(it) }
             addInfoListener<IssueInfo>   { issuesPanel.addIssue(it.issue) }
             addInfoListener<JankInfo>    { jankPanel.update(it) }
             addInfoListener<GcInfo>      { gcPanel.update(it) }
@@ -144,12 +149,13 @@ private class HeaderPanel : JPanel() {
         // Title
         g2.font = Font("SansSerif", Font.BOLD, 15)
         g2.color = Theme.BLUE
-        val title = "Kamper Performance Monitor"
+        val title = "K|JVM"
         val fm = g2.fontMetrics
-        g2.drawString(title, (width - fm.stringWidth(title)) / 2, height / 2 + fm.ascent / 2 - 2)
+        val tx = (width - fm.stringWidth(title)) / 2
+        g2.drawString(title, tx, height / 2 + fm.ascent / 2 - 2)
 
         // Subtle dot indicator
         g2.color = Theme.GREEN
-        g2.fillOval(width / 2 + fm.stringWidth(title) / 2 + 8, height / 2 - 4, 8, 8)
+        g2.fillOval(tx + fm.stringWidth(title) + 8, height / 2 - 4, 8, 8)
     }
 }

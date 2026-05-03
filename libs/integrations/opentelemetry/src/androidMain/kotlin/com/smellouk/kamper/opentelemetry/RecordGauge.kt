@@ -24,6 +24,7 @@ private class GaugeRegistration(
 
 private val providers = ConcurrentHashMap<ProviderKey, GaugeRegistration>()
 
+@Suppress("NewApi") // OTel Java SDK on Android targets API 24+ (computeIfAbsent, Duration.ofSeconds)
 internal actual fun recordGauge(
     gaugeName: String,
     value: Double,

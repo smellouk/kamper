@@ -39,12 +39,13 @@ class MainActivity : AppCompatActivity() {
     private val jankFragment    = JankFragment()
     private val gcFragment      = GcFragment()
     private val thermalFragment = ThermalFragment()
+    private val eventsFragment = EventsFragment()
 
     private val fragments  = listOf(
-        cpuFragment, gpuFragment, fpsFragment, memoryFragment, networkFragment,
-        issuesFragment, jankFragment, gcFragment, thermalFragment
+        cpuFragment, gpuFragment, fpsFragment, memoryFragment, eventsFragment,
+        networkFragment, issuesFragment, jankFragment, gcFragment, thermalFragment
     )
-    private val tabTitles = listOf("CPU", "GPU", "FPS", "Memory", "Network", "Issues", "Jank", "GC", "Thermal")
+    private val tabTitles = listOf("CPU", "GPU", "FPS", "Memory", "Events", "Network", "Issues", "Jank", "GC", "Thermal")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

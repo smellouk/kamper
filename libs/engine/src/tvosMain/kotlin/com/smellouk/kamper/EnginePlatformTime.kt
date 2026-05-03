@@ -15,3 +15,12 @@ internal actual fun engineCurrentTimeMs(): Long = memScoped {
     clock_gettime(CLOCK_REALTIME.toUInt(), ts.ptr)
     ts.tv_sec * 1_000L + ts.tv_nsec / 1_000_000L
 }
+
+@Suppress("MagicNumber")
+@OptIn(ExperimentalForeignApi::class)
+@PublishedApi
+internal actual fun engineCurrentTimeNs(): Long = memScoped {
+    val ts = alloc<timespec>()
+    clock_gettime(CLOCK_REALTIME.toUInt(), ts.ptr)
+    ts.tv_sec * 1_000_000_000L + ts.tv_nsec
+}

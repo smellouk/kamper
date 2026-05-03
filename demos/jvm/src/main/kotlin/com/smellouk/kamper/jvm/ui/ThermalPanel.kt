@@ -1,5 +1,6 @@
 package com.smellouk.kamper.jvm.ui
 
+import com.smellouk.kamper.Kamper
 import com.smellouk.kamper.thermal.ThermalInfo
 import com.smellouk.kamper.thermal.ThermalState
 import com.smellouk.kamper.jvm.ui.Theme.applyStyle
@@ -67,11 +68,13 @@ class ThermalPanel : JPanel(BorderLayout(0, 0)) {
 
         stressButton.addActionListener {
             if (stressExecutor == null) {
+                Kamper.logEvent("thermal_stress_start")
                 stressExecutor = Executors.newFixedThreadPool(4)
                 repeat(4) { stressExecutor?.submit(::spinLoop) }
                 stressButton.text = "Stop CPU Stress"
                 stressButton.applyStyle(Theme.RED)
             } else {
+                Kamper.logEvent("thermal_stress_stop")
                 stressExecutor?.shutdownNow()
                 stressExecutor = null
                 stressButton.text = "Start CPU Stress"

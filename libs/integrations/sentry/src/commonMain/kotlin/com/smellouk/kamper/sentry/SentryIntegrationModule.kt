@@ -3,6 +3,7 @@ package com.smellouk.kamper.sentry
 import com.smellouk.kamper.api.Info
 import com.smellouk.kamper.api.IntegrationModule
 import com.smellouk.kamper.api.KamperEvent
+import com.smellouk.kamper.api.UserEventInfo
 import io.sentry.kotlin.multiplatform.Sentry
 import io.sentry.kotlin.multiplatform.SentryLevel
 import io.sentry.kotlin.multiplatform.protocol.Breadcrumb
@@ -15,6 +16,7 @@ import io.sentry.kotlin.multiplatform.protocol.Breadcrumb
  *   - "cpu"    -> Sentry breadcrumb       (when [SentryConfig.forwardCpuAbove] != null AND value above threshold)
  *   - "memory" -> Sentry breadcrumb       (when [SentryConfig.forwardMemoryAbove] != null AND value above threshold)
  *   - "fps"    -> Sentry breadcrumb       (when [SentryConfig.forwardFps])
+ *   - "event"  -> Sentry breadcrumb       (when [SentryConfig.forwardEvents] AND info is [UserEventInfo]) (D-26)
  *   - other    -> ignored
  *
  * Threshold extraction is intentionally toString()-based: this module does NOT compile-time
@@ -66,6 +68,7 @@ public class SentryIntegrationModule internal constructor(
                 "cpu"   -> handleCpuMetric(event, threshold = config.forwardCpuAbove, category = "kamper.cpu")
                 "memory" -> handleMemoryMetric(event, threshold = config.forwardMemoryAbove, category = "kamper.memory")
                 "fps"   -> if (config.forwardFps) handleBreadcrumb(event, category = "kamper.fps", level = SentryLevel.INFO)
+                "event" -> handleUserEvent(event)
                 else    -> Unit // unsupported moduleName — silently drop
             }
         } catch (t: Throwable) {
@@ -117,6 +120,28 @@ public class SentryIntegrationModule internal constructor(
             this.category = category
             this.message = msg
             this.level = level
+        }
+        Sentry.addBreadcrumb(crumb)
+    }
+
+    /**
+     * Forwards a [UserEventInfo] custom event to Sentry as a breadcrumb (D-26).
+     * Instant events (`durationMs == null`): message is the event name only.
+     * Duration events (`durationMs != null`): message is `"<name> (<durationMs> ms)"`.
+     * Skipped when [SentryConfig.forwardEvents] is false or `event.info` is not a [UserEventInfo].
+     */
+    private fun handleUserEvent(event: KamperEvent) {
+        if (!config.forwardEvents) return
+        val info = event.info as? UserEventInfo ?: return
+        val msg = if (info.durationMs != null) {
+            "${info.name} (${info.durationMs} ms)"
+        } else {
+            info.name
+        }
+        val crumb = Breadcrumb().apply {
+            this.category = "kamper.event"
+            this.message = msg
+            this.level = SentryLevel.INFO
         }
         Sentry.addBreadcrumb(crumb)
     }

@@ -9,6 +9,7 @@ import {
   StatusBar,
   StyleSheet,
   Text,
+  TextInput,
   View,
 } from 'react-native';
 import {SafeAreaProvider, SafeAreaView} from 'react-native-safe-area-context';
@@ -29,6 +30,7 @@ import type {
   ThermalInfo,
   JsMemoryInfo,
   JsGcInfo,
+  UserEventInfo,
 } from 'react-native-kamper';
 
 // ─── D-12 verification: __DEV__-only overlay sample ─────────────────────
@@ -82,6 +84,7 @@ type GpuData = GpuInfo;
 type ThermalData = ThermalInfo;
 type JsMemoryData = JsMemoryInfo;
 type JsGcData = JsGcInfo;
+type UserEventData = UserEventInfo;
 
 // ── Format helpers ─────────────────────────────────────────────────────────────
 const pct = (v: number) => `${(v * 100).toFixed(1)}%`;
@@ -275,10 +278,12 @@ function CpuTab({cpu, running}: {cpu: CpuData | null; running: boolean}) {
     if (stressing) {
       activeRef.current = false;
       setStressing(false);
+      Kamper.logEvent('cpu_load_stop');
     } else {
       activeRef.current = true;
       setStressing(true);
       setTimeout(runLoop, 50);
+      Kamper.logEvent('cpu_load_start');
     }
   }, [stressing, runLoop]);
 
@@ -348,11 +353,13 @@ function MemoryTab({mem, jsMem, running}: {mem: MemoryData | null; jsMem: JsMemo
   const [allocMsg, setAllocMsg] = useState('');
 
   const alloc32Mb = useCallback(() => {
+    Kamper.logEvent('memory_alloc_32mb_js');
     allocRef.current = new Uint8Array(32 * 1024 * 1024).fill(0xAA);
     setAllocMsg('Allocated 32 MB in JS heap');
   }, []);
 
   const releaseJsMem = useCallback(() => {
+    Kamper.logEvent('memory_release_js');
     allocRef.current = null;
     setAllocMsg('Released — awaiting Hermes GC');
     setTimeout(() => setAllocMsg(''), 3000);
@@ -422,6 +429,7 @@ function NetworkTab({
   const [dlStatus, setDlStatus] = useState('');
 
   const testDownload = useCallback(async () => {
+    Kamper.logEvent('network_download_test');
     setFetching(true);
     setDlStatus('Fetching 5 MB…');
     try {
@@ -528,6 +536,7 @@ function IssuesTab({issues, onClear}: {issues: IssueData[]; onClear: () => void}
   const [spanStatus, setSpanStatus] = useState('');
 
   const triggerSlowSpan = useCallback(() => {
+    Kamper.logEvent('issue_slow_span_js');
     setSpanStatus('Blocking JS thread 800 ms…');
     setTimeout(() => {
       Kamper.beginSpan('js-slow-span', 500);
@@ -540,6 +549,7 @@ function IssuesTab({issues, onClear}: {issues: IssueData[]; onClear: () => void}
   }, []);
 
   const triggerCrash = useCallback(() => {
+    Kamper.logEvent('issue_crash_trigger');
     setTimeout(() => { throw new Error('Demo crash: test crash triggered by user'); }, 0);
   }, []);
 
@@ -566,6 +576,7 @@ function JankTab({jank, running}: {jank: JankData | null; running: boolean}) {
   const [jankMsg, setJankMsg] = useState('');
 
   const simulateJank = useCallback(() => {
+    Kamper.logEvent('jank_simulate');
     setJankMsg('Blocking 200 ms (Native)…');
     setTimeout(() => {
       const end = Date.now() + 200;
@@ -615,6 +626,7 @@ function GcTab({gc, jsGc, running}: {gc: GcData | null; jsGc: JsGcData | null; r
   const [gcMsg, setGcMsg] = useState('');
 
   const simulateGc = useCallback(() => {
+    Kamper.logEvent('gc_simulate_js');
     setGcMsg('Allocating…');
     setTimeout(() => {
       const bufs: Uint8Array[] = [];
@@ -710,10 +722,12 @@ function ThermalTab({thermal, running}: {thermal: ThermalData | null; running: b
     if (stressing) {
       activeRef.current = false;
       setStressing(false);
+      Kamper.logEvent('thermal_stress_stop');
     } else {
       activeRef.current = true;
       setStressing(true);
       setTimeout(runLoop, 50);
+      Kamper.logEvent('thermal_stress_start');
     }
   }, [stressing, runLoop]);
 
@@ -930,7 +944,7 @@ function GpuTab({gpu, running}: {gpu: GpuData | null; running: boolean}) {
       </ScrollView>
       <View style={s.footer}>
         {running
-          ? <Btn label={stressing ? 'STOP STRESS' : 'STRESS GPU'} onPress={() => setStressing(v => !v)} />
+          ? <Btn label={stressing ? 'STOP STRESS' : 'STRESS GPU'} onPress={() => { Kamper.logEvent(stressing ? 'gpu_stress_stop' : 'gpu_stress_start'); setStressing(v => !v); }} />
           : <Text style={s.footerHint}>Engine stopped</Text>
         }
       </View>
@@ -938,8 +952,92 @@ function GpuTab({gpu, running}: {gpu: GpuData | null; running: boolean}) {
   );
 }
 
+// ── Events Tab ─────────────────────────────────────────────────────────────────
+const EVENT_PRESETS = ['user_login', 'purchase', 'screen_view'];
+
+function fmtEventTime(ms: number): string {
+  const d = new Date(ms);
+  const h = String(d.getHours()).padStart(2, '0');
+  const m = String(d.getMinutes()).padStart(2, '0');
+  const sc = String(d.getSeconds()).padStart(2, '0');
+  return `${h}:${m}:${sc}`;
+}
+
+function EventRow({event}: {event: UserEventData & {wallClockMs: number}}) {
+  const hasDuration = event.durationMs != null;
+  return (
+    <View style={s.eventRow}>
+      <View style={[s.eventTypeBar, {backgroundColor: hasDuration ? C.blue : C.green}]} />
+      <View style={s.eventContent}>
+        <Text style={s.eventName}>{event.name}</Text>
+        <View style={s.eventMeta}>
+          <Text style={s.eventTime}>{fmtEventTime(event.wallClockMs)}</Text>
+          {hasDuration
+            ? <Text style={s.eventDuration}>({event.durationMs}ms)</Text>
+            : null}
+        </View>
+      </View>
+    </View>
+  );
+}
+
+function EventsTab({events, onClear}: {events: Array<UserEventData & {wallClockMs: number}>; onClear: () => void}) {
+  const [customName, setCustomName] = useState('');
+  const [recording, setRecording] = useState(false);
+
+  const logCustom = useCallback(() => {
+    const name = customName.trim();
+    if (!name) return;
+    Kamper.logEvent(name);
+    setCustomName('');
+  }, [customName]);
+
+  const triggerVideoPlayback = useCallback(() => {
+    if (recording) return;
+    setRecording(true);
+    const tokenId = Kamper.startEvent('video_playback');
+    setTimeout(() => {
+      Kamper.endEvent(tokenId);
+      setRecording(false);
+    }, 2000);
+  }, [recording]);
+
+  return (
+    <View style={s.tabContent}>
+      {events.length === 0
+        ? <View style={s.issueEmpty}><Text style={s.issueEmptyText}>No events logged</Text></View>
+        : <ScrollView style={s.tabScroll} showsVerticalScrollIndicator={false}>
+            {events.map((ev, i) => <EventRow key={i} event={ev} />)}
+          </ScrollView>
+      }
+      <View style={[s.footer, {flexDirection: 'column', gap: 8, alignItems: 'stretch'}]}>
+        <View style={{flexDirection: 'row', gap: 8, flexWrap: 'wrap'}}>
+          {EVENT_PRESETS.map(name => (
+            <Btn key={name} label={name.toUpperCase()} onPress={() => Kamper.logEvent(name)} />
+          ))}
+          <Btn label={recording ? 'Recording…' : 'video_playback'} onPress={triggerVideoPlayback} disabled={recording} />
+          <Btn label="CLEAR" onPress={onClear} />
+        </View>
+        <View style={{flexDirection: 'row', gap: 8}}>
+          <TextInput
+            style={s.eventTextInput}
+            placeholder="custom event name…"
+            placeholderTextColor={C.overlay1}
+            value={customName}
+            onChangeText={setCustomName}
+            onSubmitEditing={logCustom}
+            returnKeyType="done"
+            autoCapitalize="none"
+          />
+          <Btn label="LOG" onPress={logCustom} disabled={customName.trim().length === 0} />
+        </View>
+      </View>
+    </View>
+  );
+}
+
 // ── App ────────────────────────────────────────────────────────────────────────
-const TABS = ['CPU', 'GPU', 'FPS', 'MEMORY', 'NETWORK', 'ISSUES', 'JANK', 'GC', 'THERMAL'];
+const TABS = ['CPU', 'GPU', 'FPS', 'MEMORY', 'EVENTS', 'NETWORK', 'ISSUES', 'JANK', 'GC', 'THERMAL'];
 
 export default function App() {
   const [activeTab, setActiveTab] = useState(0);
@@ -955,11 +1053,13 @@ export default function App() {
   const [thermal, setThermal]     = useState<ThermalData | null>(null);
   const [jsMem, setJsMem]         = useState<JsMemoryData | null>(null);
   const [jsGc, setJsGc]           = useState<JsGcData | null>(null);
+  const [userEvents, setUserEvents] = useState<Array<UserEventData & {wallClockMs: number}>>([]);
   const peakRxRef                 = useRef(0);
   const peakTxRef                 = useRef(0);
 
   useEffect(() => {
     Kamper.start();
+    if (__DEV__) showOverlay();
     setRunning(true);
     const subs = [
       Kamper.on('cpu',     (d: CpuData)     => setCpu(d)),
@@ -979,6 +1079,9 @@ export default function App() {
       Kamper.on('thermal',  (d: ThermalData)  => setThermal(d)),
       Kamper.on('jsMemory', (d: JsMemoryData) => setJsMem(d)),
       Kamper.on('jsGc',     (d: JsGcData)     => setJsGc(d)),
+      Kamper.on('userEvent', (d: UserEventData) => {
+        setUserEvents(prev => [{...d, wallClockMs: Date.now()}, ...prev].slice(0, 200));
+      }),
     ];
     return () => {
       subs.forEach(sub => sub.remove());
@@ -992,6 +1095,7 @@ export default function App() {
       setRunning(false);
       setCpu(null); setFps(null); setMem(null); setNet(null); setIssues([]);
       setJank(null); setGc(null); setGpu(null); setThermal(null); setJsMem(null); setJsGc(null);
+      setUserEvents([]);
       peakRxRef.current = 0; peakTxRef.current = 0;
     } else {
       Kamper.start();
@@ -1006,7 +1110,7 @@ export default function App() {
 
       {/* Header */}
       <View style={s.header}>
-        <Text style={s.headerTitle}>Kamper Performance Monitor</Text>
+        <Text style={s.headerTitle}>{Platform.OS === 'ios' ? 'K|iOS|RN' : 'K|Android|RN'}</Text>
         <View style={[s.runDot, {backgroundColor: running ? C.green : C.surface1}]} />
         <Pressable
           style={[s.toggleBtn, {backgroundColor: running ? C.surface1 : C.blue}]}
@@ -1045,6 +1149,12 @@ export default function App() {
       {activeTab === 2 && <FpsTab     fps={fps} />}
       {activeTab === 3 && <MemoryTab  mem={mem} jsMem={jsMem} running={running} />}
       {activeTab === 4 && (
+        <EventsTab
+          events={userEvents}
+          onClear={() => setUserEvents([])}
+        />
+      )}
+      {activeTab === 5 && (
         <NetworkTab
           net={net}
           peakRxRef={peakRxRef}
@@ -1052,10 +1162,10 @@ export default function App() {
           running={running}
         />
       )}
-      {activeTab === 5 && <IssuesTab  issues={issues} onClear={() => setIssues([])} />}
-      {activeTab === 6 && <JankTab    jank={jank}    running={running} />}
-      {activeTab === 7 && <GcTab      gc={gc}        jsGc={jsGc}  running={running} />}
-      {activeTab === 8 && <ThermalTab thermal={thermal} running={running} />}
+      {activeTab === 6 && <IssuesTab  issues={issues} onClear={() => { Kamper.logEvent('issues_clear'); setIssues([]); }} />}
+      {activeTab === 7 && <JankTab    jank={jank}    running={running} />}
+      {activeTab === 8 && <GcTab      gc={gc}        jsGc={jsGc}  running={running} />}
+      {activeTab === 9 && <ThermalTab thermal={thermal} running={running} />}
     </SafeAreaView>
     </SafeAreaProvider>
   );
@@ -1158,6 +1268,28 @@ const s = StyleSheet.create({
     backgroundColor: '#0D0D1A',
     borderRadius: 8,
     overflow: 'hidden',
+  },
+
+  // Events tab
+  eventRow: {
+    flexDirection: 'row', backgroundColor: C.surface0,
+    marginHorizontal: 0, marginBottom: 1,
+  },
+  eventTypeBar: {width: 4},
+  eventContent: {flex: 1, paddingHorizontal: 12, paddingVertical: 8},
+  eventName: {fontSize: 13, color: C.text, fontFamily: MONO},
+  eventMeta: {flexDirection: 'row', gap: 8, marginTop: 2},
+  eventTime: {fontSize: 11, fontFamily: MONO, color: C.overlay1},
+  eventDuration: {fontSize: 11, fontFamily: MONO, color: C.blue},
+  eventTextInput: {
+    flex: 1,
+    backgroundColor: C.surface0,
+    color: C.text,
+    fontSize: 12,
+    fontFamily: MONO,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 8,
   },
 
   // Misc

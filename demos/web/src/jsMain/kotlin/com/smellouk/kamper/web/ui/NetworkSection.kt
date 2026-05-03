@@ -1,5 +1,6 @@
 package com.smellouk.kamper.web.ui
 
+import com.smellouk.kamper.Kamper
 import com.smellouk.kamper.network.NetworkInfo
 import org.w3c.dom.HTMLElement
 
@@ -43,7 +44,10 @@ internal object NetworkSection {
         val controls = container.div("controls")
         controls.button("btn btn-action") {
             textContent = "Measure Bandwidth"
-            onclick = { measureBandwidth() }
+            onclick = {
+                Kamper.logEvent("network_download_test")
+                measureBandwidth()
+            }
         }
     }
 

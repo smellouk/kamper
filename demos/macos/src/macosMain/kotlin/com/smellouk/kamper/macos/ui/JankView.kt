@@ -1,6 +1,7 @@
 @file:OptIn(kotlinx.cinterop.ExperimentalForeignApi::class, kotlinx.cinterop.BetaInteropApi::class)
 package com.smellouk.kamper.macos.ui
 
+import com.smellouk.kamper.Kamper
 import com.smellouk.kamper.jank.JankInfo
 import kotlinx.cinterop.*
 import platform.AppKit.*
@@ -92,6 +93,7 @@ class JankView : NSView {
     }
 
     private fun simulateJank() {
+        Kamper.logEvent("jank_simulate")
         val end = NSDate.dateWithTimeIntervalSinceNow(0.2)
         while (NSDate.date().compare(end) == NSOrderedAscending) {}
     }

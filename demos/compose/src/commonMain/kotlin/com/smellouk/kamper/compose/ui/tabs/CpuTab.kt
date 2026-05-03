@@ -21,6 +21,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.smellouk.kamper.Kamper
 import com.smellouk.kamper.cpu.CpuInfo
 import com.smellouk.kamper.compose.ui.KamperColors
 import com.smellouk.kamper.compose.ui.MetricRow
@@ -56,6 +57,7 @@ fun CpuTab(info: CpuInfo, modifier: Modifier = Modifier) {
             Button(
                 onClick = {
                     if (!isStressRunning) {
+                        Kamper.logEvent("cpu_load_start")
                         isStressRunning = true
                         stressJob = scope.launch(Dispatchers.Default) {
                             var s = 0.0
@@ -64,6 +66,7 @@ fun CpuTab(info: CpuInfo, modifier: Modifier = Modifier) {
                             }
                         }
                     } else {
+                        Kamper.logEvent("cpu_load_stop")
                         stressJob?.cancel()
                         stressJob = null
                         isStressRunning = false

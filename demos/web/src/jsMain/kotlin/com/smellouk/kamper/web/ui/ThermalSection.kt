@@ -1,5 +1,6 @@
 package com.smellouk.kamper.web.ui
 
+import com.smellouk.kamper.Kamper
 import com.smellouk.kamper.thermal.ThermalInfo
 import com.smellouk.kamper.thermal.ThermalState
 import kotlinx.browser.document
@@ -71,6 +72,7 @@ internal object ThermalSection {
 
     private fun toggleStress() {
         if (!stressActive) {
+            Kamper.logEvent("thermal_stress_start")
             stressActive = true
             stressBtn.textContent = "Stop CPU Stress"
             stressInterval = kotlinx.browser.window.setInterval({
@@ -78,6 +80,7 @@ internal object ThermalSection {
                 while (kotlin.js.Date().getTime() < end) {}
             }, 60)
         } else {
+            Kamper.logEvent("thermal_stress_stop")
             stressActive = false
             stressBtn.textContent = "Start CPU Stress"
             kotlinx.browser.window.clearInterval(stressInterval)

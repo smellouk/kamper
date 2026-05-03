@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.sp
 import com.smellouk.kamper.issues.Issue
 import com.smellouk.kamper.issues.IssueType
 import com.smellouk.kamper.issues.Severity
+import com.smellouk.kamper.Kamper
 import com.smellouk.kamper.compose.triggerCrash
 import com.smellouk.kamper.compose.triggerSlowSpan
 import com.smellouk.kamper.compose.ui.KamperColors
@@ -74,11 +75,20 @@ fun IssuesTab(
                 .padding(horizontal = 16.dp, vertical = 10.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            TriggerButton("Slow Span", KamperColors.blue)  { triggerSlowSpan() }
+            TriggerButton("Slow Span", KamperColors.blue)  {
+                Kamper.logEvent("issue_slow_span")
+                triggerSlowSpan()
+            }
             Spacer(Modifier.width(8.dp))
-            TriggerButton("Crash", KamperColors.red)       { triggerCrash() }
+            TriggerButton("Crash", KamperColors.red)       {
+                Kamper.logEvent("issue_crash_trigger")
+                triggerCrash()
+            }
             Spacer(Modifier.width(8.dp))
-            TriggerButton("Clear", KamperColors.overlay1)  { onClear() }
+            TriggerButton("Clear", KamperColors.overlay1)  {
+                Kamper.logEvent("issues_clear")
+                onClear()
+            }
         }
     }
 }

@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.google.android.material.button.MaterialButton
+import com.smellouk.kamper.Kamper
 import com.smellouk.kamper.cpu.CpuInfo
 import com.smellouk.kamper.android.views.MetricRowView
 
@@ -66,12 +67,14 @@ class CpuFragment : Fragment() {
     private fun toggleLoad() {
         isLoading = !isLoading
         if (isLoading) {
+            Kamper.logEvent("cpu_load_start")
             loadButton?.text = "Stop CPU Load"
             loadButton?.backgroundTintList = ColorStateList.valueOf(0xFFF38BA8.toInt())
             repeat(4) {
                 Thread { while (isLoading) { /* spin */ } }.apply { isDaemon = true; start() }
             }
         } else {
+            Kamper.logEvent("cpu_load_stop")
             loadButton?.text = "Start CPU Load"
             loadButton?.backgroundTintList = ColorStateList.valueOf(0xFF313244.toInt())
         }

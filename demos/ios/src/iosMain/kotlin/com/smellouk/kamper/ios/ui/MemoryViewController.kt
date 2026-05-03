@@ -1,6 +1,7 @@
 @file:OptIn(kotlinx.cinterop.ExperimentalForeignApi::class, kotlinx.cinterop.BetaInteropApi::class)
 package com.smellouk.kamper.ios.ui
 
+import com.smellouk.kamper.Kamper
 import com.smellouk.kamper.memory.MemoryInfo
 import kotlinx.cinterop.*
 import platform.Foundation.*
@@ -33,8 +34,14 @@ class MemoryViewController : UIViewController(nibName = null, bundle = null) {
             translatesAutoresizingMaskIntoConstraints = false
         }
 
-        allocTarget = ActionTarget { allocations.add(ByteArray(32 * 1024 * 1024)) }
-        freeTarget  = ActionTarget { allocations.clear() }
+        allocTarget = ActionTarget {
+            Kamper.logEvent("memory_alloc_32mb")
+            allocations.add(ByteArray(32 * 1024 * 1024))
+        }
+        freeTarget = ActionTarget {
+            Kamper.logEvent("memory_gc")
+            allocations.clear()
+        }
         allocButton = makeButton("Alloc 32 MB", allocTarget)
         freeButton  = makeButton("Free",        freeTarget)
 

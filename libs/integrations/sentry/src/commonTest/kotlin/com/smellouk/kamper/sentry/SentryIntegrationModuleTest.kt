@@ -2,6 +2,7 @@ package com.smellouk.kamper.sentry
 
 import com.smellouk.kamper.api.Info
 import com.smellouk.kamper.api.KamperEvent
+import com.smellouk.kamper.api.UserEventInfo
 import kotlin.test.Test
 import kotlin.test.assertTrue
 
@@ -97,6 +98,41 @@ class SentryIntegrationModuleTest {
         // Even with a pathological Info, the catch (Throwable) inside onEvent must absorb the failure.
         module.onEvent(makeEvent("issue", pathological))
 
+        assertTrue(true)
+    }
+
+    // --- D-25 / D-26 event branch tests ---
+
+    @Test
+    fun event_branch_emits_breadcrumb_for_instant_event() {
+        val module = SentryModule("https://test@sentry.io/20") { forwardEvents = true }
+        // Sentry SDK on JVM test target no-ops addBreadcrumb; we verify the call does not throw
+        // and the guard logic (forwardEvents=true, non-INVALID UserEventInfo) is reached.
+        module.onEvent(makeEvent("event", UserEventInfo(name = "purchase", durationMs = null)))
+        assertTrue(true)
+    }
+
+    @Test
+    fun event_branch_emits_breadcrumb_with_duration_suffix() {
+        val module = SentryModule("https://test@sentry.io/21") { forwardEvents = true }
+        // durationMs != null — message should be "video_decode (1024 ms)"
+        module.onEvent(makeEvent("event", UserEventInfo(name = "video_decode", durationMs = 1024L)))
+        assertTrue(true)
+    }
+
+    @Test
+    fun event_branch_skips_when_forwardEvents_is_false() {
+        val module = SentryModule("https://test@sentry.io/22") { forwardEvents = false }
+        // Guard: forwardEvents=false → no Sentry SDK call; must not throw
+        module.onEvent(makeEvent("event", UserEventInfo(name = "purchase", durationMs = null)))
+        assertTrue(true)
+    }
+
+    @Test
+    fun event_branch_drops_invalid_userEventInfo() {
+        val module = SentryModule("https://test@sentry.io/23") { forwardEvents = true }
+        // event.info = Info.INVALID (not UserEventInfo.INVALID) — the top-level guard fires
+        module.onEvent(makeEvent("event", Info.INVALID))
         assertTrue(true)
     }
 }

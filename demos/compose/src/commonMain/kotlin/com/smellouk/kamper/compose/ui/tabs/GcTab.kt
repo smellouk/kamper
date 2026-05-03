@@ -22,6 +22,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.smellouk.kamper.Kamper
 import com.smellouk.kamper.gc.GcInfo
 import com.smellouk.kamper.compose.ui.KamperColors
 import kotlinx.coroutines.Dispatchers
@@ -88,6 +89,7 @@ fun GcTab(info: GcInfo, modifier: Modifier = Modifier) {
             Spacer(Modifier.weight(1f))
             Button(
                 onClick = {
+                    Kamper.logEvent("gc_simulate")
                     scope.launch(Dispatchers.Default) {
                         repeat(200_000) { ByteArray(1024) }
                         gc()
