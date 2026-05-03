@@ -1,12 +1,12 @@
-# Kamper
+# Konitor (formerly Kamper)
 
 ## What This Is
 
-Kamper is a Kotlin Multiplatform performance monitoring library for Android and JVM. It provides real-time CPU, FPS, memory, network, jank, GC, and thermal monitoring via a modular plugin architecture, surfacing metrics through an in-app Compose overlay panel and a programmatic listener API.
+Konitor is a Kotlin Multiplatform performance monitoring library for Android, iOS, JVM, macOS, tvOS, JS, and WASM. It provides real-time CPU, FPS, memory, network, jank, GC, thermal, and GPU monitoring via a modular plugin architecture, surfacing metrics through an in-app Compose overlay panel and a programmatic listener API.
 
 ## Core Value
 
-The monitoring must never crash or destabilize the host app — every metric collection failure is silently swallowed so Kamper is always safe to ship in production builds.
+The monitoring must never crash or destabilize the host app — every metric collection failure is silently swallowed so Konitor is always safe to ship in production builds.
 
 ## Requirements
 
@@ -69,4 +69,4 @@ Kamper is a brownfield KMP library with 89 commits of history now aligned to Con
 | Engine.validate() single-call semantics | Per D-13 validate() is called from app code (not on a hot loop) — no need to synchronize performanceList iteration | ✓ Good |
 
 ---
-*Last updated: 2026-04-29 after Phase 21 completion — kamper/ renamed to libs/ across filesystem, build scripts, CI, docs, and dev tooling; README renovated per D-12 11-section structure*
+*Last updated: 2026-05-03 after Phase 25 completion — library renamed from Kamper to Konitor across all surfaces; all packages, classes, artifacts, and docs updated; 17/17 verification truths passed*

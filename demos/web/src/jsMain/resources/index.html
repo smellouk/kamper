@@ -166,6 +166,30 @@
         .issue-time { font-size: 11px; font-family: monospace; color: var(--overlay1); margin-left: auto; }
         .issue-msg { font-size: 12px; color: var(--text); }
         .issue-details { font-size: 11px; font-family: monospace; color: var(--overlay1); margin-top: 2px; }
+
+        /* Events tab */
+        .event-list { display: flex; flex-direction: column; gap: 1px; margin-top: 16px; }
+        .event-row {
+            display: flex; align-items: center;
+            background: var(--mantle);
+            border-radius: 6px; overflow: hidden;
+            padding: 10px 12px 10px 0;
+        }
+        .event-bar { width: 3px; min-height: 36px; flex-shrink: 0; border-radius: 0 2px 2px 0; margin-right: 12px; }
+        .event-content { flex: 1; display: flex; flex-direction: column; gap: 3px; }
+        .event-name { font-size: 13px; font-weight: 600; font-family: monospace; color: var(--text); }
+        .event-duration { font-size: 11px; font-family: monospace; color: var(--blue); }
+        .event-time { font-size: 11px; font-family: monospace; color: var(--overlay1); margin-left: 12px; flex-shrink: 0; }
+        .event-input-row { display: flex; gap: 8px; margin-top: 10px; align-items: center; }
+        .event-input {
+            flex: 1; max-width: 240px;
+            background: var(--mantle); color: var(--text);
+            border: 1px solid var(--surface1); border-radius: 6px;
+            padding: 6px 10px; font-size: 12px; font-family: monospace;
+        }
+        .event-input::placeholder { color: var(--overlay1); }
+        .event-input:focus { outline: none; border-color: var(--blue); }
+        .event-log-btn { font-size: 12px; font-weight: 700; padding: 6px 14px; }
     </style>
 </head>
 <body>

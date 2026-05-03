@@ -42,7 +42,7 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Kamper"
+rootProject.name = "Konitor"
 
 include(":libs:api")
 include(":libs:bom")
@@ -86,3 +86,8 @@ include(":demos:ios")
 // settings.gradle already has includeBuild('../../..') for dependency substitution back to
 // the root — Gradle 8.x handles the mutual composite relationship correctly.
 includeBuild("demos/react-native/android")
+// NOTE: Flutter composite builds (libs/ui/flutter/android and demos/flutter/android) are NOT
+// included here. Gradle 9 rejects composite builds with duplicate leaf-directory names —
+// both would produce build path :android, colliding with demos/react-native/android.
+// The Flutter plugin and demo use includeBuild('../../../..') in their own settings.gradle
+// to pull in the monorepo root for :libs:* resolution (same self-referencing pattern).

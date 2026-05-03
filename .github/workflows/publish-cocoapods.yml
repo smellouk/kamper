@@ -1,5 +1,5 @@
-# Builds the Kamper XCFramework on macOS, attaches the zipped framework
-# to the GitHub Release as Kamper.xcframework.zip, then publishes the
+# Builds the Konitor XCFramework on macOS, attaches the zipped framework
+# to the GitHub Release as Konitor.xcframework.zip, then publishes the
 # podspec to CocoaPods trunk so the source URL is resolvable for consumers.
 name: Publish CocoaPods
 
@@ -30,16 +30,16 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
 
       - name: Build XCFramework
-        run: ./gradlew :libs:apple-sdk:assembleKamperReleaseXCFramework --no-configuration-cache
+        run: ./gradlew :libs:apple-sdk:assembleKonitorReleaseXCFramework --no-configuration-cache
 
       - name: Verify XCFramework output
         run: |
-          test -d libs/apple-sdk/build/XCFrameworks/release/Kamper.xcframework \
-            || (echo "Kamper.xcframework directory missing" && exit 1)
+          test -d libs/apple-sdk/build/XCFrameworks/release/Konitor.xcframework \
+            || (echo "Konitor.xcframework directory missing" && exit 1)
 
       - name: Zip XCFramework
         working-directory: libs/apple-sdk/build/XCFrameworks/release
-        run: zip -r Kamper.xcframework.zip Kamper.xcframework
+        run: zip -r Konitor.xcframework.zip Konitor.xcframework
 
       - name: Upload XCFramework to GitHub Release
         env:
@@ -47,10 +47,10 @@ jobs:
           TAG: ${{ github.event.release.tag_name }}
         run: |
           gh release upload "$TAG" \
-            libs/apple-sdk/build/XCFrameworks/release/Kamper.xcframework.zip \
+            libs/apple-sdk/build/XCFrameworks/release/Konitor.xcframework.zip \
             --clobber
 
       - name: Push to CocoaPods trunk
         env:
           COCOAPODS_TRUNK_TOKEN: ${{ secrets.COCOAPODS_TRUNK_TOKEN }}
-        run: pod trunk push Kamper.podspec --allow-warnings --skip-import-validation
+        run: pod trunk push Konitor.podspec --allow-warnings --skip-import-validation

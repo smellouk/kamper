@@ -14,7 +14,7 @@ buildscript {
     dependencies {
         classpath("com.android.tools.build:gradle:8.13.0")
         classpath("com.facebook.react:react-native-gradle-plugin")
-        // Pin Kotlin to 2.3.20 to match Kamper's compiled metadata version
+        // Pin Kotlin to 2.3.20 to match Konitor's compiled metadata version
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:2.3.20")
     }
 }

@@ -1,10 +1,10 @@
 plugins {
-    id("kamper.kmp.library")
-    id("kamper.publish")
+    id("konitor.kmp.library")
+    id("konitor.publish")
 }
 
 android {
-    namespace = "com.smellouk.kamper.gpu"
+    namespace = "com.smellouk.konitor.gpu"
     externalNativeBuild {
         cmake {
             path("src/androidMain/cpp/CMakeLists.txt")
@@ -47,7 +47,7 @@ kotlin {
         target.compilations.getByName("main") {
             cinterops.create("gpuInfo") {
                 defFile(project.file("src/nativeInterop/cinterop/gpuInfo.def"))
-                packageName("com.smellouk.kamper.gpu.cinterop")
+                packageName("com.smellouk.konitor.gpu.cinterop")
             }
         }
     }

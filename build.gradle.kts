@@ -6,6 +6,7 @@ import java.lang.System.getenv as Env
 
 plugins {
     alias(libs.plugins.detekt)
+    id("konitor.execution-time")
     alias(libs.plugins.test.logger) apply false
     alias(libs.plugins.kotlin.multiplatform) apply false
     alias(libs.plugins.kotlin.android) apply false
@@ -24,16 +25,16 @@ extra.apply {
             val properties = java.util.Properties()
             properties.load(propertiesFile.inputStream())
 
-            set("KAMPER_GH_USER", properties["kamperGhUser"])
-            set("KAMPER_GH_PAT", properties["kamperGhToken"])
+            set("KONITOR_GH_USER", properties["konitorGhUser"])
+            set("KONITOR_GH_PAT", properties["konitorGhToken"])
         }
-        Env().containsKey("KAMPER_GH_USER") && Env().containsKey("KAMPER_GH_PAT") -> {
-            set("KAMPER_GH_USER", Env("KAMPER_GH_USER"))
-            set("KAMPER_GH_PAT", Env("KAMPER_GH_PAT"))
+        Env().containsKey("KONITOR_GH_USER") && Env().containsKey("KONITOR_GH_PAT") -> {
+            set("KONITOR_GH_USER", Env("KONITOR_GH_USER"))
+            set("KONITOR_GH_PAT", Env("KONITOR_GH_PAT"))
         }
         else -> {
-            set("KAMPER_GH_USER", "")
-            set("KAMPER_GH_PAT", "")
+            set("KONITOR_GH_USER", "")
+            set("KONITOR_GH_PAT", "")
         }
     }
 

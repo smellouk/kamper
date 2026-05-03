@@ -7,26 +7,26 @@
     <ID>ComplexCondition:AndroidOverlayManager.kt$LeanbackComposeView$(event.keyCode == KeyEvent.KEYCODE_MENU || event.keyCode == KeyEvent.KEYCODE_BACK) &amp;&amp; event.action == KeyEvent.ACTION_DOWN &amp;&amp; event.repeatCount &gt; 0</ID>
     <ID>ComplexCondition:CpuInfoRepositoryImpl.kt$CpuInfoRepositoryImpl$firstCallComplete &amp;&amp; dto == CpuInfoDto.INVALID &amp;&amp; apiLevel &gt;= Build.VERSION_CODES.O &amp;&amp; !procStatOk</ID>
     <ID>ComplexCondition:IosNetworkInfoSource.kt$IosNetworkInfoSource$name != null &amp;&amp; !name.startsWith("lo") &amp;&amp; addr != null &amp;&amp; addr.pointed.sa_family.toInt() == AF_LINK</ID>
-    <ID>ComplexCondition:KamperPanelActivity.kt$KamperPanelActivity$isLeanback &amp;&amp; event.action == KeyEvent.ACTION_DOWN &amp;&amp; (event.keyCode == KeyEvent.KEYCODE_DPAD_LEFT || event.keyCode == KeyEvent.KEYCODE_DPAD_RIGHT)</ID>
-    <ID>ConstructorParameterNaming:KamperTheme.kt$KamperColors$val BASE: Color</ID>
-    <ID>ConstructorParameterNaming:KamperTheme.kt$KamperColors$val BLUE: Color</ID>
-    <ID>ConstructorParameterNaming:KamperTheme.kt$KamperColors$val BORDER: Color</ID>
-    <ID>ConstructorParameterNaming:KamperTheme.kt$KamperColors$val GREEN: Color</ID>
-    <ID>ConstructorParameterNaming:KamperTheme.kt$KamperColors$val MAUVE: Color</ID>
-    <ID>ConstructorParameterNaming:KamperTheme.kt$KamperColors$val OVERLAY: Color</ID>
-    <ID>ConstructorParameterNaming:KamperTheme.kt$KamperColors$val PEACH: Color</ID>
-    <ID>ConstructorParameterNaming:KamperTheme.kt$KamperColors$val RED: Color</ID>
-    <ID>ConstructorParameterNaming:KamperTheme.kt$KamperColors$val SCRIM: Color</ID>
-    <ID>ConstructorParameterNaming:KamperTheme.kt$KamperColors$val SUBTEXT: Color</ID>
-    <ID>ConstructorParameterNaming:KamperTheme.kt$KamperColors$val SURFACE1: Color</ID>
-    <ID>ConstructorParameterNaming:KamperTheme.kt$KamperColors$val SURFACE: Color</ID>
-    <ID>ConstructorParameterNaming:KamperTheme.kt$KamperColors$val TEAL: Color</ID>
-    <ID>ConstructorParameterNaming:KamperTheme.kt$KamperColors$val TEXT: Color</ID>
-    <ID>ConstructorParameterNaming:KamperTheme.kt$KamperColors$val WARNING: Color</ID>
-    <ID>ConstructorParameterNaming:KamperTheme.kt$KamperColors$val YELLOW: Color</ID>
+    <ID>ComplexCondition:KonitorPanelActivity.kt$KonitorPanelActivity$isLeanback &amp;&amp; event.action == KeyEvent.ACTION_DOWN &amp;&amp; (event.keyCode == KeyEvent.KEYCODE_DPAD_LEFT || event.keyCode == KeyEvent.KEYCODE_DPAD_RIGHT)</ID>
+    <ID>ConstructorParameterNaming:KonitorTheme.kt$KonitorColors$val BASE: Color</ID>
+    <ID>ConstructorParameterNaming:KonitorTheme.kt$KonitorColors$val BLUE: Color</ID>
+    <ID>ConstructorParameterNaming:KonitorTheme.kt$KonitorColors$val BORDER: Color</ID>
+    <ID>ConstructorParameterNaming:KonitorTheme.kt$KonitorColors$val GREEN: Color</ID>
+    <ID>ConstructorParameterNaming:KonitorTheme.kt$KonitorColors$val MAUVE: Color</ID>
+    <ID>ConstructorParameterNaming:KonitorTheme.kt$KonitorColors$val OVERLAY: Color</ID>
+    <ID>ConstructorParameterNaming:KonitorTheme.kt$KonitorColors$val PEACH: Color</ID>
+    <ID>ConstructorParameterNaming:KonitorTheme.kt$KonitorColors$val RED: Color</ID>
+    <ID>ConstructorParameterNaming:KonitorTheme.kt$KonitorColors$val SCRIM: Color</ID>
+    <ID>ConstructorParameterNaming:KonitorTheme.kt$KonitorColors$val SUBTEXT: Color</ID>
+    <ID>ConstructorParameterNaming:KonitorTheme.kt$KonitorColors$val SURFACE1: Color</ID>
+    <ID>ConstructorParameterNaming:KonitorTheme.kt$KonitorColors$val SURFACE: Color</ID>
+    <ID>ConstructorParameterNaming:KonitorTheme.kt$KonitorColors$val TEAL: Color</ID>
+    <ID>ConstructorParameterNaming:KonitorTheme.kt$KonitorColors$val TEXT: Color</ID>
+    <ID>ConstructorParameterNaming:KonitorTheme.kt$KonitorColors$val WARNING: Color</ID>
+    <ID>ConstructorParameterNaming:KonitorTheme.kt$KonitorColors$val YELLOW: Color</ID>
     <ID>EmptyFunctionBlock:DroppedFramesDetector.kt$DroppedFramesDetector.&lt;no name provided&gt;${}</ID>
     <ID>EmptyFunctionBlock:SlowStartDetector.kt$SlowStartDetector.&lt;no name provided&gt;${}</ID>
-    <ID>Filename:TestListeners.kt$com.smellouk.kamper.api.TestListeners.kt</ID>
+    <ID>Filename:TestListeners.kt$com.smellouk.konitor.api.TestListeners.kt</ID>
     <ID>FunctionNaming:AndroidOverlayManagerDetachTest.kt$AndroidOverlayManagerDetachTest$@Test fun detachFromActivity_shouldNotPropagateException_whenRemoveViewThrows()</ID>
     <ID>FunctionNaming:AndroidOverlayManagerTest.kt$AndroidOverlayManagerTest$@Test fun detachFromActivity_onEmptyOverlayViews_shouldBeNoOp()</ID>
     <ID>FunctionNaming:AndroidOverlayManagerTest.kt$AndroidOverlayManagerTest$@Test fun detachFromActivity_shouldLeaveOverlayViewsEmpty_afterSuccessfulRemoval()</ID>
@@ -59,13 +59,13 @@
     <ID>FunctionNaming:FpsPerformanceTest.kt$FpsPerformanceTest$@Test fun clean_should_clean_FpsChoreographer()</ID>
     <ID>FunctionNaming:FpsPerformanceTest.kt$FpsPerformanceTest$@Test fun start_should_call_parent_start_and_FpsChoreographer_start()</ID>
     <ID>FunctionNaming:FpsPerformanceTest.kt$FpsPerformanceTest$@Test fun stop_should_call_parent_start_and_FpsChoreographer_stop()</ID>
-    <ID>FunctionNaming:KamperConfigReceiverTest.kt$KamperConfigReceiverTest$@Test fun onReceive_shouldDefaultToStart_whenEnabledExtraIsMissing()</ID>
-    <ID>FunctionNaming:KamperConfigReceiverTest.kt$KamperConfigReceiverTest$@Test fun onReceive_shouldInvokeKamperStart_whenEnabledExtraIsTrue()</ID>
-    <ID>FunctionNaming:KamperConfigReceiverTest.kt$KamperConfigReceiverTest$@Test fun onReceive_shouldInvokeKamperStop_whenEnabledExtraIsFalse()</ID>
-    <ID>FunctionNaming:KamperTest.kt$KamperTest$@Test fun clear_shouldNotThrow()</ID>
-    <ID>FunctionNaming:KamperTest.kt$KamperTest$@Test fun setup_shouldOverrideDefaultConfig()</ID>
-    <ID>FunctionNaming:KamperTest.kt$KamperTest$@Test fun start_shouldNotThrow()</ID>
-    <ID>FunctionNaming:KamperTest.kt$KamperTest$@Test fun stop_shouldNotThrow()</ID>
+    <ID>FunctionNaming:KonitorConfigReceiverTest.kt$KonitorConfigReceiverTest$@Test fun onReceive_shouldDefaultToStart_whenEnabledExtraIsMissing()</ID>
+    <ID>FunctionNaming:KonitorConfigReceiverTest.kt$KonitorConfigReceiverTest$@Test fun onReceive_shouldInvokeKonitorStart_whenEnabledExtraIsTrue()</ID>
+    <ID>FunctionNaming:KonitorConfigReceiverTest.kt$KonitorConfigReceiverTest$@Test fun onReceive_shouldInvokeKonitorStop_whenEnabledExtraIsFalse()</ID>
+    <ID>FunctionNaming:KonitorTest.kt$KonitorTest$@Test fun clear_shouldNotThrow()</ID>
+    <ID>FunctionNaming:KonitorTest.kt$KonitorTest$@Test fun setup_shouldOverrideDefaultConfig()</ID>
+    <ID>FunctionNaming:KonitorTest.kt$KonitorTest$@Test fun start_shouldNotThrow()</ID>
+    <ID>FunctionNaming:KonitorTest.kt$KonitorTest$@Test fun stop_shouldNotThrow()</ID>
     <ID>FunctionNaming:MemoryInfoRepositoryImplTest.kt$MemoryInfoRepositoryImplTest$@Test fun getInfo_should_call_MemoryInfoSource_and_MemoryInfoMapper()</ID>
     <ID>FunctionNaming:MemoryInfoSourceTest.kt$MemoryInfoSourceTest$@Test fun getMemoryInfoDto_should_return_invalid_memory_info_when_activityManager_is_null()</ID>
     <ID>FunctionNaming:MemoryInfoSourceTest.kt$MemoryInfoSourceTest$@Test fun getMemoryInfoDto_should_return_invalid_memory_info_when_and_exception_is_thrown()</ID>
@@ -87,25 +87,26 @@
     <ID>FunctionNaming:ShellCpuInfoSourceTest.kt$ShellCpuInfoSourceTest$@Test fun getCpuInfoDto_returns_correct_user_and_system_deltas_from_pid_stat()</ID>
     <ID>FunctionNaming:ShellCpuInfoSourceTest.kt$ShellCpuInfoSourceTest$@Test fun getCpuInfoDto_returns_idleTime_as_totalTime_minus_appDelta()</ID>
     <ID>FunctionNaming:ShellCpuInfoSourceTest.kt$ShellCpuInfoSourceTest$@Test fun getCpuInfoDto_returns_valid_dto_with_correct_appTime_on_second_call()</ID>
-    <ID>LongMethod:ActivityTab.kt$@Composable internal fun ActivityTab( state: StateFlow&lt;KamperUiState&gt;, settings: StateFlow&lt;KamperUiSettings&gt; )</ID>
+    <ID>LongMethod:ActivityTab.kt$@Composable internal fun ActivityTab( state: StateFlow&lt;KonitorUiState&gt;, settings: StateFlow&lt;KonitorUiSettings&gt; )</ID>
     <ID>LongMethod:AndroidOverlayManager.kt$AndroidOverlayManager$private fun attachToActivity(activity: Activity)</ID>
-    <ID>LongMethod:KamperChip.kt$@Composable internal fun KamperChip( state: KamperUiState, settings: KamperUiSettings = KamperUiSettings(), chipState: ChipState = ChipState.PEEK, onClick: () -&gt; Unit, mirrorLayout: Boolean = false, onDrag: ((dx: Float, dy: Float) -&gt; Unit)? = null, onDragEnd: (() -&gt; Unit)? = null, isTv: Boolean = false, hasTvFocus: Boolean = false )</ID>
-    <ID>LongMethod:KamperChip.kt$@Composable private fun MetricRow(icon: String, color: Color, label: String, value: String, mirror: Boolean, fontSize: androidx.compose.ui.unit.TextUnit)</ID>
-    <ID>LongMethod:KamperPanel.kt$@Composable internal fun KamperPanel( state: StateFlow&lt;KamperUiState&gt;, settings: StateFlow&lt;KamperUiSettings&gt;, isRecording: StateFlow&lt;Boolean&gt;, recordingSampleCount: StateFlow&lt;Int&gt;, maxRecordingSamples: Int, onSettingsChange: (KamperUiSettings) -&gt; Unit, onClearIssues: () -&gt; Unit, onStartRecording: () -&gt; Unit, onStopRecording: () -&gt; Unit, onExportTrace: () -&gt; Unit, onStartEngine: () -&gt; Unit, onStopEngine: () -&gt; Unit, onRestartEngine: () -&gt; Unit, onDismiss: () -&gt; Unit, // When non-negative, tab selection is driven externally (by KamperPanelActivity on TV). externalTab: Int = -1, onTabChange: ((Int) -&gt; Unit)? = null, isTv: Boolean = false )</ID>
-    <ID>LongMethod:KamperPublishPlugin.kt$KamperPublishPlugin$override fun apply(project: Project)</ID>
-    <ID>LongMethod:KamperUi.kt$KamperUi$actual fun attach()</ID>
+    <ID>LongMethod:EventsTab.kt$@Composable internal fun EventsTab( events: List&lt;EventEntry&gt;, onClear: () -&gt; Unit )</ID>
+    <ID>LongMethod:KonitorChip.kt$@Composable internal fun KonitorChip( state: KonitorUiState, settings: KonitorUiSettings = KonitorUiSettings(), chipState: ChipState = ChipState.PEEK, onClick: () -&gt; Unit, mirrorLayout: Boolean = false, onDrag: ((dx: Float, dy: Float) -&gt; Unit)? = null, onDragEnd: (() -&gt; Unit)? = null, isTv: Boolean = false, hasTvFocus: Boolean = false )</ID>
+    <ID>LongMethod:KonitorChip.kt$@Composable private fun MetricRow(icon: String, color: Color, label: String, value: String, mirror: Boolean, fontSize: androidx.compose.ui.unit.TextUnit)</ID>
+    <ID>LongMethod:KonitorPanel.kt$@Composable internal fun KonitorPanel( state: StateFlow&lt;KonitorUiState&gt;, settings: StateFlow&lt;KonitorUiSettings&gt;, isRecording: StateFlow&lt;Boolean&gt;, recordingSampleCount: StateFlow&lt;Int&gt;, maxRecordingSamples: Int, onSettingsChange: (KonitorUiSettings) -&gt; Unit, onClearIssues: () -&gt; Unit, onStartRecording: () -&gt; Unit, onStopRecording: () -&gt; Unit, onExportTrace: () -&gt; Unit, onStartEngine: () -&gt; Unit, onStopEngine: () -&gt; Unit, onRestartEngine: () -&gt; Unit, onDismiss: () -&gt; Unit, onClearEvents: () -&gt; Unit = {}, // When non-negative, tab selection is driven externally (by KonitorPanelActivity on TV). externalTab: Int = -1, onTabChange: ((Int) -&gt; Unit)? = null, isTv: Boolean = false )</ID>
+    <ID>LongMethod:KonitorPublishPlugin.kt$KonitorPublishPlugin$override fun apply(project: Project)</ID>
+    <ID>LongMethod:KonitorUi.kt$KonitorUi$actual fun attach()</ID>
     <ID>LongMethod:PanelComponents.kt$@Composable internal fun IssueDetailDialog(issue: Issue, onDismiss: () -&gt; Unit)</ID>
     <ID>LongMethod:PanelComponents.kt$@Composable internal fun MetricCard( title: String, current: String, fraction: Float, color: Color, history: List&lt;Float&gt;, extra: String?, dimmed: Boolean = false, unsupported: Boolean = false )</ID>
     <ID>LongMethod:PanelComponents.kt$@Composable internal fun RecordingBadge( isRecording: Boolean, sampleCount: Int, maxRecordingSamples: Int )</ID>
     <ID>LongMethod:PerfettoTab.kt$@Composable internal fun PerfettoTab( isRecording: Boolean, sampleCount: Int, maxRecordingSamples: Int, onStartRecording: () -&gt; Unit, onStopRecording: () -&gt; Unit, onExportTrace: () -&gt; Unit )</ID>
-    <ID>LongMethod:SettingsTab.kt$@Composable internal fun SettingsTab( s: KamperUiState, cfg: KamperUiSettings, onSettingsChange: (KamperUiSettings) -&gt; Unit, onStartEngine: () -&gt; Unit, onStopEngine: () -&gt; Unit, onRestartEngine: () -&gt; Unit, isTv: Boolean = false )</ID>
-    <ID>LongMethod:SettingsTab.kt$@Composable private fun IssuesSubConfig(cfg: KamperUiSettings, onChange: (KamperUiSettings) -&gt; Unit)</ID>
-    <ID>LongParameterList:KamperChip.kt$( state: KamperUiState, settings: KamperUiSettings = KamperUiSettings(), chipState: ChipState = ChipState.PEEK, onClick: () -&gt; Unit, mirrorLayout: Boolean = false, onDrag: ((dx: Float, dy: Float) -&gt; Unit)? = null, onDragEnd: (() -&gt; Unit)? = null, isTv: Boolean = false, hasTvFocus: Boolean = false )</ID>
-    <ID>LongParameterList:KamperChip.kt$(icon: String, color: Color, label: String, value: String, mirror: Boolean, fontSize: androidx.compose.ui.unit.TextUnit)</ID>
-    <ID>LongParameterList:KamperPanel.kt$( state: StateFlow&lt;KamperUiState&gt;, settings: StateFlow&lt;KamperUiSettings&gt;, isRecording: StateFlow&lt;Boolean&gt;, recordingSampleCount: StateFlow&lt;Int&gt;, maxRecordingSamples: Int, onSettingsChange: (KamperUiSettings) -&gt; Unit, onClearIssues: () -&gt; Unit, onStartRecording: () -&gt; Unit, onStopRecording: () -&gt; Unit, onExportTrace: () -&gt; Unit, onStartEngine: () -&gt; Unit, onStopEngine: () -&gt; Unit, onRestartEngine: () -&gt; Unit, onDismiss: () -&gt; Unit, // When non-negative, tab selection is driven externally (by KamperPanelActivity on TV). externalTab: Int = -1, onTabChange: ((Int) -&gt; Unit)? = null, isTv: Boolean = false )</ID>
+    <ID>LongMethod:SettingsTab.kt$@Composable internal fun SettingsTab( s: KonitorUiState, cfg: KonitorUiSettings, onSettingsChange: (KonitorUiSettings) -&gt; Unit, onStartEngine: () -&gt; Unit, onStopEngine: () -&gt; Unit, onRestartEngine: () -&gt; Unit, isTv: Boolean = false )</ID>
+    <ID>LongMethod:SettingsTab.kt$@Composable private fun IssuesSubConfig(cfg: KonitorUiSettings, onChange: (KonitorUiSettings) -&gt; Unit)</ID>
+    <ID>LongParameterList:KonitorChip.kt$( state: KonitorUiState, settings: KonitorUiSettings = KonitorUiSettings(), chipState: ChipState = ChipState.PEEK, onClick: () -&gt; Unit, mirrorLayout: Boolean = false, onDrag: ((dx: Float, dy: Float) -&gt; Unit)? = null, onDragEnd: (() -&gt; Unit)? = null, isTv: Boolean = false, hasTvFocus: Boolean = false )</ID>
+    <ID>LongParameterList:KonitorChip.kt$(icon: String, color: Color, label: String, value: String, mirror: Boolean, fontSize: androidx.compose.ui.unit.TextUnit)</ID>
+    <ID>LongParameterList:KonitorPanel.kt$( state: StateFlow&lt;KonitorUiState&gt;, settings: StateFlow&lt;KonitorUiSettings&gt;, isRecording: StateFlow&lt;Boolean&gt;, recordingSampleCount: StateFlow&lt;Int&gt;, maxRecordingSamples: Int, onSettingsChange: (KonitorUiSettings) -&gt; Unit, onClearIssues: () -&gt; Unit, onStartRecording: () -&gt; Unit, onStopRecording: () -&gt; Unit, onExportTrace: () -&gt; Unit, onStartEngine: () -&gt; Unit, onStopEngine: () -&gt; Unit, onRestartEngine: () -&gt; Unit, onDismiss: () -&gt; Unit, onClearEvents: () -&gt; Unit = {}, // When non-negative, tab selection is driven externally (by KonitorPanelActivity on TV). externalTab: Int = -1, onTabChange: ((Int) -&gt; Unit)? = null, isTv: Boolean = false )</ID>
     <ID>LongParameterList:PanelComponents.kt$( title: String, current: String, fraction: Float, color: Color, history: List&lt;Float&gt;, extra: String?, dimmed: Boolean = false, unsupported: Boolean = false )</ID>
     <ID>LongParameterList:PerfettoTab.kt$( isRecording: Boolean, sampleCount: Int, maxRecordingSamples: Int, onStartRecording: () -&gt; Unit, onStopRecording: () -&gt; Unit, onExportTrace: () -&gt; Unit )</ID>
-    <ID>LongParameterList:SettingsTab.kt$( s: KamperUiState, cfg: KamperUiSettings, onSettingsChange: (KamperUiSettings) -&gt; Unit, onStartEngine: () -&gt; Unit, onStopEngine: () -&gt; Unit, onRestartEngine: () -&gt; Unit, isTv: Boolean = false )</ID>
+    <ID>LongParameterList:SettingsTab.kt$( s: KonitorUiState, cfg: KonitorUiSettings, onSettingsChange: (KonitorUiSettings) -&gt; Unit, onStartEngine: () -&gt; Unit, onStopEngine: () -&gt; Unit, onRestartEngine: () -&gt; Unit, isTv: Boolean = false )</ID>
     <ID>MagicNumber:ActivityTab.kt$0.1f</ID>
     <ID>MagicNumber:ActivityTab.kt$0.2f</ID>
     <ID>MagicNumber:ActivityTab.kt$0.4f</ID>
@@ -125,6 +126,20 @@
     <ID>MagicNumber:CrashDetector.kt$CrashDetector$16</ID>
     <ID>MagicNumber:DroppedFramesDetector.kt$DroppedFramesDetector.&lt;no name provided&gt;$16</ID>
     <ID>MagicNumber:DroppedFramesDetector.kt$DroppedFramesDetector.&lt;no name provided&gt;$1_000_000L</ID>
+    <ID>MagicNumber:EventsTab.kt$10_000L</ID>
+    <ID>MagicNumber:EventsTab.kt$10f</ID>
+    <ID>MagicNumber:EventsTab.kt$1_000</ID>
+    <ID>MagicNumber:EventsTab.kt$2_000</ID>
+    <ID>MagicNumber:EventsTab.kt$30_000L</ID>
+    <ID>MagicNumber:EventsTab.kt$3f</ID>
+    <ID>MagicNumber:EventsTab.kt$4f</ID>
+    <ID>MagicNumber:EventsTab.kt$50</ID>
+    <ID>MagicNumber:EventsTab.kt$500</ID>
+    <ID>MagicNumber:EventsTab.kt$5f</ID>
+    <ID>MagicNumber:EventsTab.kt$60_000</ID>
+    <ID>MagicNumber:EventsTab.kt$EventWindow.SEC10$10_000L</ID>
+    <ID>MagicNumber:EventsTab.kt$EventWindow.SEC30$30_000L</ID>
+    <ID>MagicNumber:EventsTab.kt$EventWindow.SEC5$5_000L</ID>
     <ID>MagicNumber:FormatUtils.kt$10</ID>
     <ID>MagicNumber:FormatUtils.kt$100</ID>
     <ID>MagicNumber:IosFpsTimer.kt$IosFpsTimer$1_000_000_000L</ID>
@@ -146,48 +161,50 @@
     <ID>MagicNumber:JvmNetworkInfoSource.kt$JvmNetworkInfoSource$6</ID>
     <ID>MagicNumber:JvmNetworkInfoSource.kt$JvmNetworkInfoSource$8</ID>
     <ID>MagicNumber:JvmNetworkInfoSource.kt$JvmNetworkInfoSource$9</ID>
-    <ID>MagicNumber:KamperChip.kt$0.1f</ID>
-    <ID>MagicNumber:KamperChip.kt$0.75f</ID>
-    <ID>MagicNumber:KamperChip.kt$1024f</ID>
-    <ID>MagicNumber:KamperChip.kt$11f</ID>
-    <ID>MagicNumber:KamperPanel.kt$0.80f</ID>
-    <ID>MagicNumber:KamperPanel.kt$3</ID>
-    <ID>MagicNumber:KamperTheme.kt$KamperColors.Companion$0x33000000</ID>
-    <ID>MagicNumber:KamperTheme.kt$KamperColors.Companion$0x33FFFFFF</ID>
-    <ID>MagicNumber:KamperTheme.kt$KamperColors.Companion$0x991E1E2E</ID>
-    <ID>MagicNumber:KamperTheme.kt$KamperColors.Companion$0xE61E1E2E</ID>
-    <ID>MagicNumber:KamperTheme.kt$KamperColors.Companion$0xE6EFF1F5</ID>
-    <ID>MagicNumber:KamperTheme.kt$KamperColors.Companion$0xFF179299</ID>
-    <ID>MagicNumber:KamperTheme.kt$KamperColors.Companion$0xFF1E1E2E</ID>
-    <ID>MagicNumber:KamperTheme.kt$KamperColors.Companion$0xFF1E66F5</ID>
-    <ID>MagicNumber:KamperTheme.kt$KamperColors.Companion$0xFF313244</ID>
-    <ID>MagicNumber:KamperTheme.kt$KamperColors.Companion$0xFF40A02B</ID>
-    <ID>MagicNumber:KamperTheme.kt$KamperColors.Companion$0xFF45475A</ID>
-    <ID>MagicNumber:KamperTheme.kt$KamperColors.Companion$0xFF4C4F69</ID>
-    <ID>MagicNumber:KamperTheme.kt$KamperColors.Companion$0xFF5C5F77</ID>
-    <ID>MagicNumber:KamperTheme.kt$KamperColors.Companion$0xFF8839EF</ID>
-    <ID>MagicNumber:KamperTheme.kt$KamperColors.Companion$0xFF89B4FA</ID>
-    <ID>MagicNumber:KamperTheme.kt$KamperColors.Companion$0xFF94E2D5</ID>
-    <ID>MagicNumber:KamperTheme.kt$KamperColors.Companion$0xFFA6ADC8</ID>
-    <ID>MagicNumber:KamperTheme.kt$KamperColors.Companion$0xFFA6E3A1</ID>
-    <ID>MagicNumber:KamperTheme.kt$KamperColors.Companion$0xFFCBA6F7</ID>
-    <ID>MagicNumber:KamperTheme.kt$KamperColors.Companion$0xFFCDD6F4</ID>
-    <ID>MagicNumber:KamperTheme.kt$KamperColors.Companion$0xFFD20F39</ID>
-    <ID>MagicNumber:KamperTheme.kt$KamperColors.Companion$0xFFDCE0E8</ID>
-    <ID>MagicNumber:KamperTheme.kt$KamperColors.Companion$0xFFDF8E1D</ID>
-    <ID>MagicNumber:KamperTheme.kt$KamperColors.Companion$0xFFE6E9EF</ID>
-    <ID>MagicNumber:KamperTheme.kt$KamperColors.Companion$0xFFEFF1F5</ID>
-    <ID>MagicNumber:KamperTheme.kt$KamperColors.Companion$0xFFF38BA8</ID>
-    <ID>MagicNumber:KamperTheme.kt$KamperColors.Companion$0xFFF9E2AF</ID>
-    <ID>MagicNumber:KamperTheme.kt$KamperColors.Companion$0xFFFAB387</ID>
-    <ID>MagicNumber:KamperTheme.kt$KamperColors.Companion$0xFFFE640B</ID>
-    <ID>MagicNumber:KamperTheme.kt$KamperColors.Companion$0xFFFFA500</ID>
-    <ID>MagicNumber:KamperUi.kt$KamperUi$100</ID>
-    <ID>MagicNumber:KamperUi.kt$KamperUi$20.0</ID>
-    <ID>MagicNumber:KamperUi.kt$KamperUi$34.0</ID>
-    <ID>MagicNumber:KamperUi.kt$KamperUi$60.0</ID>
-    <ID>MagicNumber:KamperUi.kt$TvosChipViewController$1000.0</ID>
-    <ID>MagicNumber:KamperUi.kt$TvosChipViewController$500L</ID>
+    <ID>MagicNumber:KonitorChip.kt$0.1f</ID>
+    <ID>MagicNumber:KonitorChip.kt$0.75f</ID>
+    <ID>MagicNumber:KonitorChip.kt$1024f</ID>
+    <ID>MagicNumber:KonitorChip.kt$11f</ID>
+    <ID>MagicNumber:KonitorPanel.kt$0.80f</ID>
+    <ID>MagicNumber:KonitorPanel.kt$3</ID>
+    <ID>MagicNumber:KonitorPanel.kt$4</ID>
+    <ID>MagicNumber:KonitorTheme.kt$KonitorColors.Companion$0x33000000</ID>
+    <ID>MagicNumber:KonitorTheme.kt$KonitorColors.Companion$0x33FFFFFF</ID>
+    <ID>MagicNumber:KonitorTheme.kt$KonitorColors.Companion$0x991E1E2E</ID>
+    <ID>MagicNumber:KonitorTheme.kt$KonitorColors.Companion$0xE61E1E2E</ID>
+    <ID>MagicNumber:KonitorTheme.kt$KonitorColors.Companion$0xE6EFF1F5</ID>
+    <ID>MagicNumber:KonitorTheme.kt$KonitorColors.Companion$0xFF179299</ID>
+    <ID>MagicNumber:KonitorTheme.kt$KonitorColors.Companion$0xFF1E1E2E</ID>
+    <ID>MagicNumber:KonitorTheme.kt$KonitorColors.Companion$0xFF1E66F5</ID>
+    <ID>MagicNumber:KonitorTheme.kt$KonitorColors.Companion$0xFF313244</ID>
+    <ID>MagicNumber:KonitorTheme.kt$KonitorColors.Companion$0xFF40A02B</ID>
+    <ID>MagicNumber:KonitorTheme.kt$KonitorColors.Companion$0xFF45475A</ID>
+    <ID>MagicNumber:KonitorTheme.kt$KonitorColors.Companion$0xFF4C4F69</ID>
+    <ID>MagicNumber:KonitorTheme.kt$KonitorColors.Companion$0xFF5C5F77</ID>
+    <ID>MagicNumber:KonitorTheme.kt$KonitorColors.Companion$0xFF8839EF</ID>
+    <ID>MagicNumber:KonitorTheme.kt$KonitorColors.Companion$0xFF89B4FA</ID>
+    <ID>MagicNumber:KonitorTheme.kt$KonitorColors.Companion$0xFF94E2D5</ID>
+    <ID>MagicNumber:KonitorTheme.kt$KonitorColors.Companion$0xFFA6ADC8</ID>
+    <ID>MagicNumber:KonitorTheme.kt$KonitorColors.Companion$0xFFA6E3A1</ID>
+    <ID>MagicNumber:KonitorTheme.kt$KonitorColors.Companion$0xFFCBA6F7</ID>
+    <ID>MagicNumber:KonitorTheme.kt$KonitorColors.Companion$0xFFCDD6F4</ID>
+    <ID>MagicNumber:KonitorTheme.kt$KonitorColors.Companion$0xFFD20F39</ID>
+    <ID>MagicNumber:KonitorTheme.kt$KonitorColors.Companion$0xFFDCE0E8</ID>
+    <ID>MagicNumber:KonitorTheme.kt$KonitorColors.Companion$0xFFDF8E1D</ID>
+    <ID>MagicNumber:KonitorTheme.kt$KonitorColors.Companion$0xFFE6E9EF</ID>
+    <ID>MagicNumber:KonitorTheme.kt$KonitorColors.Companion$0xFFEFF1F5</ID>
+    <ID>MagicNumber:KonitorTheme.kt$KonitorColors.Companion$0xFFF38BA8</ID>
+    <ID>MagicNumber:KonitorTheme.kt$KonitorColors.Companion$0xFFF9E2AF</ID>
+    <ID>MagicNumber:KonitorTheme.kt$KonitorColors.Companion$0xFFFAB387</ID>
+    <ID>MagicNumber:KonitorTheme.kt$KonitorColors.Companion$0xFFFE640B</ID>
+    <ID>MagicNumber:KonitorTheme.kt$KonitorColors.Companion$0xFFFFA500</ID>
+    <ID>MagicNumber:KonitorUi.kt$KonitorUi$100</ID>
+    <ID>MagicNumber:KonitorUi.kt$KonitorUi$34.0</ID>
+    <ID>MagicNumber:KonitorUi.kt$KonitorUi$60.0</ID>
+    <ID>MagicNumber:KonitorUi.kt$TvosChipViewController$1000.0</ID>
+    <ID>MagicNumber:KonitorUi.kt$TvosChipViewController$500L</ID>
+    <ID>MagicNumber:KonitorUiRepository.kt$KonitorUiRepository$1000</ID>
+    <ID>MagicNumber:KonitorUiRepository.kt$KonitorUiRepository$978_307_200.0</ID>
     <ID>MagicNumber:MacosCpuInfoSource.kt$MacosCpuInfoSource$100.0</ID>
     <ID>MagicNumber:MacosFpsTimer.kt$MacosFpsTimer$1_000_000_000L</ID>
     <ID>MagicNumber:MacosNetworkInfoSource.kt$MacosNetworkInfoSource$3</ID>
@@ -268,36 +285,37 @@
     <ID>MagicNumber:StrictModeDetector.kt$StrictModeDetector$16</ID>
     <ID>MagicNumber:ThermalInfoRepositoryImpl.kt$ThermalInfoRepositoryImpl$10.0</ID>
     <ID>MatchingDeclarationName:TestListeners.kt$MockableListener&lt;I : Info&gt; : </ID>
-    <ID>MaxLineLength:CpuInfoRepositoryImpl.kt$CpuInfoRepositoryImpl$Log.d("Kamper/CPU", "platformSupported=false (both sources unavailable) — returning CpuInfo.UNSUPPORTED")</ID>
-    <ID>MaxLineLength:CpuInfoRepositoryImpl.kt$ProcStatAccessibilityProvider$if (BuildConfig.DEBUG) Log.d("Kamper/CPU", "/proc/stat accessible=false ${e.javaClass.simpleName}: ${e.message}")</ID>
+    <ID>MaxLineLength:CpuInfoRepositoryImpl.kt$CpuInfoRepositoryImpl$Log.d("Konitor/CPU", "platformSupported=false (both sources unavailable) — returning CpuInfo.UNSUPPORTED")</ID>
+    <ID>MaxLineLength:CpuInfoRepositoryImpl.kt$ProcStatAccessibilityProvider$if (BuildConfig.DEBUG) Log.d("Konitor/CPU", "/proc/stat accessible=false ${e.javaClass.simpleName}: ${e.message}")</ID>
+    <ID>MaxLineLength:EventsTab.kt$Text(entry.name, color = KonitorTheme.TEXT, fontSize = 12.sp, fontFamily = FontFamily.Monospace, fontWeight = FontWeight.SemiBold)</ID>
     <ID>MaxLineLength:IssueSerializer.kt$.</ID>
     <ID>MaxLineLength:IssuesConfig.kt$CrashConfig.Builder$fun build()</ID>
     <ID>MaxLineLength:IssuesConfig.kt$MemoryPressureConfig.Builder$fun build()</ID>
     <ID>MaxLineLength:IssuesConfig.kt$SlowSpanConfig.Builder$fun build()</ID>
     <ID>MaxLineLength:IssuesConfig.kt$SlowStartConfig.Builder$fun build()</ID>
     <ID>MaxLineLength:JsNetworkInfoSource.kt$JsNetworkInfoSource$val uplinkMbps: Double = js("navigator.connection &amp;&amp; navigator.connection.uplink ? +navigator.connection.uplink : 0")</ID>
-    <ID>MaxLineLength:KamperChip.kt$MetricRow(ChipIcons.gc, KamperTheme.YELLOW, "GC", "+${state.gcCountDelta}", mirrorLayout, fontSize)</ID>
-    <ID>MaxLineLength:KamperChip.kt$MetricRow(ChipIcons.jank, KamperTheme.MAUVE, "JANK", "${state.jankDroppedFrames} fr", mirrorLayout, fontSize)</ID>
-    <ID>MaxLineLength:KamperChip.kt$MetricRow(ChipIcons.thermal, KamperTheme.PEACH, "THRM", state.thermalState.name, mirrorLayout, fontSize)</ID>
-    <ID>MaxLineLength:KamperChip.kt$Text(ChipIcons.issues, color = color, fontSize = fontSize, fontWeight = FontWeight.Bold, modifier = Modifier.width(14.dp))</ID>
-    <ID>MaxLineLength:KamperChip.kt$if (showCpu) MetricRow(ChipIcons.cpu, KamperTheme.BLUE, "CPU", "${state.cpuPercent.formatDp(1)}%", mirrorLayout, fontSize)</ID>
-    <ID>MaxLineLength:KamperChip.kt$if (settings.fpsEnabled &amp;&amp; settings.showFps) MetricRow(ChipIcons.fps, KamperTheme.GREEN, "FPS", "${state.fps} fps", mirrorLayout, fontSize)</ID>
-    <ID>MaxLineLength:KamperChip.kt$if (settings.memoryEnabled &amp;&amp; settings.showMemory) MetricRow(ChipIcons.mem, KamperTheme.PEACH, "MEM", "${state.memoryUsedMb.formatDp(0)} MB", mirrorLayout, fontSize)</ID>
-    <ID>MaxLineLength:KamperChip.kt$private</ID>
-    <ID>MaxLineLength:KamperChip.kt$private val CHIP_SHAPE_LEFT = RoundedCornerShape(topStart = 0.dp, bottomStart = 0.dp, topEnd = 10.dp, bottomEnd = 10.dp)</ID>
-    <ID>MaxLineLength:KamperChip.kt$private val CHIP_SHAPE_RIGHT = RoundedCornerShape(topStart = 10.dp, bottomStart = 10.dp, topEnd = 0.dp, bottomEnd = 0.dp)</ID>
-    <ID>MaxLineLength:KamperUi.kt$ChipTouchView$if</ID>
-    <ID>MaxLineLength:KamperUi.kt$KamperUi$overlayManager = AndroidOverlayManager(app, repo.state, repo.settings, config, repo::clearIssues).also { it.show() }</ID>
-    <ID>MaxLineLength:KamperUiInitProvider.kt$KamperUiInitProvider$override fun query(uri: Uri, projection: Array&lt;out String&gt;?, selection: String?, selectionArgs: Array&lt;out String&gt;?, sortOrder: String?): Cursor?</ID>
-    <ID>MaxLineLength:KamperUiInitProvider.kt$KamperUiInitProvider$override fun update(uri: Uri, values: ContentValues?, selection: String?, selectionArgs: Array&lt;out String&gt;?): Int</ID>
+    <ID>MaxLineLength:KonitorChip.kt$MetricRow(ChipIcons.jank, KonitorTheme.MAUVE, "JANK", "${state.jankDroppedFrames} fr", mirrorLayout, fontSize)</ID>
+    <ID>MaxLineLength:KonitorChip.kt$MetricRow(ChipIcons.thermal, KonitorTheme.PEACH, "THRM", state.thermalState.name, mirrorLayout, fontSize)</ID>
+    <ID>MaxLineLength:KonitorChip.kt$Text(ChipIcons.issues, color = color, fontSize = fontSize, fontWeight = FontWeight.Bold, modifier = Modifier.width(14.dp))</ID>
+    <ID>MaxLineLength:KonitorChip.kt$if (settings.fpsEnabled &amp;&amp; settings.showFps) MetricRow(ChipIcons.fps, KonitorTheme.GREEN, "FPS", "${state.fps} fps", mirrorLayout, fontSize)</ID>
+    <ID>MaxLineLength:KonitorChip.kt$if (settings.memoryEnabled &amp;&amp; settings.showMemory) MetricRow(ChipIcons.mem, KonitorTheme.PEACH, "MEM", "${state.memoryUsedMb.formatDp(0)} MB", mirrorLayout, fontSize)</ID>
+    <ID>MaxLineLength:KonitorChip.kt$if (showCpu) MetricRow(ChipIcons.cpu, KonitorTheme.BLUE, "CPU", "${state.cpuPercent.formatDp(1)}%", mirrorLayout, fontSize)</ID>
+    <ID>MaxLineLength:KonitorChip.kt$private</ID>
+    <ID>MaxLineLength:KonitorChip.kt$private val CHIP_SHAPE_LEFT = RoundedCornerShape(topStart = 0.dp, bottomStart = 0.dp, topEnd = 10.dp, bottomEnd = 10.dp)</ID>
+    <ID>MaxLineLength:KonitorChip.kt$private val CHIP_SHAPE_RIGHT = RoundedCornerShape(topStart = 10.dp, bottomStart = 10.dp, topEnd = 0.dp, bottomEnd = 0.dp)</ID>
+    <ID>MaxLineLength:KonitorUi.kt$ChipTouchView$if</ID>
+    <ID>MaxLineLength:KonitorUi.kt$KonitorUi$overlayManager = AndroidOverlayManager(app, repo.state, repo.settings, config, repo::clearIssues).also { it.show() }</ID>
+    <ID>MaxLineLength:KonitorUiInitProvider.kt$KonitorUiInitProvider$override fun query(uri: Uri, projection: Array&lt;out String&gt;?, selection: String?, selectionArgs: Array&lt;out String&gt;?, sortOrder: String?): Cursor?</ID>
+    <ID>MaxLineLength:KonitorUiInitProvider.kt$KonitorUiInitProvider$override fun update(uri: Uri, values: ContentValues?, selection: String?, selectionArgs: Array&lt;out String&gt;?): Int</ID>
     <ID>MaxLineLength:MemoryPressureDetector.kt$MemoryPressureDetector$message = "Heap at ${(heapRatio * 100).toInt()}% of max (threshold: ${(threshold * 100).toInt()}%)"</ID>
     <ID>MaxLineLength:PanelComponents.kt$.</ID>
-    <ID>MaxLineLength:PerfettoTab.kt$Text("Open in Perfetto UI", color = KamperTheme.TEXT, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)</ID>
-    <ID>MaxLineLength:ProcCpuInfoSource.kt$ProcCpuInfoSource$Log.d("Kamper/CPU/Proc", "parsed current=$currentCpuInfoDto cached=${if (this::cachedDto.isInitialized) cachedDto else null}")</ID>
-    <ID>MaxLineLength:ProcCpuInfoSource.kt$ProcCpuInfoSource$catch (e: Exception) { Log.e("Kamper/CPU/Proc", "/proc/$pid/stat read failed: ${e.javaClass.simpleName}: ${e.message}"); return CpuInfoDto.INVALID }</ID>
-    <ID>MaxLineLength:ProcCpuInfoSource.kt$ProcCpuInfoSource$catch (e: Exception) { Log.e("Kamper/CPU/Proc", "/proc/stat read failed: ${e.javaClass.simpleName}: ${e.message}"); return CpuInfoDto.INVALID }</ID>
+    <ID>MaxLineLength:PerfettoTab.kt$Text("Open in Perfetto UI", color = KonitorTheme.TEXT, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)</ID>
+    <ID>MaxLineLength:ProcCpuInfoSource.kt$ProcCpuInfoSource$Log.d("Konitor/CPU/Proc", "parsed current=$currentCpuInfoDto cached=${if (this::cachedDto.isInitialized) cachedDto else null}")</ID>
+    <ID>MaxLineLength:ProcCpuInfoSource.kt$ProcCpuInfoSource$catch (e: Exception) { Log.e("Konitor/CPU/Proc", "/proc/$pid/stat read failed: ${e.javaClass.simpleName}: ${e.message}"); return CpuInfoDto.INVALID }</ID>
+    <ID>MaxLineLength:ProcCpuInfoSource.kt$ProcCpuInfoSource$catch (e: Exception) { Log.e("Konitor/CPU/Proc", "/proc/stat read failed: ${e.javaClass.simpleName}: ${e.message}"); return CpuInfoDto.INVALID }</ID>
     <ID>MaxLineLength:ProcCpuInfoSource.kt$ProcCpuInfoSource$val</ID>
-    <ID>MaxLineLength:SentryIntegrationModule.kt$SentryIntegrationModule$"fps" -&gt; if (config.forwardFps) handleBreadcrumb(event, category = "kamper.fps", level = SentryLevel.INFO)</ID>
+    <ID>MaxLineLength:SentryIntegrationModule.kt$SentryIntegrationModule$"fps" -&gt; if (config.forwardFps) handleBreadcrumb(event, category = "konitor.fps", level = SentryLevel.INFO)</ID>
+    <ID>MaxLineLength:SentryIntegrationModule.kt$SentryIntegrationModule$"memory" -&gt; handleMemoryMetric(event, threshold = config.forwardMemoryAbove, category = "konitor.memory")</ID>
     <ID>MaxLineLength:ShellCpuInfoSource.kt$ShellCpuInfoSource$Log.d(TAG, "userDelta=$userDelta sysDelta=$sysDelta appDelta=$appDelta totalTicks=$totalTicks elapsedMs=$elapsedMs numCores=$numCores")</ID>
     <ID>MaxLineLength:SlowStartDetector.kt$SlowStartDetector$message = "${type.name.replace("_", " ").lowercase().replaceFirstChar { it.uppercase() }} took ${elapsed}ms (threshold: ${threshold}ms)"</ID>
     <ID>MayBeConst:FirebaseConfig.kt$FirebaseConfig.Companion$public val DEFAULT_FORWARD_ISSUES: Boolean = false</ID>
@@ -305,7 +323,6 @@
     <ID>MayBeConst:SentryConfig.kt$SentryConfig.Companion$public val DEFAULT_FORWARD_FPS: Boolean = false</ID>
     <ID>MayBeConst:SentryConfig.kt$SentryConfig.Companion$public val DEFAULT_FORWARD_ISSUES: Boolean = false</ID>
     <ID>MultiLineIfElse:ActivityTab.kt$null</ID>
-    <ID>MultiLineIfElse:IosCpuInfoSource.kt$IosCpuInfoSource$CpuInfoDto( totalTime = total, userTime = dUser + dNice, systemTime = dSystem, idleTime = dIdle, ioWaitTime = 0.0, appTime = 0.0 )</ID>
     <ID>MultiLineIfElse:IosCpuInfoSource.kt$IosCpuInfoSource$CpuInfoDto.INVALID</ID>
     <ID>MultiLineIfElse:IosMemoryInfoSource.kt$IosMemoryInfoSource$0L</ID>
     <ID>MultiLineIfElse:IssueSerializer.kt$append('%').append(code.toString(16).padStart(2, '0').uppercase())</ID>
@@ -314,19 +331,19 @@
     <ID>MultiLineIfElse:IssueSerializer.kt$p[8].split('\u001E').filter { '=' in it } .associate { e -&gt; e.substringBefore('=').pctDecode() to e.substringAfter('=').pctDecode() }</ID>
     <ID>MultiLineIfElse:IssueSpans.kt$IssueSpans$object : ActiveSpan { override fun end() = spans.forEach { it.end() } }</ID>
     <ID>MultiLineIfElse:IssueSpans.kt$IssueSpans$spans[0]</ID>
-    <ID>MultiLineIfElse:KamperChip.kt$MetricRow(ChipIcons.gc, KamperTheme.YELLOW, "GC", "+${state.gcCountDelta}", mirrorLayout, fontSize)</ID>
-    <ID>MultiLineIfElse:KamperChip.kt$MetricRow(ChipIcons.jank, KamperTheme.MAUVE, "JANK", "${state.jankDroppedFrames} fr", mirrorLayout, fontSize)</ID>
-    <ID>MultiLineIfElse:KamperChip.kt$MetricRow(ChipIcons.thermal, KamperTheme.PEACH, "THRM", state.thermalState.name, mirrorLayout, fontSize)</ID>
-    <ID>MultiLineIfElse:KamperChip.kt$Modifier</ID>
-    <ID>MultiLineIfElse:KamperUi.kt$KamperUi$defaults.boolForKey(PREF_ON_RIGHT)</ID>
-    <ID>MultiLineIfElse:KamperUi.kt$KamperUi$true</ID>
-    <ID>MultiLineIfElse:PanelComponents.kt$KamperTheme.SURFACE.copy(alpha = 0.6f)</ID>
+    <ID>MultiLineIfElse:KonitorChip.kt$MetricRow(ChipIcons.gc, KonitorTheme.YELLOW, "GC", "+${state.gcCountDelta}", mirrorLayout, fontSize)</ID>
+    <ID>MultiLineIfElse:KonitorChip.kt$MetricRow(ChipIcons.jank, KonitorTheme.MAUVE, "JANK", "${state.jankDroppedFrames} fr", mirrorLayout, fontSize)</ID>
+    <ID>MultiLineIfElse:KonitorChip.kt$MetricRow(ChipIcons.thermal, KonitorTheme.PEACH, "THRM", state.thermalState.name, mirrorLayout, fontSize)</ID>
+    <ID>MultiLineIfElse:KonitorChip.kt$Modifier</ID>
+    <ID>MultiLineIfElse:KonitorUi.kt$KonitorUi$defaults.boolForKey(PREF_ON_RIGHT)</ID>
+    <ID>MultiLineIfElse:KonitorUi.kt$KonitorUi$true</ID>
+    <ID>MultiLineIfElse:PanelComponents.kt$KonitorTheme.SURFACE.copy(alpha = 0.6f)</ID>
     <ID>MultiLineIfElse:PanelComponents.kt$badgeColor.copy(alpha = 0.15f)</ID>
     <ID>MultiLineIfElse:PerfettoTab.kt$"Export .perfetto-trace ($sampleCount samples)"</ID>
     <ID>MultiLineIfElse:PerfettoTab.kt$"Export .perfetto-trace"</ID>
-    <ID>MultiLineIfElse:PerfettoTab.kt$Column( modifier = Modifier .fillMaxWidth() .clip(RoundedCornerShape(8.dp)) .background(KamperTheme.BASE) .border(0.5.dp, KamperTheme.BORDER, RoundedCornerShape(8.dp)) .padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp) ) { Row(verticalAlignment = Alignment.CenterVertically) { StepBadge("3") Spacer(Modifier.width(8.dp)) Text("Open in Perfetto UI", color = KamperTheme.TEXT, fontSize = 12.sp, fontWeight = FontWeight.SemiBold) } Text(URL_UI, color = KamperTheme.TEAL, fontSize = 11.sp, fontFamily = FontFamily.Monospace) }</ID>
-    <ID>MultiLineIfElse:PerfettoTab.kt$Text( "MANUAL (ADB)", color = KamperTheme.SUBTEXT, fontSize = 10.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(top = 4.dp) )</ID>
-    <ID>MultiLineIfElse:PerfettoTab.kt$Text( "Run a system-level trace directly from your machine while the app is running.", color = KamperTheme.SUBTEXT, fontSize = 11.sp, lineHeight = 16.sp )</ID>
+    <ID>MultiLineIfElse:PerfettoTab.kt$Column( modifier = Modifier .fillMaxWidth() .clip(RoundedCornerShape(8.dp)) .background(KonitorTheme.BASE) .border(0.5.dp, KonitorTheme.BORDER, RoundedCornerShape(8.dp)) .padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp) ) { Row(verticalAlignment = Alignment.CenterVertically) { StepBadge("3") Spacer(Modifier.width(8.dp)) Text("Open in Perfetto UI", color = KonitorTheme.TEXT, fontSize = 12.sp, fontWeight = FontWeight.SemiBold) } Text(URL_UI, color = KonitorTheme.TEAL, fontSize = 11.sp, fontFamily = FontFamily.Monospace) }</ID>
+    <ID>MultiLineIfElse:PerfettoTab.kt$Text( "MANUAL (ADB)", color = KonitorTheme.SUBTEXT, fontSize = 10.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(top = 4.dp) )</ID>
+    <ID>MultiLineIfElse:PerfettoTab.kt$Text( "Run a system-level trace directly from your machine while the app is running.", color = KonitorTheme.SUBTEXT, fontSize = 11.sp, lineHeight = 16.sp )</ID>
     <ID>NoConsecutiveBlankLines:RecordingManagerTest.kt$ </ID>
     <ID>NoMultipleSpaces:ActivityTab.kt$ </ID>
     <ID>NoMultipleSpaces:AndroidOverlayManager.kt$AndroidOverlayManager$ </ID>
@@ -334,19 +351,20 @@
     <ID>NoMultipleSpaces:AndroidOverlayManager.kt$LeanbackComposeView$ </ID>
     <ID>NoMultipleSpaces:Engine.kt$Engine$ </ID>
     <ID>NoMultipleSpaces:EngineIntegrationTest.kt$EngineIntegrationTest$ </ID>
+    <ID>NoMultipleSpaces:EventsTab.kt$ </ID>
     <ID>NoMultipleSpaces:IssueSerializer.kt$ </ID>
     <ID>NoMultipleSpaces:IssuesTab.kt$ </ID>
-    <ID>NoMultipleSpaces:KamperChip.kt$ </ID>
-    <ID>NoMultipleSpaces:KamperConfigReceiverTest.kt$KamperConfigReceiverTest$ </ID>
-    <ID>NoMultipleSpaces:KamperPanel.kt$ </ID>
-    <ID>NoMultipleSpaces:KamperPanelActivity.kt$KamperPanelActivity$ </ID>
-    <ID>NoMultipleSpaces:KamperPanelTest.kt$KamperPanelTest$ </ID>
-    <ID>NoMultipleSpaces:KamperPublishPlugin.kt$KamperPublishPlugin$ </ID>
-    <ID>NoMultipleSpaces:KamperTheme.kt$KamperColors.Companion$ </ID>
-    <ID>NoMultipleSpaces:KamperTheme.kt$KamperTheme$ </ID>
-    <ID>NoMultipleSpaces:KamperUi.kt$KamperUi$ </ID>
-    <ID>NoMultipleSpaces:KamperUi.kt$TvosChipViewController$ </ID>
-    <ID>NoMultipleSpaces:KamperUiRepository.kt$KamperUiRepository$ </ID>
+    <ID>NoMultipleSpaces:KonitorChip.kt$ </ID>
+    <ID>NoMultipleSpaces:KonitorConfigReceiverTest.kt$KonitorConfigReceiverTest$ </ID>
+    <ID>NoMultipleSpaces:KonitorPanel.kt$ </ID>
+    <ID>NoMultipleSpaces:KonitorPanelActivity.kt$KonitorPanelActivity$ </ID>
+    <ID>NoMultipleSpaces:KonitorPanelTest.kt$KonitorPanelTest$ </ID>
+    <ID>NoMultipleSpaces:KonitorPublishPlugin.kt$KonitorPublishPlugin$ </ID>
+    <ID>NoMultipleSpaces:KonitorTheme.kt$KonitorColors.Companion$ </ID>
+    <ID>NoMultipleSpaces:KonitorTheme.kt$KonitorTheme$ </ID>
+    <ID>NoMultipleSpaces:KonitorUi.kt$KonitorUi$ </ID>
+    <ID>NoMultipleSpaces:KonitorUi.kt$TvosChipViewController$ </ID>
+    <ID>NoMultipleSpaces:KonitorUiRepository.kt$KonitorUiRepository$ </ID>
     <ID>NoMultipleSpaces:ModuleLifecycleManager.kt$ModuleLifecycleManager$ </ID>
     <ID>NoMultipleSpaces:ModuleLifecycleManager.kt$ModuleLifecycleManager.&lt;no name provided&gt;$ </ID>
     <ID>NoMultipleSpaces:OtelIntegrationModule.kt$OtelIntegrationModule$ </ID>
@@ -359,27 +377,27 @@
     <ID>NoMultipleSpaces:SettingsRepository.kt$SettingsRepository$ </ID>
     <ID>NoMultipleSpaces:ShellCpuInfoSourceTest.kt$ShellCpuInfoSourceTest$ </ID>
     <ID>NoMultipleSpaces:ThermalInfoRepositoryImpl.kt$ThermalInfoRepositoryImpl$ </ID>
-    <ID>NoUnusedImports:AndroidOverlayManager.kt$com.smellouk.kamper.ui.AndroidOverlayManager.kt</ID>
-    <ID>NoUnusedImports:CpuInfoMapperTest.kt$com.smellouk.kamper.cpu.repository.CpuInfoMapperTest.kt</ID>
-    <ID>NoUnusedImports:EngineIntegrationTest.kt$com.smellouk.kamper.EngineIntegrationTest.kt</ID>
-    <ID>NoUnusedImports:JankPerformance.kt$com.smellouk.kamper.jank.JankPerformance.kt</ID>
-    <ID>NoUnusedImports:KamperUi.kt$com.smellouk.kamper.ui.KamperUi.kt</ID>
-    <ID>NoUnusedImports:Module.kt$com.smellouk.kamper.cpu.Module.kt</ID>
-    <ID>NoUnusedImports:Module.kt$com.smellouk.kamper.firebase.Module.kt</ID>
-    <ID>NoUnusedImports:Module.kt$com.smellouk.kamper.fps.Module.kt</ID>
-    <ID>NoUnusedImports:Module.kt$com.smellouk.kamper.issues.Module.kt</ID>
-    <ID>NoUnusedImports:Module.kt$com.smellouk.kamper.jank.Module.kt</ID>
-    <ID>NoUnusedImports:Module.kt$com.smellouk.kamper.memory.Module.kt</ID>
-    <ID>NoUnusedImports:Module.kt$com.smellouk.kamper.network.Module.kt</ID>
-    <ID>NoUnusedImports:Module.kt$com.smellouk.kamper.opentelemetry.Module.kt</ID>
-    <ID>NoUnusedImports:Module.kt$com.smellouk.kamper.sentry.Module.kt</ID>
-    <ID>NoUnusedImports:Module.kt$com.smellouk.kamper.thermal.Module.kt</ID>
-    <ID>NoUnusedImports:PanelComponents.kt$com.smellouk.kamper.ui.compose.PanelComponents.kt</ID>
-    <ID>NoUnusedImports:PerfettoTab.kt$com.smellouk.kamper.ui.compose.PerfettoTab.kt</ID>
-    <ID>ParameterListWrapping:KamperChip.kt$(icon: String, color: Color, label: String, value: String, mirror: Boolean, fontSize: androidx.compose.ui.unit.TextUnit)</ID>
-    <ID>ParameterListWrapping:KamperUiInitProvider.kt$KamperUiInitProvider$(uri: Uri, values: ContentValues?, selection: String?, selectionArgs: Array&lt;out String&gt;?)</ID>
+    <ID>NoUnusedImports:AndroidOverlayManager.kt$com.smellouk.konitor.ui.AndroidOverlayManager.kt</ID>
+    <ID>NoUnusedImports:CpuInfoMapperTest.kt$com.smellouk.konitor.cpu.repository.CpuInfoMapperTest.kt</ID>
+    <ID>NoUnusedImports:EngineIntegrationTest.kt$com.smellouk.konitor.EngineIntegrationTest.kt</ID>
+    <ID>NoUnusedImports:JankPerformance.kt$com.smellouk.konitor.jank.JankPerformance.kt</ID>
+    <ID>NoUnusedImports:KonitorUi.kt$com.smellouk.konitor.ui.KonitorUi.kt</ID>
+    <ID>NoUnusedImports:Module.kt$com.smellouk.konitor.cpu.Module.kt</ID>
+    <ID>NoUnusedImports:Module.kt$com.smellouk.konitor.firebase.Module.kt</ID>
+    <ID>NoUnusedImports:Module.kt$com.smellouk.konitor.fps.Module.kt</ID>
+    <ID>NoUnusedImports:Module.kt$com.smellouk.konitor.issues.Module.kt</ID>
+    <ID>NoUnusedImports:Module.kt$com.smellouk.konitor.jank.Module.kt</ID>
+    <ID>NoUnusedImports:Module.kt$com.smellouk.konitor.memory.Module.kt</ID>
+    <ID>NoUnusedImports:Module.kt$com.smellouk.konitor.network.Module.kt</ID>
+    <ID>NoUnusedImports:Module.kt$com.smellouk.konitor.opentelemetry.Module.kt</ID>
+    <ID>NoUnusedImports:Module.kt$com.smellouk.konitor.sentry.Module.kt</ID>
+    <ID>NoUnusedImports:Module.kt$com.smellouk.konitor.thermal.Module.kt</ID>
+    <ID>NoUnusedImports:PanelComponents.kt$com.smellouk.konitor.ui.compose.PanelComponents.kt</ID>
+    <ID>NoUnusedImports:PerfettoTab.kt$com.smellouk.konitor.ui.compose.PerfettoTab.kt</ID>
+    <ID>ParameterListWrapping:KonitorChip.kt$(icon: String, color: Color, label: String, value: String, mirror: Boolean, fontSize: androidx.compose.ui.unit.TextUnit)</ID>
+    <ID>ParameterListWrapping:KonitorUiInitProvider.kt$KonitorUiInitProvider$(uri: Uri, values: ContentValues?, selection: String?, selectionArgs: Array&lt;out String&gt;?)</ID>
     <ID>ParameterListWrapping:ProcCpuInfoSource.kt$ProcCpuInfoSource$(e: Exception)</ID>
-    <ID>ReturnCount:OtelIntegrationModule.kt$OtelIntegrationModule$override fun onEvent(event: KamperEvent)</ID>
+    <ID>ReturnCount:OtelIntegrationModule.kt$OtelIntegrationModule$override fun onEvent(event: KonitorEvent)</ID>
     <ID>ReturnCount:ShellCpuInfoSource.kt$ShellCpuInfoSource$override fun getCpuInfoDto(): CpuInfoDto</ID>
     <ID>SpacingAroundKeyword:AndroidOverlayManager.kt$AndroidOverlayManager.&lt;no name provided&gt;$catch</ID>
     <ID>SpacingAroundKeyword:ProcCpuInfoSource.kt$ProcCpuInfoSource$catch</ID>
@@ -393,8 +411,8 @@
     <ID>SwallowedException:SentryIntegrationModule.kt$SentryIntegrationModule$t: Throwable</ID>
     <ID>TooManyFunctions:AndroidOverlayManager.kt$AndroidOverlayManager</ID>
     <ID>TooManyFunctions:Engine.kt$Engine</ID>
-    <ID>TooManyFunctions:KamperUiRepository.kt$KamperUiRepository</ID>
-    <ID>TooManyFunctions:PanelComponents.kt$com.smellouk.kamper.ui.compose.PanelComponents.kt</ID>
+    <ID>TooManyFunctions:KonitorUiRepository.kt$KonitorUiRepository</ID>
+    <ID>TooManyFunctions:PanelComponents.kt$com.smellouk.konitor.ui.compose.PanelComponents.kt</ID>
     <ID>TooManyFunctions:RecordingManagerTest.kt$RecordingManagerTest</ID>
   </CurrentIssues>
 </SmellBaseline>

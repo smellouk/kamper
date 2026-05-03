@@ -1,10 +1,10 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 
-// kamper.android.config (from build-logic) sets compileSdk=35, minSdk=21, Java 17.
+// konitor.android.config (from build-logic) sets compileSdk=35, minSdk=21, Java 17.
 // Available in the monorepo build context; absent in the demo autolink context — skipped safely.
 try {
-    apply plugin: 'kamper.android.config'
+    apply plugin: 'konitor.android.config'
 } catch (org.gradle.api.plugins.UnknownPluginException ignored) { }
 
 // com.facebook.react configures codegen and build-config fields for RN turbo modules.
@@ -14,11 +14,11 @@ try {
 } catch (org.gradle.api.plugins.UnknownPluginException ignored) { }
 
 android {
-    namespace 'com.smellouk.kamper.rn'
-    // Explicit compileSdk: ensures it is always set even when kamper.android.config is absent.
+    namespace 'com.smellouk.konitor.rn'
+    // Explicit compileSdk: ensures it is always set even when konitor.android.config is absent.
     compileSdk = 35
     defaultConfig {
-        // minSdk 24: RN 0.85 minimum; overrides the kamper.android.config default of 21.
+        // minSdk 24: RN 0.85 minimum; overrides the konitor.android.config default of 21.
         minSdk 24
     }
 
@@ -66,17 +66,17 @@ dependencies {
     } else {
         // Version string is a placeholder; composite-build substitution ignores the version.
         def v = "local"
-        implementation "com.smellouk.kamper:engine:$v"
-        implementation "com.smellouk.kamper:cpu-module:$v"
-        implementation "com.smellouk.kamper:fps-module:$v"
-        implementation "com.smellouk.kamper:memory-module:$v"
-        implementation "com.smellouk.kamper:network-module:$v"
-        implementation "com.smellouk.kamper:issues-module:$v"
-        implementation "com.smellouk.kamper:jank-module:$v"
-        implementation "com.smellouk.kamper:gc-module:$v"
-        implementation "com.smellouk.kamper:thermal-module:$v"
-        implementation "com.smellouk.kamper:gpu-module:$v"
-        implementation "com.smellouk.kamper:rn:$v"
-        debugImplementation "com.smellouk.kamper:kmm:$v"
+        implementation "com.smellouk.konitor:engine:$v"
+        implementation "com.smellouk.konitor:cpu-module:$v"
+        implementation "com.smellouk.konitor:fps-module:$v"
+        implementation "com.smellouk.konitor:memory-module:$v"
+        implementation "com.smellouk.konitor:network-module:$v"
+        implementation "com.smellouk.konitor:issues-module:$v"
+        implementation "com.smellouk.konitor:jank-module:$v"
+        implementation "com.smellouk.konitor:gc-module:$v"
+        implementation "com.smellouk.konitor:thermal-module:$v"
+        implementation "com.smellouk.konitor:gpu-module:$v"
+        implementation "com.smellouk.konitor:rn:$v"
+        debugImplementation "com.smellouk.konitor:kmm:$v"
     }
 }

@@ -1,8 +1,8 @@
 // src/hooks/useGc.ts — single-metric hook (D-07).
 
 import { useEffect, useState } from 'react';
-import { Kamper } from '../Kamper';
-import { _acquireEngine, _releaseEngine } from './useKamper';
+import { Konitor } from '../Konitor';
+import { _acquireEngine, _releaseEngine } from './useKonitor';
 import type { GcInfo } from '../types';
 
 /**
@@ -14,7 +14,7 @@ export function useGc(): GcInfo | null {
 
   useEffect(() => {
     _acquireEngine({ gc: true });
-    const sub = Kamper.on('gc', (d: GcInfo) => {
+    const sub = Konitor.on('gc', (d: GcInfo) => {
       setData(d);
     });
     return () => {

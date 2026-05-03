@@ -1,8 +1,8 @@
 // src/hooks/useFps.ts — single-metric hook (D-07).
 
 import { useEffect, useState } from 'react';
-import { Kamper } from '../Kamper';
-import { _acquireEngine, _releaseEngine } from './useKamper';
+import { Konitor } from '../Konitor';
+import { _acquireEngine, _releaseEngine } from './useKonitor';
 import type { FpsInfo } from '../types';
 
 /**
@@ -14,7 +14,7 @@ export function useFps(): FpsInfo | null {
 
   useEffect(() => {
     _acquireEngine({ fps: true });
-    const sub = Kamper.on('fps', (d: FpsInfo) => {
+    const sub = Konitor.on('fps', (d: FpsInfo) => {
       setData(d);
     });
     return () => {

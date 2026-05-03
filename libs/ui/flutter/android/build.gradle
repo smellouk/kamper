@@ -1,0 +1,56 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+
+// konitor.android.config sets compileSdk=35, minSdk=21, Java 17.
+// Available in monorepo context; absent in standalone Flutter build — skipped safely.
+try {
+    apply plugin: 'konitor.android.config'
+} catch (org.gradle.api.plugins.UnknownPluginException ignored) { }
+
+android {
+    namespace 'com.smellouk.konitor.flutter'
+    compileSdk = (findProperty("android.compileSdk") ?: "35").toString().toInteger()
+    buildFeatures {
+        buildConfig true
+    }
+    defaultConfig {
+        minSdk = (findProperty("android.minSdk") ?: "21").toString().toInteger()
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    kotlinOptions {
+        jvmTarget = (findProperty("jvm.target") ?: "17").toString()
+    }
+}
+
+dependencies {
+    // Dual-context: monorepo → project path; standalone → Maven (substituted by composite)
+    if (findProject(':libs:engine') != null) {
+        implementation project(':libs:engine')
+        implementation project(':libs:modules:cpu')
+        implementation project(':libs:modules:fps')
+        implementation project(':libs:modules:memory')
+        implementation project(':libs:modules:network')
+        implementation project(':libs:modules:issues')
+        implementation project(':libs:modules:jank')
+        implementation project(':libs:modules:gc')
+        implementation project(':libs:modules:thermal')
+        implementation project(':libs:modules:gpu')
+        debugImplementation project(':libs:ui:kmm')
+    } else {
+        def v = "local"
+        implementation "com.smellouk.konitor:engine:$v"
+        implementation "com.smellouk.konitor:cpu-module:$v"
+        implementation "com.smellouk.konitor:fps-module:$v"
+        implementation "com.smellouk.konitor:memory-module:$v"
+        implementation "com.smellouk.konitor:network-module:$v"
+        implementation "com.smellouk.konitor:issues-module:$v"
+        implementation "com.smellouk.konitor:jank-module:$v"
+        implementation "com.smellouk.konitor:gc-module:$v"
+        implementation "com.smellouk.konitor:thermal-module:$v"
+        implementation "com.smellouk.konitor:gpu-module:$v"
+        debugImplementation "com.smellouk.konitor:kmm:$v"
+    }
+}

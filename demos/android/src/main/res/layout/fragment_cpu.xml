@@ -56,28 +56,28 @@
                 android:textSize="12sp"
                 android:textStyle="bold"/>
 
-            <com.smellouk.kamper.android.views.MetricRowView
+            <com.smellouk.konitor.android.views.MetricRowView
                 android:id="@+id/cpuTotalRow"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:layout_marginTop="8dp"/>
 
-            <com.smellouk.kamper.android.views.MetricRowView
+            <com.smellouk.konitor.android.views.MetricRowView
                 android:id="@+id/cpuAppRow"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"/>
 
-            <com.smellouk.kamper.android.views.MetricRowView
+            <com.smellouk.konitor.android.views.MetricRowView
                 android:id="@+id/cpuUserRow"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"/>
 
-            <com.smellouk.kamper.android.views.MetricRowView
+            <com.smellouk.konitor.android.views.MetricRowView
                 android:id="@+id/cpuSystemRow"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"/>
 
-            <com.smellouk.kamper.android.views.MetricRowView
+            <com.smellouk.konitor.android.views.MetricRowView
                 android:id="@+id/cpuIoWaitRow"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"/>

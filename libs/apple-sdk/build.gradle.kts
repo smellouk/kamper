@@ -6,7 +6,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
 }
 
-// KamperUi uses ios_arm64/ios_simulator_arm64 Compose klib variants; same compatibility
+// KonitorUi uses ios_arm64/ios_simulator_arm64 Compose klib variants; same compatibility
 // shim as libs/ui/kmm so Gradle resolves the correct klib for each target.
 val konanTargetAttr = Attribute.of("org.jetbrains.kotlin.native.target", String::class.java)
 dependencies.attributesSchema {
@@ -44,13 +44,13 @@ abstract class TvosIosDisambiguationRule : AttributeDisambiguationRule<String> {
 }
 
 kotlin {
-    val xcf = XCFramework("Kamper")
+    val xcf = XCFramework("Konitor")
     listOf(
         iosArm64(),
         iosSimulatorArm64()
     ).forEach { target ->
         target.binaries.framework {
-            baseName = "Kamper"
+            baseName = "Konitor"
             isStatic = true
             xcf.add(this)
             export(project(":libs:engine"))
@@ -58,6 +58,7 @@ kotlin {
             export(project(":libs:modules:fps"))
             export(project(":libs:modules:memory"))
             export(project(":libs:modules:network"))
+            export(project(":libs:modules:issues"))
             export(project(":libs:ui:kmm"))
         }
     }
@@ -70,7 +71,9 @@ kotlin {
                 api(project(":libs:modules:fps"))
                 api(project(":libs:modules:memory"))
                 api(project(":libs:modules:network"))
+                api(project(":libs:modules:issues"))
                 api(project(":libs:ui:kmm"))
+                implementation(libs.kotlinx.coroutines.core)
             }
         }
     }

@@ -3,30 +3,30 @@
 
     <application>
         <provider
-            android:name=".KamperUiInitProvider"
-            android:authorities="${applicationId}.kamper_ui_provider"
+            android:name=".KonitorUiInitProvider"
+            android:authorities="${applicationId}.konitor_ui_provider"
             android:exported="false" />
 
         <provider
             android:name="androidx.core.content.FileProvider"
-            android:authorities="${applicationId}.kamper.provider"
+            android:authorities="${applicationId}.konitor.provider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/kamper_file_paths" />
+                android:resource="@xml/konitor_file_paths" />
         </provider>
 
         <activity
-            android:name=".KamperPanelActivity"
+            android:name=".KonitorPanelActivity"
             android:exported="false"
-            android:theme="@style/Theme.Kamper.Transparent" />
+            android:theme="@style/Theme.Konitor.Transparent" />
 
         <receiver
-            android:name="com.smellouk.kamper.ui.KamperConfigReceiver"
+            android:name="com.smellouk.konitor.ui.KonitorConfigReceiver"
             android:exported="false">
             <intent-filter>
-                <action android:name="com.smellouk.kamper.CONFIGURE" />
+                <action android:name="com.smellouk.konitor.CONFIGURE" />
             </intent-filter>
         </receiver>
     </application>

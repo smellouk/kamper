@@ -8,10 +8,10 @@ plugins {
 }
 
 android {
-    namespace = "com.smellouk.kamper.compose"
+    namespace = "com.smellouk.konitor.compose"
     compileSdk = 35
     defaultConfig {
-        applicationId = "com.smellouk.kamper.compose"
+        applicationId = "com.smellouk.konitor.compose"
         minSdk = 21
         targetSdk = 35
         versionCode = 1
@@ -24,6 +24,7 @@ android {
 }
 
 kotlin {
+    applyDefaultHierarchyTemplate()
     androidTarget()
     jvm("desktop")
     listOf(
@@ -65,15 +66,11 @@ kotlin {
             }
         }
 
-        val iosMain by creating {
-            dependsOn(commonMain)
+        named("iosMain") {
             dependencies {
                 implementation(project(":libs:ui:kmm"))
             }
         }
-
-        val iosArm64Main by getting { dependsOn(iosMain) }
-        val iosSimulatorArm64Main by getting { dependsOn(iosMain) }
 
         val desktopMain by getting {
             dependencies {
@@ -86,7 +83,7 @@ kotlin {
 compose {
     desktop {
         application {
-            mainClass = "com.smellouk.kamper.compose.MainKt"
+            mainClass = "com.smellouk.konitor.compose.MainKt"
             nativeDistributions {
                 targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
                 packageName = "K|Compose"

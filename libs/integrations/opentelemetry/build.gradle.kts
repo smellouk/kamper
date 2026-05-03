@@ -2,12 +2,12 @@ plugins {
     id("org.jetbrains.kotlin.multiplatform")
     id("com.android.library")
     id("dev.mokkery")
-    id("kamper.android.config")
-    id("kamper.publish")
+    id("konitor.android.config")
+    id("konitor.publish")
 }
 
 android {
-    namespace = "com.smellouk.kamper.opentelemetry"
+    namespace = "com.smellouk.konitor.opentelemetry"
 }
 
 kotlin {

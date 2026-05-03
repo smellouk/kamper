@@ -1,6 +1,6 @@
 name: iosApp
 options:
-  bundleIdPrefix: com.smellouk.kamper
+  bundleIdPrefix: com.smellouk.konitor
   deploymentTarget:
     iOS: "16.0"
   generateEmptyDirectories: true
@@ -42,7 +42,7 @@ targets:
           - UIInterfaceOrientationLandscapeRight
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.smellouk.kamper.compose
+        PRODUCT_BUNDLE_IDENTIFIER: com.smellouk.konitor.compose
         CODE_SIGN_STYLE: Automatic
         DEVELOPMENT_TEAM: ""
     preBuildScripts:

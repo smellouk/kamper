@@ -384,6 +384,9 @@ Plans:
 | 22. Manual Demo Testing | 8/8 | Complete    | 2026-05-02 |
 | 23. GPU Module          | 12/12 | Complete  | 2026-05-02 |
 | 24. Log Events (Perfetto) | 10/10 | Complete | 2026-05-03 |
+| 25. Kamper → Konitor Rename | 0/7 | Ready to execute | - |
+| 25. Rename to Konitor    | 0/7 | In progress | - |
+| 26. Flutter Support Package | 0/6 | Ready to execute | - |
 
 ### Phase 21: Monorepo structure and clean up (e.g. renaming kamper/ to libs/) is a structural refactor
 
@@ -453,4 +456,35 @@ Plans:
 - [x] 24-08-PLAN.md — Wave 3: Perfetto export — Tracks.EVENTS=8, PerfettoExporter named-event-track encoding, RecordingManager + KamperUiRepository wiring (D-16..D-21)
 - [x] 24-09-PLAN.md — Wave 4: Android demo — EventsFragment + fragment_events.xml + item_event.xml + MainActivity (D-22, D-23, D-24); includes human-verify checkpoint
 - [x] 24-10-PLAN.md — Wave 4: Phase 25 ROADMAP cleanup — remove duplicate entry + sync STATE.md (D-33)
+
+### Phase 25: rename the library from Kamper to Konitor
+
+**Goal:** Rename the library from "Kamper" to "Konitor" across all surfaces — package namespaces (`com.smellouk.kamper` → `com.smellouk.konitor`), public API class names (`Kamper`, `KamperUi`, `KamperPanel`, `KamperChip`, `KamperDslMarker`, etc.), Maven artifact IDs, Gradle build config namespaces, file/directory names, documentation, and CI config — producing a fully consistent "Konitor" brand with no lingering "kamper" references in shipped artifacts.
+**Requirements**: TBD (no mapped REQUIREMENTS.md IDs)
+**Depends on:** Phase 24
+**Plans:** 7 plans
+
+Plans:
+- [x] 25-01-PLAN.md — Wave 1: KonitorPublishPlugin.kt + build-logic/build.gradle.kts + settings.gradle.kts + root build.gradle.kts credential keys
+- [x] 25-02-PLAN.md — Wave 1 (parallel): Source directory renames com/smellouk/kamper→konitor + package declaration + import updates across all 548 .kt files in libs/
+- [x] 25-03-PLAN.md — Wave 2: Public class renames (Kamper→Konitor, KamperUi→KonitorUi, etc.) + Kamper*.kt file renames + AndroidManifest.xml component refs in libs/
+- [x] 25-04-PLAN.md — Wave 3: Android namespace/applicationId in all libs/ build.gradle.kts + BOM coordinates + GPU native lib rename + cinterop def + XML resource rename
+- [x] 25-05-PLAN.md — Wave 4: Demo source renames + demo build configs + RN TypeScript/podspec + Kamper.podspec→Konitor.podspec + CI workflows + release-please-config
+- [x] 25-06-PLAN.md — Wave 5: 6 skill directory renames + CLAUDE.md + README.md + CONTRIBUTING.md + CAPACITY.md + bug-report.yml
+- [x] 25-07-PLAN.md — Wave 6: Final grep audit (zero kamper in shipped artifacts) + build verification (api:test + engine:test + detekt) + human checkpoint
+
+### Phase 26: flutter support package and demo
+
+**Goal:** Add first-class Flutter support to Konitor — a `konitor_flutter` Dart/Flutter plugin package mirroring the React Native package structure, with platform channel bindings to the existing Kotlin/Swift native modules, and a Flutter demo app showing all available metrics.
+**Requirements**: TBD (no mapped REQUIREMENTS.md IDs — D-01 through D-17 from CONTEXT.md serve as requirement set)
+**Depends on:** Phase 25
+**Plans:** 6 plans
+
+Plans:
+- [ ] 26-01-PLAN.md — Wave 1: Dart layer (pubspec.yaml, 10 model classes, KonitorConfig, Konitor class with 9 EventChannels, barrel file)
+- [ ] 26-02-PLAN.md — Wave 1 (parallel): Android KonitorFlutterPlugin.kt (FlutterPlugin + MethodCallHandler + ActivityAware, 9 modules + INVALID guards)
+- [ ] 26-03-PLAN.md — Wave 1 (parallel): iOS KonitorFlutterPlugin.swift (4 functional channels + 6 no-ops) + KonitorFlutter.podspec + CHANGELOG.md
+- [ ] 26-04-PLAN.md — Wave 2: Flutter demo app (demos/flutter/ scaffold, pubspec path dep, main.dart with Catppuccin Mocha theme and all metric tabs)
+- [ ] 26-05-PLAN.md — Wave 2 (parallel): Root settings.gradle.kts composite wiring + detekt + test verification
+- [ ] 26-06-PLAN.md — Wave 3: Human verification checkpoint (Android build + smoke test)
 

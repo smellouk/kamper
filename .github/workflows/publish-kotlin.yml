@@ -34,8 +34,8 @@ jobs:
         run: ./gradlew publishToMavenCentral publishAllPublicationsToGithubPackagesRepository --no-configuration-cache
         env:
           # GitHub Packages credentials (existing pattern from publisher.yml)
-          KAMPER_GH_USER: ${{ secrets.KAMPER_GH_USER }}
-          KAMPER_GH_PAT: ${{ secrets.KAMPER_GH_PAT }}
+          KONITOR_GH_USER: ${{ secrets.KONITOR_GH_USER }}
+          KONITOR_GH_PAT: ${{ secrets.KONITOR_GH_PAT }}
           # Maven Central Portal credentials (vanniktech reads these env var names)
           ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.SONATYPE_USERNAME }}
           ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.SONATYPE_PASSWORD }}

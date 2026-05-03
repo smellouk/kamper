@@ -1,16 +1,16 @@
-# Kamper
+# Konitor
 
-[![License](https://img.shields.io/github/license/smellouk/kamper)](LICENSE)
-[![Release](https://img.shields.io/github/v/tag/smellouk/kamper?label=release&color=blue)](https://github.com/smellouk/kamper/releases)
-[![Issues](https://img.shields.io/github/issues/smellouk/kamper)](https://github.com/smellouk/kamper/issues)
-[![Stars](https://img.shields.io/github/stars/smellouk/kamper?style=social)](https://github.com/smellouk/kamper/stargazers)
-[![CI](https://img.shields.io/github/actions/workflow/status/smellouk/kamper/pull-request.yml?branch=main&label=CI)](https://github.com/smellouk/kamper/actions/workflows/pull-request.yml)
+[![License](https://img.shields.io/github/license/smellouk/konitor)](LICENSE)
+[![Release](https://img.shields.io/github/v/tag/smellouk/konitor?label=release&color=blue)](https://github.com/smellouk/konitor/releases)
+[![Issues](https://img.shields.io/github/issues/smellouk/konitor)](https://github.com/smellouk/konitor/issues)
+[![Stars](https://img.shields.io/github/stars/smellouk/konitor?style=social)](https://github.com/smellouk/konitor/stargazers)
+[![CI](https://img.shields.io/github/actions/workflow/status/smellouk/konitor/pull-request.yml?branch=main&label=CI)](https://github.com/smellouk/konitor/actions/workflows/pull-request.yml)
 
 **Kotlin Multiplatform performance monitoring.** A plugin-based library that gives you live CPU, FPS, memory, network, jank, GC, thermal, and issue detection across Android, iOS, JVM, macOS, and Web — through a single unified API.
 
 <img src="screenshots/1.gif" width="320" align="right"/>
 
-Kamper uses a zero-boilerplate `install()` model — each of the eight modules is independently installable, so you only pay for what you use. The flagship feature is the Kamper UI debug overlay: a floating chip that appears automatically in Android debug builds with zero app code, and attaches with one line on iOS. Kamper runs across Android, iOS, JVM, macOS, JS, and Wasm, delivering consistent metric callbacks through a single listener API on every platform.
+Konitor uses a zero-boilerplate `install()` model — each of the eight modules is independently installable, so you only pay for what you use. The flagship feature is the Konitor UI debug overlay: a floating chip that appears automatically in Android debug builds with zero app code, and attaches with one line on iOS. Konitor runs across Android, iOS, JVM, macOS, JS, and Wasm, delivering consistent metric callbacks through a single listener API on every platform.
 
 <br clear="right"/>
 
@@ -18,7 +18,7 @@ Kamper uses a zero-boilerplate `install()` model — each of the eight modules i
 
 ## Modules
 
-Kamper ships eight independently-installable performance modules. Install only what you need.
+Konitor ships eight independently-installable performance modules. Install only what you need.
 
 | Name | Description | Platforms |
 |------|-------------|-----------|
@@ -46,15 +46,15 @@ Three steps to live performance metrics.
 ```kotlin
 // build.gradle.kts (Module: app)
 dependencies {
-    implementation("com.smellouk.kamper:engine:$kamperVersion")
-    implementation("com.smellouk.kamper:cpu-module:$kamperVersion")
+    implementation("com.smellouk.konitor:engine:$konitorVersion")
+    implementation("com.smellouk.konitor:cpu-module:$konitorVersion")
 }
 ```
 
-**Step 2 — Set up Kamper and install a module**
+**Step 2 — Set up Konitor and install a module**
 
 ```kotlin
-Kamper.setup {
+Konitor.setup {
     logger = Logger.DEFAULT
 }.apply {
     install(CpuModule)
@@ -65,7 +65,7 @@ Kamper.setup {
 **Step 3 — Register a listener**
 
 ```kotlin
-Kamper.addInfoListener<CpuInfo> { cpu ->
+Konitor.addInfoListener<CpuInfo> { cpu ->
     if (cpu == CpuInfo.INVALID) return@addInfoListener
     println("CPU: ${cpu.totalUseRatio}")
 }
@@ -74,34 +74,34 @@ Kamper.addInfoListener<CpuInfo> { cpu ->
 ### Lifecycle
 
 ```kotlin
-Kamper.start()   // begin polling
-Kamper.stop()    // pause polling
-Kamper.clear()   // uninstall + remove listeners
+Konitor.start()   // begin polling
+Konitor.stop()    // pause polling
+Konitor.clear()   // uninstall + remove listeners
 ```
 
-On Android, `lifecycle.addObserver(Kamper)` wires `start`/`stop`/`clear` to the Activity lifecycle automatically.
+On Android, `lifecycle.addObserver(Konitor)` wires `start`/`stop`/`clear` to the Activity lifecycle automatically.
 
 ---
 
-## Kamper UI
+## Konitor UI
 
 A floating chip overlay that sits over any screen and shows live performance metrics. Tap to expand, tap again to open the full panel. Drag to either edge — it snaps flush with no extra rounded corner on the anchored side. Shake the device to restore a collapsed chip.
 
 **Android: zero app code required.** A `ContentProvider` auto-initialises the overlay in debug builds and disables it automatically in release. Add the dependency and you're done:
 
 ```kotlin
-debugImplementation("com.smellouk.kamper:ui-android:$kamperVersion")
+debugImplementation("com.smellouk.konitor:ui-android:$konitorVersion")
 ```
 
 **iOS: one line in `AppDelegate`.**
 
 ```swift
 // AppDelegate.swift
-import KamperUi
+import KonitorUi
 
 func application(_ application: UIApplication,
                  didFinishLaunchingWithOptions ...) -> Bool {
-    KamperUi.shared.attach()
+    KonitorUi.shared.attach()
     return true
 }
 ```
@@ -146,7 +146,7 @@ func application(_ application: UIApplication,
 
 ```kotlin
 // In Application.onCreate() or anywhere before first activity launch
-KamperUi.configure {
+KonitorUi.configure {
     isEnabled  = true
     position   = ChipPosition.TOP_END  // TOP_START | TOP_END | CENTER_START | CENTER_END | BOTTOM_START | BOTTOM_END
 }
@@ -160,14 +160,14 @@ The **Perfetto** tab lets you record a session in-app and export a `.perfetto-tr
 
 ## Service Integrations
 
-Kamper can forward metrics and crash events to third-party observability services. Each
+Konitor can forward metrics and crash events to third-party observability services. Each
 integration is a separate artifact — add only the ones you need. Nothing is forwarded unless
 you explicitly enable it in the DSL config (all forwarding flags default to `false`).
 
-Use `addIntegration()` on the `Kamper` engine instance to attach an integration module:
+Use `addIntegration()` on the `Konitor` engine instance to attach an integration module:
 
 ```kotlin
-Kamper
+Konitor
     .install(CpuModule)
     .install(MemoryModule)
     .addIntegration(SentryModule(dsn = "https://abc123@sentry.io/123456") {
@@ -187,7 +187,7 @@ breadcrumbs (only when the configured threshold is exceeded).
 
 ```kotlin
 dependencies {
-    implementation("com.smellouk.kamper:sentry-integration:$kamperVersion")
+    implementation("com.smellouk.konitor:sentry-integration:$konitorVersion")
 }
 ```
 
@@ -214,7 +214,7 @@ are not forwarded — Crashlytics is for error tracking, not performance metrics
 
 ```kotlin
 dependencies {
-    implementation("com.smellouk.kamper:firebase-integration:$kamperVersion")
+    implementation("com.smellouk.konitor:firebase-integration:$konitorVersion")
 }
 ```
 
@@ -222,14 +222,14 @@ dependencies {
 On JVM, macOS, JS, and WasmJS the integration is a no-op — no platform guard is needed in
 your code.
 
-> **Note:** Firebase must already be initialised by the host app before Kamper starts.
+> **Note:** Firebase must already be initialised by the host app before Konitor starts.
 > On Android this means a valid `google-services.json` and the `com.google.gms.google-services`
 > plugin. On iOS this means a valid `GoogleService-Info.plist` loaded at app launch.
 
 **DSL usage:**
 
 ```kotlin
-Kamper
+Konitor
     .install(IssuesModule())
     .addIntegration(
         FirebaseModule {
@@ -243,14 +243,14 @@ Kamper
 ### OpenTelemetry (Grafana, Datadog, New Relic, Honeycomb, …)
 
 Exports CPU, memory, and FPS metrics as OpenTelemetry gauge measurements over OTLP HTTP.
-One OTLP endpoint covers all compatible backends — no need for separate `kamper-grafana`
-or `kamper-datadog` artifacts.
+One OTLP endpoint covers all compatible backends — no need for separate `konitor-grafana`
+or `konitor-datadog` artifacts.
 
 **Dependency:**
 
 ```kotlin
 dependencies {
-    implementation("com.smellouk.kamper:opentelemetry-integration:$kamperVersion")
+    implementation("com.smellouk.konitor:opentelemetry-integration:$konitorVersion")
 }
 ```
 
@@ -261,7 +261,7 @@ has no Metrics API for those targets.
 **DSL usage:**
 
 ```kotlin
-Kamper
+Konitor
     .install(CpuModule)
     .install(MemoryModule)
     .addIntegration(
@@ -283,9 +283,9 @@ Kamper
 |--------|------|---------|-------------|
 | `otlpEndpointUrl` | `String` | required | OTLP HTTP metrics endpoint (`http://` or `https://` prefix required) |
 | `otlpAuthToken` | `String?` | `null` | Bearer token or API key for the endpoint |
-| `forwardCpu` | `Boolean` | `false` | Export CPU ratio as `kamper.cpu.usage` gauge |
-| `forwardMemory` | `Boolean` | `false` | Export heap usage as `kamper.memory.usage` gauge |
-| `forwardFps` | `Boolean` | `false` | Export FPS as `kamper.fps` gauge |
+| `forwardCpu` | `Boolean` | `false` | Export CPU ratio as `konitor.cpu.usage` gauge |
+| `forwardMemory` | `Boolean` | `false` | Export heap usage as `konitor.memory.usage` gauge |
+| `forwardFps` | `Boolean` | `false` | Export FPS as `konitor.fps` gauge |
 | `exportIntervalSeconds` | `Long` | `30` | How often the OTLP reader flushes gauges to the backend |
 
 ---
@@ -302,24 +302,24 @@ Kamper
 | GC       | ✅ | ❌ | ✅ | ❌ | ❌ |
 | Thermal  | ✅ | ❌ | ❌ | ❌ | ❌ |
 | Issues   | ✅ | ❌ | ✅ | ❌ | ❌ |
-| Kamper UI| ✅ | ✅⁴ | ❌ | ❌ | ❌ |
+| Konitor UI| ✅ | ✅⁴ | ❌ | ❌ | ❌ |
 
 > ¹ Heap metrics via `performance.memory` (Chromium-based browsers only).
 > ² Full support requires API 23+. API 16–22 reports system-level traffic only.
 > ³ Bandwidth estimate via the [Network Information API](https://developer.mozilla.org/en-US/docs/Web/API/NetworkInformation) (Chrome / Edge).
-> ⁴ Requires `KamperUi.attach()` in `AppDelegate` — no auto-init on iOS.
+> ⁴ Requires `KonitorUi.attach()` in `AppDelegate` — no auto-init on iOS.
 
 ---
 
 ## Versioning
 
-Kamper follows [semantic versioning](https://semver.org/):
+Konitor follows [semantic versioning](https://semver.org/):
 
 - **Patch** (`1.0.x`) — bug fixes; no API changes
 - **Minor** (`1.x.0`) — new modules or features; backward compatible
 - **Major** (`x.0.0`) — breaking API changes; frozen for all v1.x releases
 
-The latest release is always available on [GitHub Releases](https://github.com/smellouk/kamper/releases).
+The latest release is always available on [GitHub Releases](https://github.com/smellouk/konitor/releases).
 Changes are listed in [CHANGELOG.md](CHANGELOG.md).
 
 ---
@@ -330,9 +330,9 @@ Contributions are welcome. Please read the guides below before opening a pull re
 
 - [`CONTRIBUTING.md`](CONTRIBUTING.md) — contribution guide (PR process, commit conventions)
 - [`CLAUDE.md`](CLAUDE.md) — operational reference for build commands, module patterns, and commit conventions used by both Claude agents and human contributors
-- [GitHub Releases](https://github.com/smellouk/kamper/releases) — published release notes
+- [GitHub Releases](https://github.com/smellouk/konitor/releases) — published release notes
 
-New module idea? Browse [`libs/modules/`](libs/modules/) for the canonical 4-class structure (Info, Config, Watcher, Performance), or run the `/kamper-new-module` Claude skill if you have Claude Code.
+New module idea? Browse [`libs/modules/`](libs/modules/) for the canonical 4-class structure (Info, Config, Watcher, Performance), or run the `/konitor-new-module` Claude skill if you have Claude Code.
 
 ---
 

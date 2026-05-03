@@ -1,8 +1,8 @@
 // src/hooks/useThermal.ts — single-metric hook (D-07).
 
 import { useEffect, useState } from 'react';
-import { Kamper } from '../Kamper';
-import { _acquireEngine, _releaseEngine } from './useKamper';
+import { Konitor } from '../Konitor';
+import { _acquireEngine, _releaseEngine } from './useKonitor';
 import type { ThermalInfo } from '../types';
 
 /**
@@ -14,7 +14,7 @@ export function useThermal(): ThermalInfo | null {
 
   useEffect(() => {
     _acquireEngine({ thermal: true });
-    const sub = Kamper.on('thermal', (d: ThermalInfo) => {
+    const sub = Konitor.on('thermal', (d: ThermalInfo) => {
       setData(d);
     });
     return () => {

@@ -1,5 +1,5 @@
 name: Bug Report
-description: Report a reproducible bug in Kamper
+description: Report a reproducible bug in Konitor
 title: "[Bug]: "
 labels: ["bug", "triage"]
 body:
@@ -24,7 +24,7 @@ body:
       description: Minimal code or steps to reproduce the issue.
       placeholder: |
         1. Install CpuModule
-        2. Call Kamper.start()
+        2. Call Konitor.start()
         3. ...
     validations:
       required: true
@@ -59,9 +59,9 @@ body:
       required: true
 
   - type: input
-    id: kamper_version
+    id: konitor_version
     attributes:
-      label: Kamper version
+      label: Konitor version
       placeholder: "1.0.0"
     validations:
       required: true

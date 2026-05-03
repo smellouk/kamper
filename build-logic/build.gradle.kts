@@ -20,17 +20,21 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach 
 
 gradlePlugin {
     plugins {
-        register("kamperKmpLibrary") {
-            id = "kamper.kmp.library"
+        register("konitorKmpLibrary") {
+            id = "konitor.kmp.library"
             implementationClass = "KmpLibraryPlugin"
         }
-        register("kamperAndroidConfig") {
-            id = "kamper.android.config"
+        register("konitorAndroidConfig") {
+            id = "konitor.android.config"
             implementationClass = "AndroidConfigPlugin"
         }
-        register("kamperPublish") {
-            id = "kamper.publish"
-            implementationClass = "KamperPublishPlugin"
+        register("konitorPublish") {
+            id = "konitor.publish"
+            implementationClass = "KonitorPublishPlugin"
+        }
+        register("konitorExecutionTime") {
+            id = "konitor.execution-time"
+            implementationClass = "KonitorExecutionTimePlugin"
         }
     }
 }

@@ -2,12 +2,12 @@ plugins {
     id("org.jetbrains.kotlin.multiplatform")
     id("com.android.library")
     id("dev.mokkery")
-    id("kamper.android.config")
-    id("kamper.publish")
+    id("konitor.android.config")
+    id("konitor.publish")
 }
 
 android {
-    namespace = "com.smellouk.kamper.sentry"
+    namespace = "com.smellouk.konitor.sentry"
 }
 
 kotlin {
@@ -22,7 +22,7 @@ kotlin {
     // js(IR) and wasmJs are intentionally excluded: sentry-kotlin-multiplatform:0.13.0
     // does not publish JS/WasmJS artifacts. Including these targets causes a KMP
     // dependency resolution failure (webMain source set cannot resolve the dep).
-    // The other kamper modules support JS/WasmJS because they only depend on kamper:api
+    // The other konitor modules support JS/WasmJS because they only depend on konitor:api
     // which also lacks JS/WasmJS-specific sentry calls.
 
     sourceSets {

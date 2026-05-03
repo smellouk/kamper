@@ -13,9 +13,12 @@
   },
   "dependencies": {
     "@react-native/new-app-screen": "0.85.2",
+    "jest-validate": "^30.3.0",
+    "jest-worker": "^30.3.0",
+    "lines-and-columns": "^2.0.4",
     "react": "19.2.3",
     "react-native": "0.85.2",
-    "react-native-kamper": "file:../../libs/ui/rn",
+    "react-native-konitor": "file:../../libs/ui/rn",
     "react-native-safe-area-context": "^5.5.2"
   },
   "devDependencies": {

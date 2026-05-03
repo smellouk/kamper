@@ -1,5 +1,5 @@
-// src/types.ts — Public TypeScript types exposed by react-native-kamper.
-// Field names match canonical Kotlin emit payloads (see KamperModule.kt lines 49-113).
+// src/types.ts — Public TypeScript types exposed by react-native-konitor.
+// Field names match canonical Kotlin emit payloads (see KonitorModule.kt lines 49-113).
 
 export interface CpuInfo {
   totalUseRatio: number;
@@ -84,12 +84,12 @@ export interface UserEventInfo {
 }
 
 /**
- * KamperConfig — per-module enable flags (D-08).
+ * KonitorConfig — per-module enable flags (D-08).
  * All flags default to `true` when undefined; pass `false` to disable a module.
  * Note: On iOS only cpu/fps/memory/network are available — issues/jank/gc/thermal
  * flags are silently ignored on iOS (XCFramework only exports 4 modules).
  */
-export interface KamperConfig {
+export interface KonitorConfig {
   cpu?: boolean;
   fps?: boolean;
   memory?: boolean;

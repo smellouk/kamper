@@ -1,10 +1,10 @@
 plugins {
-    id("kamper.kmp.library")
-    id("kamper.publish")
+    id("konitor.kmp.library")
+    id("konitor.publish")
 }
 
 android {
-    namespace = "com.smellouk.kamper.thermal"
+    namespace = "com.smellouk.konitor.thermal"
 }
 
 kotlin {
@@ -39,7 +39,7 @@ kotlin {
         target.compilations.getByName("main") {
             cinterops.create("thermalState") {
                 defFile(project.file("src/nativeInterop/cinterop/thermalState.def"))
-                packageName("com.smellouk.kamper.thermal.cinterop")
+                packageName("com.smellouk.konitor.thermal.cinterop")
             }
         }
     }
@@ -49,7 +49,7 @@ kotlin {
         target.compilations.getByName("main") {
             cinterops.create("thermalStateIos") {
                 defFile(project.file("src/nativeInterop/cinterop/thermalStateIos.def"))
-                packageName("com.smellouk.kamper.thermal.cinterop")
+                packageName("com.smellouk.konitor.thermal.cinterop")
             }
         }
     }

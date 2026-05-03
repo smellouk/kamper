@@ -1,15 +1,16 @@
-// src/index.ts — Public barrel export for `react-native-kamper`.
+// src/index.ts — Public barrel export for `react-native-konitor`.
 //
 // Consumers import:
-//   import { Kamper, useCpu, showOverlay } from 'react-native-kamper';
-//   import type { CpuInfo, KamperConfig } from 'react-native-kamper';
+//   import { Konitor, useCpu, showOverlay } from 'react-native-konitor';
+//   import type { CpuInfo, KonitorConfig } from 'react-native-konitor';
 
 // Imperative API (D-07)
-export { Kamper } from './Kamper';
-export type { KamperApi, KamperEventMap, KamperSubscription } from './Kamper';
+export { Konitor } from './Konitor';
+export type { KonitorApi, KonitorEventMap, KonitorSubscription } from './Konitor';
 
 // Hooks (D-07)
-export { useKamper } from './hooks/useKamper';
+export { useKonitor } from './hooks/useKonitor';
+export type { KonitorState } from './hooks/useKonitor';
 export { useCpu } from './hooks/useCpu';
 export { useFps } from './hooks/useFps';
 export { useMemory } from './hooks/useMemory';
@@ -33,10 +34,10 @@ export type {
   JsMemoryInfo,
   JsGcInfo,
   UserEventInfo,
-  KamperConfig,
+  KonitorConfig,
 } from './types';
 
 // Top-level convenience exports (D-12)
-import { Kamper as _Kamper } from './Kamper';
-export const showOverlay = (): void => _Kamper.showOverlay();
-export const hideOverlay = (): void => _Kamper.hideOverlay();
+import { Konitor as _Konitor } from './Konitor';
+export const showOverlay = (): void => _Konitor.showOverlay();
+export const hideOverlay = (): void => _Konitor.hideOverlay();

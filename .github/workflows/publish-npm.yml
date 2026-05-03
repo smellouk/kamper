@@ -1,4 +1,4 @@
-# Publishes the react-native-kamper npm package on each
+# Publishes the react-native-konitor npm package on each
 # libs/ui/rn-* GitHub Release. Skips root-component releases.
 name: Publish npm
 

@@ -77,9 +77,9 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace "com.smellouk.kamper.rn"
+    namespace "com.smellouk.konitor.rn"
     defaultConfig {
-        applicationId "com.smellouk.kamper.rn"
+        applicationId "com.smellouk.konitor.rn"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
@@ -117,9 +117,9 @@ dependencies {
         implementation jscFlavor
     }
 
-    // Kamper artifacts are now transitive via `react-native-kamper`
-    // (kamper/react-native/android/build.gradle declares the full module set).
-    // The npm autolinker discovers `react-native-kamper` from
-    // demos/react-native/package.json `"react-native-kamper": "file:..."`
+    // Konitor artifacts are now transitive via `react-native-konitor`
+    // (konitor/react-native/android/build.gradle declares the full module set).
+    // The npm autolinker discovers `react-native-konitor` from
+    // demos/react-native/package.json `"react-native-konitor": "file:..."`
     // and links its android/build.gradle into this app's compile graph.
 }

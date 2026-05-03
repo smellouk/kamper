@@ -1,10 +1,10 @@
 plugins {
-    id("kamper.kmp.library")
-    id("kamper.publish")
+    id("konitor.kmp.library")
+    id("konitor.publish")
 }
 
 android {
-    namespace = "com.smellouk.kamper.fps"
+    namespace = "com.smellouk.konitor.fps"
 }
 
 kotlin {

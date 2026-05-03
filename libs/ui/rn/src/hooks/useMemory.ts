@@ -1,8 +1,8 @@
 // src/hooks/useMemory.ts — single-metric hook (D-07).
 
 import { useEffect, useState } from 'react';
-import { Kamper } from '../Kamper';
-import { _acquireEngine, _releaseEngine } from './useKamper';
+import { Konitor } from '../Konitor';
+import { _acquireEngine, _releaseEngine } from './useKonitor';
 import type { MemoryInfo } from '../types';
 
 /**
@@ -14,7 +14,7 @@ export function useMemory(): MemoryInfo | null {
 
   useEffect(() => {
     _acquireEngine({ memory: true });
-    const sub = Kamper.on('memory', (d: MemoryInfo) => {
+    const sub = Konitor.on('memory', (d: MemoryInfo) => {
       setData(d);
     });
     return () => {

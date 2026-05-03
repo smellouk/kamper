@@ -9,12 +9,12 @@ typedef struct {
     long idle;
     long nice;
     int valid; /* 0 = ok, -1 = error */
-} KamperCpuTicks;
+} KonitorCpuTicks;
 
 /* Fill *out with CPU tick counters from Mach host_statistics.
  * Returns 0 on success, -1 on failure.
  * Avoids popen("top") overhead — kernel counter read, returns immediately. */
-static int kamper_fill_cpu_ticks(KamperCpuTicks *out) {
+static int konitor_fill_cpu_ticks(KonitorCpuTicks *out) {
     host_cpu_load_info_data_t info;
     mach_msg_type_number_t count = HOST_CPU_LOAD_INFO_COUNT;
     if (host_statistics(mach_host_self(), HOST_CPU_LOAD_INFO,
@@ -31,7 +31,7 @@ static int kamper_fill_cpu_ticks(KamperCpuTicks *out) {
 }
 
 /* Number of logical CPU cores. Used to normalize multi-threaded app CPU %. */
-static int kamper_get_logical_cpu_count(void) {
+static int konitor_get_logical_cpu_count(void) {
     int count = 0;
     size_t len = sizeof(count);
     sysctlbyname("hw.logicalcpu", &count, &len, NULL, 0);

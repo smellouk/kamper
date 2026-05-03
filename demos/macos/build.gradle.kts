@@ -3,17 +3,12 @@ plugins {
 }
 
 kotlin {
-    macosX64 {
-        binaries {
+    @Suppress("DEPRECATION") val macosX64 = macosX64()
+    val macosArm64 = macosArm64()
+    listOf(macosX64, macosArm64).forEach {
+        it.binaries {
             executable {
-                entryPoint = "com.smellouk.kamper.macos.main"
-            }
-        }
-    }
-    macosArm64 {
-        binaries {
-            executable {
-                entryPoint = "com.smellouk.kamper.macos.main"
+                entryPoint = "com.smellouk.konitor.macos.main"
             }
         }
     }

@@ -1,0 +1,272 @@
+package com.smellouk.konitor.ui.compose
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import com.smellouk.konitor.ui.KonitorUiSettings
+import com.smellouk.konitor.ui.KonitorUiState
+
+@Composable
+internal fun SettingsTab(
+    s: KonitorUiState,
+    cfg: KonitorUiSettings,
+    onSettingsChange: (KonitorUiSettings) -> Unit,
+    onStartEngine: () -> Unit,
+    onStopEngine: () -> Unit,
+    onRestartEngine: () -> Unit,
+    isTv: Boolean = false
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        if (isTv) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Spacer(Modifier.weight(1f))
+                ThemeToggle(
+                    isDark = cfg.isDarkTheme,
+                    onToggle = { onSettingsChange(cfg.copy(isDarkTheme = !cfg.isDarkTheme)) }
+                )
+            }
+        }
+
+        EngineSection(
+            running = s.engineRunning,
+            onStart = onStartEngine,
+            onStop = onStopEngine,
+            onRestart = onRestartEngine
+        )
+
+        SectionLabel("MODULES")
+
+        ModuleCard(
+            icon = ChipIcons.cpu,
+            name = "CPU",
+            color = KonitorTheme.BLUE,
+            enabled = cfg.cpuEnabled,
+            showInChip = cfg.showCpu,
+            intervalMs = cfg.cpuIntervalMs,
+            intervalOptions = INTERVAL_OPTIONS,
+            onEnabledChange = { onSettingsChange(cfg.copy(cpuEnabled = it)) },
+            onShowInChipChange = { onSettingsChange(cfg.copy(showCpu = it)) },
+            onIntervalChange = { onSettingsChange(cfg.copy(cpuIntervalMs = it)) },
+            unsupported = s.cpuUnsupported
+        )
+
+        ModuleCard(
+            icon = ChipIcons.gpu,
+            name = "GPU",
+            color = KonitorTheme.MAUVE,
+            enabled = cfg.gpuEnabled,
+            showInChip = cfg.showGpu,
+            intervalMs = cfg.gpuIntervalMs,
+            intervalOptions = INTERVAL_OPTIONS,
+            onEnabledChange = { onSettingsChange(cfg.copy(gpuEnabled = it)) },
+            onShowInChipChange = { onSettingsChange(cfg.copy(showGpu = it)) },
+            onIntervalChange = { onSettingsChange(cfg.copy(gpuIntervalMs = it)) },
+            unsupported = s.gpuUnsupported
+        )
+
+        ModuleCard(
+            icon = ChipIcons.fps,
+            name = "FPS",
+            color = KonitorTheme.GREEN,
+            enabled = cfg.fpsEnabled,
+            showInChip = cfg.showFps,
+            intervalMs = null,
+            intervalOptions = emptyList(),
+            onEnabledChange = { onSettingsChange(cfg.copy(fpsEnabled = it)) },
+            onShowInChipChange = { onSettingsChange(cfg.copy(showFps = it)) },
+            onIntervalChange = {}
+        )
+
+        ModuleCard(
+            icon = ChipIcons.mem,
+            name = "Memory",
+            color = KonitorTheme.PEACH,
+            enabled = cfg.memoryEnabled,
+            showInChip = cfg.showMemory,
+            intervalMs = cfg.memoryIntervalMs,
+            intervalOptions = INTERVAL_OPTIONS,
+            onEnabledChange = { onSettingsChange(cfg.copy(memoryEnabled = it)) },
+            onShowInChipChange = { onSettingsChange(cfg.copy(showMemory = it)) },
+            onIntervalChange = { onSettingsChange(cfg.copy(memoryIntervalMs = it)) }
+        )
+
+        ModuleCard(
+            icon = ChipIcons.net,
+            name = "Network",
+            color = KonitorTheme.TEAL,
+            enabled = cfg.networkEnabled,
+            showInChip = cfg.showNetwork,
+            intervalMs = cfg.networkIntervalMs,
+            intervalOptions = INTERVAL_OPTIONS,
+            onEnabledChange = { onSettingsChange(cfg.copy(networkEnabled = it)) },
+            onShowInChipChange = { onSettingsChange(cfg.copy(showNetwork = it)) },
+            onIntervalChange = { onSettingsChange(cfg.copy(networkIntervalMs = it)) },
+            unsupported = s.networkUnsupported
+        )
+
+        ModuleCard(
+            icon = ChipIcons.issues,
+            name = "Issues",
+            color = KonitorTheme.RED,
+            enabled = cfg.issuesEnabled,
+            showInChip = cfg.showIssues,
+            intervalMs = cfg.issuesIntervalMs,
+            intervalOptions = INTERVAL_OPTIONS,
+            onEnabledChange = { onSettingsChange(cfg.copy(issuesEnabled = it)) },
+            onShowInChipChange = { onSettingsChange(cfg.copy(showIssues = it)) },
+            onIntervalChange = { onSettingsChange(cfg.copy(issuesIntervalMs = it)) },
+            extraContent = { IssuesSubConfig(cfg = cfg, onChange = onSettingsChange) }
+        )
+
+        ModuleCard(
+            icon = ChipIcons.jank,
+            name = "Jank",
+            color = KonitorTheme.MAUVE,
+            enabled = cfg.jankEnabled,
+            showInChip = cfg.showJank,
+            intervalMs = null,
+            intervalOptions = emptyList(),
+            onEnabledChange = { onSettingsChange(cfg.copy(jankEnabled = it)) },
+            onShowInChipChange = { onSettingsChange(cfg.copy(showJank = it)) },
+            onIntervalChange = {},
+            unsupported = s.jankUnsupported
+        )
+
+        ModuleCard(
+            icon = ChipIcons.gc,
+            name = "GC",
+            color = KonitorTheme.YELLOW,
+            enabled = cfg.gcEnabled,
+            showInChip = cfg.showGc,
+            intervalMs = null,
+            intervalOptions = emptyList(),
+            onEnabledChange = { onSettingsChange(cfg.copy(gcEnabled = it)) },
+            onShowInChipChange = { onSettingsChange(cfg.copy(showGc = it)) },
+            onIntervalChange = {},
+            unsupported = s.gcUnsupported
+        )
+
+        ModuleCard(
+            icon = ChipIcons.thermal,
+            name = "Thermal",
+            color = KonitorTheme.PEACH,
+            enabled = cfg.thermalEnabled,
+            showInChip = cfg.showThermal,
+            intervalMs = null,
+            intervalOptions = emptyList(),
+            onEnabledChange = { onSettingsChange(cfg.copy(thermalEnabled = it)) },
+            onShowInChipChange = { onSettingsChange(cfg.copy(showThermal = it)) },
+            onIntervalChange = {},
+            unsupported = s.thermalUnsupported
+        )
+    }
+}
+
+@Composable
+private fun IssuesSubConfig(cfg: KonitorUiSettings, onChange: (KonitorUiSettings) -> Unit) {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        SectionLabel("DETECTORS")
+
+        DetectorCard(
+            name = "Slow Span",
+            enabled = cfg.slowSpanEnabled,
+            onEnabledChange = { onChange(cfg.copy(slowSpanEnabled = it)) }
+        ) {
+            OptionRow(
+                label = "Threshold",
+                options = listOf(500L to "500 ms", 1_000L to "1 s", 2_000L to "2 s", 5_000L to "5 s"),
+                selected = cfg.slowSpanThresholdMs,
+                onSelect = { onChange(cfg.copy(slowSpanThresholdMs = it)) }
+            )
+        }
+
+        DetectorCard(
+            name = "Dropped Frames",
+            enabled = cfg.droppedFramesEnabled,
+            onEnabledChange = { onChange(cfg.copy(droppedFramesEnabled = it)) }
+        ) {
+            OptionRow(
+                label = "Frame threshold",
+                options = listOf(16L to "16 ms", 32L to "32 ms", 64L to "64 ms"),
+                selected = cfg.droppedFrameThresholdMs,
+                onSelect = { onChange(cfg.copy(droppedFrameThresholdMs = it)) }
+            )
+            Spacer(Modifier.height(6.dp))
+            OptionRow(
+                label = "Consecutive frames",
+                options = listOf(2 to "2", 3 to "3", 5 to "5"),
+                selected = cfg.droppedFrameConsecutiveThreshold,
+                onSelect = { onChange(cfg.copy(droppedFrameConsecutiveThreshold = it)) }
+            )
+        }
+
+        DetectorCard(
+            name = "Crash",
+            enabled = cfg.crashEnabled,
+            onEnabledChange = { onChange(cfg.copy(crashEnabled = it)) }
+        )
+
+        DetectorCard(
+            name = "Memory Pressure",
+            enabled = cfg.memoryPressureEnabled,
+            onEnabledChange = { onChange(cfg.copy(memoryPressureEnabled = it)) }
+        ) {
+            OptionRow(
+                label = "Warning at",
+                options = listOf(0.70f to "70%", 0.80f to "80%", 0.90f to "90%"),
+                selected = cfg.memPressureWarningPct,
+                onSelect = { onChange(cfg.copy(memPressureWarningPct = it)) }
+            )
+            Spacer(Modifier.height(6.dp))
+            OptionRow(
+                label = "Critical at",
+                options = listOf(0.90f to "90%", 0.95f to "95%", 0.99f to "99%"),
+                selected = cfg.memPressureCriticalPct,
+                onSelect = { onChange(cfg.copy(memPressureCriticalPct = it)) }
+            )
+        }
+
+        DetectorCard(
+            name = "ANR",
+            enabled = cfg.anrEnabled,
+            onEnabledChange = { onChange(cfg.copy(anrEnabled = it)) }
+        ) {
+            OptionRow(
+                label = "Threshold",
+                options = listOf(2_000L to "2 s", 5_000L to "5 s", 10_000L to "10 s"),
+                selected = cfg.anrThresholdMs,
+                onSelect = { onChange(cfg.copy(anrThresholdMs = it)) }
+            )
+        }
+
+        DetectorCard(
+            name = "Slow Start",
+            enabled = cfg.slowStartEnabled,
+            onEnabledChange = { onChange(cfg.copy(slowStartEnabled = it)) }
+        ) {
+            OptionRow(
+                label = "Cold start threshold",
+                options = listOf(1_000L to "1 s", 2_000L to "2 s", 3_000L to "3 s"),
+                selected = cfg.slowStartColdThresholdMs,
+                onSelect = { onChange(cfg.copy(slowStartColdThresholdMs = it)) }
+            )
+            Spacer(Modifier.height(6.dp))
+            OptionRow(
+                label = "Warm start threshold",
+                options = listOf(500L to "500 ms", 800L to "800 ms", 1_000L to "1 s"),
+                selected = cfg.slowStartWarmThresholdMs,
+                onSelect = { onChange(cfg.copy(slowStartWarmThresholdMs = it)) }
+            )
+        }
+    }
+}

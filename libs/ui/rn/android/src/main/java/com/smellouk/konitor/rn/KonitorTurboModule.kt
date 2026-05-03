@@ -1,0 +1,312 @@
+package com.smellouk.konitor.rn
+
+import com.facebook.react.bridge.Arguments
+import com.facebook.react.bridge.ReactApplicationContext
+import com.facebook.react.bridge.ReadableMap
+import com.facebook.react.bridge.ReadableType
+import com.facebook.react.bridge.UiThreadUtil
+import com.facebook.react.module.annotations.ReactModule
+import com.smellouk.konitor.Konitor
+import com.smellouk.konitor.cpu.CpuInfo
+import com.smellouk.konitor.cpu.CpuModule
+import com.smellouk.konitor.fps.FpsInfo
+import com.smellouk.konitor.fps.FpsModule
+import com.smellouk.konitor.gc.GcInfo
+import com.smellouk.konitor.gc.GcModule
+import com.smellouk.konitor.issues.ActiveSpan
+import com.smellouk.konitor.issues.AnrConfig
+import com.smellouk.konitor.issues.IssueInfo
+import com.smellouk.konitor.issues.IssueSpans
+import com.smellouk.konitor.issues.IssuesModule
+import com.smellouk.konitor.jank.JankInfo
+import com.smellouk.konitor.jank.JankModule
+import com.smellouk.konitor.memory.MemoryInfo
+import com.smellouk.konitor.memory.MemoryModule
+import com.smellouk.konitor.network.NetworkInfo
+import com.smellouk.konitor.network.NetworkModule
+import com.smellouk.konitor.gpu.GpuInfo
+import com.smellouk.konitor.gpu.GpuModule
+import com.smellouk.konitor.thermal.ThermalInfo
+import com.smellouk.konitor.thermal.ThermalModule
+import com.smellouk.konitor.EventToken
+import com.smellouk.konitor.api.UserEventInfo
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.atomic.AtomicInteger
+import com.smellouk.konitor.rn.JsGcInfo
+import com.smellouk.konitor.rn.JsGcModule
+import com.smellouk.konitor.rn.JsIssueInfo
+import com.smellouk.konitor.rn.JsIssueModule
+import com.smellouk.konitor.rn.JsMemoryInfo
+import com.smellouk.konitor.rn.JsMemoryModule
+import com.smellouk.konitor.rn.JsRuntimeBridge
+import com.smellouk.konitor.ui.KonitorUi
+
+/**
+ * Android TurboModule implementation of `KonitorModule`.
+ *
+ * Ports `demos/react-native/.../KonitorModule.kt` (Legacy Bridge —
+ * ReactContextBaseJavaModule + legacy method annotations + legacy event emitter)
+ * to the New Architecture pattern: extends Codegen-generated
+ * NativeKonitorModuleSpec, uses emitOnXxx() for events.
+ *
+ * Per Plan 14 D-04: New Arch (TurboModule) only — no Legacy Bridge interop.
+ * Per D-05: Codegen spec at src/NativeKonitorModule.ts is source of truth.
+ * Per D-06: payload shapes preserved verbatim from KonitorModule.kt.
+ * Per D-08: per-module config parsed from ReadableMap.
+ * Per D-10/D-11: showOverlay/hideOverlay dispatch to UI thread.
+ */
+@ReactModule(name = KonitorTurboModule.NAME)
+class KonitorTurboModule(reactContext: ReactApplicationContext) :
+    NativeKonitorModuleSpec(reactContext) {
+
+    override fun getName(): String = NAME
+
+    // ─── Per-module config parsing (D-08) ─────────────────────────────────
+    // Default: each flag true unless explicitly false. Matches KonitorConfig
+    // semantics in src/types.ts.
+    //
+    // Type-safe read (mitigates T-12-11): JS may pass non-boolean values
+    // (`{cpu: 1}` or `{cpu: "yes"}`). `getBoolean` throws ClassCastException
+    // for non-boolean keys; we guard with `getType(key)` first and treat
+    // non-boolean values as the safe default `true` (do NOT throw — broken
+    // configs should still start the engine in the most permissive state
+    // rather than crash native code).
+    private fun ReadableMap?.flag(key: String): Boolean {
+        if (this == null || !this.hasKey(key)) return true
+        return if (this.getType(key) == ReadableType.Boolean) {
+            this.getBoolean(key)
+        } else {
+            true
+        }
+    }
+
+    // ─── start(config) — install enabled modules + wire all listeners ────
+    override fun start(config: ReadableMap) {
+        // Reset before re-installing: stop running coroutines, then clear all listeners and
+        // modules. Without this, repeated start()/stop() cycles (including React Strict Mode's
+        // double-invocation of effects) accumulate duplicate listeners, causing each event to
+        // fire twice.
+        Konitor.stop()
+        Konitor.clear()
+        Konitor.apply {
+            // Module installation gated by per-module flag (D-08).
+            if (config.flag("cpu"))     install(CpuModule)
+            if (config.flag("fps"))     install(FpsModule)
+            if (config.flag("memory"))  install(MemoryModule(reactApplicationContext))
+            if (config.flag("network")) install(NetworkModule)
+            if (config.flag("issues")) {
+                install(IssuesModule(reactApplicationContext, anr = AnrConfig(thresholdMs = 5_000L)) {
+                    crash { chainToPreviousHandler = false }
+                })
+            }
+            if (config.flag("jank"))    install(JankModule(reactApplicationContext.applicationContext as android.app.Application, reactApplicationContext.currentActivity))
+            if (config.flag("gc"))       install(GcModule)
+            if (config.flag("thermal"))  install(ThermalModule(reactApplicationContext))
+            if (config.flag("gpu"))      install(GpuModule)
+            if (config.flag("jsMemory")) install(JsMemoryModule)
+            if (config.flag("jsGc"))     install(JsGcModule)
+            if (config.flag("jsCrash"))  install(JsIssueModule)
+
+            // ─── 8 metric listeners ──────────────────────────────────────
+            // INVALID guard preserved on every metric (established codebase pattern).
+            // Payload field names copied verbatim from demos/.../KonitorModule.kt lines 47-113.
+            // emitOnXxx replaces emit("konitor_xxx", ...) — generated by Codegen EventEmitter<T>.
+
+            addInfoListener<CpuInfo> { info ->
+                if (info == CpuInfo.INVALID) return@addInfoListener
+                emitOnCpu(Arguments.createMap().apply {
+                    putDouble("totalUseRatio", info.totalUseRatio.toDouble())
+                    putDouble("appRatio",      info.appRatio.toDouble())
+                    putDouble("userRatio",     info.userRatio.toDouble())
+                    putDouble("systemRatio",   info.systemRatio.toDouble())
+                    putDouble("ioWaitRatio",   info.ioWaitRatio.toDouble())
+                })
+            }
+
+            addInfoListener<FpsInfo> { info ->
+                if (info == FpsInfo.INVALID) return@addInfoListener
+                emitOnFps(Arguments.createMap().apply {
+                    putInt("fps", info.fps)
+                })
+            }
+
+            addInfoListener<MemoryInfo> { info ->
+                if (info == MemoryInfo.INVALID) return@addInfoListener
+                emitOnMemory(Arguments.createMap().apply {
+                    putDouble("heapAllocatedMb", info.heapMemoryInfo.allocatedInMb.toDouble())
+                    putDouble("heapMaxMb",       info.heapMemoryInfo.maxMemoryInMb.toDouble())
+                    putDouble("ramUsedMb",       (info.ramInfo.totalRamInMb - info.ramInfo.availableRamInMb).toDouble())
+                    putDouble("ramTotalMb",      info.ramInfo.totalRamInMb.toDouble())
+                    putBoolean("isLowMemory",    info.ramInfo.isLowMemory)
+                })
+            }
+
+            addInfoListener<NetworkInfo> { info ->
+                if (info == NetworkInfo.INVALID || info == NetworkInfo.NOT_SUPPORTED) return@addInfoListener
+                emitOnNetwork(Arguments.createMap().apply {
+                    putDouble("rxMb", info.rxSystemTotalInMb.toDouble())
+                    putDouble("txMb", info.txSystemTotalInMb.toDouble())
+                })
+            }
+
+            addInfoListener<IssueInfo> { info ->
+                // No INVALID guard — matches established pattern (KonitorModule.kt has none for issues).
+                emitOnIssue(Arguments.createMap().apply {
+                    putString("id",        info.issue.id)
+                    putString("type",      info.issue.type.name)
+                    putString("severity",  info.issue.severity.name)
+                    putString("message",   info.issue.message)
+                    putDouble("timestamp", info.issue.timestampMs.toDouble())
+                    info.issue.durationMs?.let { putDouble("durationMs", it.toDouble()) }
+                    info.issue.threadName?.let { putString("threadName", it) }
+                })
+            }
+
+            addInfoListener<JankInfo> { info ->
+                if (info == JankInfo.INVALID) return@addInfoListener
+                emitOnJank(Arguments.createMap().apply {
+                    putInt("droppedFrames",   info.droppedFrames)
+                    putDouble("jankyRatio",   info.jankyFrameRatio.toDouble())
+                    putDouble("worstFrameMs", info.worstFrameMs.toDouble())
+                })
+            }
+
+            addInfoListener<GcInfo> { info ->
+                if (info == GcInfo.INVALID) return@addInfoListener
+                emitOnGc(Arguments.createMap().apply {
+                    putDouble("gcCountDelta",   info.gcCountDelta.toDouble())
+                    putDouble("gcPauseMsDelta", info.gcPauseMsDelta.toDouble())
+                    putDouble("gcCount",        info.gcCount.toDouble())
+                })
+            }
+
+            addInfoListener<GpuInfo> { info ->
+                if (info == GpuInfo.INVALID || info == GpuInfo.UNSUPPORTED) return@addInfoListener
+                emitOnGpu(Arguments.createMap().apply {
+                    putDouble("utilization",          info.utilization)
+                    putDouble("usedMemoryMb",         info.usedMemoryMb)
+                    putDouble("totalMemoryMb",        info.totalMemoryMb)
+                    putDouble("curFreqKhz",           info.curFreqKhz.toDouble())
+                    putDouble("maxFreqKhz",           info.maxFreqKhz.toDouble())
+                    putDouble("appUtilization",       info.appUtilization)
+                    putDouble("rendererUtilization",  info.rendererUtilization)
+                    putDouble("tilerUtilization",     info.tilerUtilization)
+                    putDouble("computeUtilization",   info.computeUtilization)
+                })
+            }
+
+            addInfoListener<ThermalInfo> { info ->
+                if (info == ThermalInfo.INVALID) return@addInfoListener
+                emitOnThermal(Arguments.createMap().apply {
+                    putString("state",          info.state.name)
+                    putBoolean("isThrottling",  info.isThrottling)
+                    putDouble("temperatureC",   info.temperatureC)
+                })
+            }
+
+            addInfoListener<JsMemoryInfo> { info ->
+                if (info == JsMemoryInfo.INVALID) return@addInfoListener
+                emitOnJsMemory(Arguments.createMap().apply {
+                    putDouble("usedMb",  info.usedMb)
+                    putDouble("totalMb", info.totalMb)
+                })
+            }
+
+            addInfoListener<JsGcInfo> { info ->
+                if (info == JsGcInfo.INVALID) return@addInfoListener
+                emitOnJsGc(Arguments.createMap().apply {
+                    putDouble("gcCount",        info.gcCount.toDouble())
+                    putDouble("gcPauseMs",      info.gcPauseMs)
+                    putDouble("gcCountDelta",   info.gcCountDelta.toDouble())
+                    putDouble("gcPauseMsDelta", info.gcPauseMsDelta)
+                })
+            }
+
+            addInfoListener<JsIssueInfo> { info ->
+                if (info == JsIssueInfo.INVALID) return@addInfoListener
+                emitOnIssue(Arguments.createMap().apply {
+                    putString("id",        info.id)
+                    putString("type",      "CRASH")
+                    putString("severity",  if (info.isFatal) "CRITICAL" else "ERROR")
+                    putString("message",   info.message)
+                    putDouble("timestamp", info.timestampMs.toDouble())
+                    putString("threadName", "js")
+                })
+            }
+
+            addInfoListener<UserEventInfo> { info ->
+                if (info == UserEventInfo.INVALID) return@addInfoListener
+                emitOnUserEvent(Arguments.createMap().apply {
+                    putString("name", info.name)
+                    info.durationMs?.let { putDouble("durationMs", it.toDouble()) }
+                })
+            }
+        }
+        Konitor.start()
+    }
+
+    // ─── stop() ───────────────────────────────────────────────────────────
+    override fun stop() {
+        Konitor.stop()
+    }
+
+    // ─── Overlay (D-10, D-11) ─────────────────────────────────────────────
+    // KonitorUi.show(context) / hide() are public facades added in Plan 02.
+    // Pitfall 4 (RESEARCH.md): MUST run on UI thread — AndroidOverlayManager
+    // requires main-thread execution.
+    override fun showOverlay() {
+        if (!BuildConfig.DEBUG) return
+        UiThreadUtil.runOnUiThread {
+            KonitorUi.show(reactApplicationContext)
+        }
+    }
+
+    override fun hideOverlay() {
+        if (!BuildConfig.DEBUG) return
+        UiThreadUtil.runOnUiThread {
+            KonitorUi.hide()
+        }
+    }
+
+    // ─── JS bridge write methods ──────────────────────────────────────────
+    override fun reportJsMemory(usedMb: Double, totalMb: Double) =
+        JsRuntimeBridge.updateMemory(usedMb, totalMb)
+
+    override fun reportJsGc(count: Double, pauseMs: Double) =
+        JsRuntimeBridge.updateGc(count.toLong(), pauseMs)
+
+    override fun reportCrash(message: String, stack: String, isFatal: Boolean) =
+        JsRuntimeBridge.enqueueCrash(message, stack, isFatal)
+
+    // ─── Span tracking — routes JS spans into IssueSpans ─────────────────
+    private val activeSpans = java.util.concurrent.ConcurrentHashMap<String, ActiveSpan>()
+    private val tokenMap = ConcurrentHashMap<Int, EventToken>()
+    private val tokenIdCounter = AtomicInteger(0)
+
+    override fun beginSpan(label: String, thresholdMs: Double) {
+        activeSpans[label] = IssueSpans.begin(label, thresholdMs.toLong())
+    }
+
+    override fun endSpan(label: String) {
+        activeSpans.remove(label)?.end()
+    }
+
+    // ─── Event logging ────────────────────────────────────────────────────
+    override fun logEvent(name: String) {
+        Konitor.logEvent(name)
+    }
+
+    override fun startEvent(name: String): Double {
+        val id = tokenIdCounter.incrementAndGet()
+        tokenMap[id] = Konitor.startEvent(name)
+        return id.toDouble()
+    }
+
+    override fun endEvent(tokenId: Double) {
+        tokenMap.remove(tokenId.toInt())?.let { Konitor.endEvent(it) }
+    }
+
+    companion object {
+        const val NAME = "KonitorModule"
+    }
+}

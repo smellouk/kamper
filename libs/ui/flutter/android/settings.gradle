@@ -1,0 +1,29 @@
+rootProject.name = 'konitor-flutter'
+
+// Load shared Android/Kotlin versions from monorepo root gradle.properties.
+// This makes android.compileSdk, android.minSdk, jvm.target etc. available
+// as project properties in all subproject build.gradle files.
+def sharedProps = new Properties()
+def sharedPropsFile = new File(settings.rootDir, '../../../gradle.properties')
+if (sharedPropsFile.exists()) {
+    sharedPropsFile.withInputStream { sharedProps.load(it) }
+    sharedProps.each { k, v -> settings.extensions.extraProperties[k.toString()] = v }
+}
+
+// Include monorepo root so :libs:* projects resolve within this build.
+// Required by Gradle composite build mechanics (Pitfall 4 from RESEARCH.md).
+includeBuild('../../../..') {
+    dependencySubstitution {
+        substitute module('com.smellouk.konitor:engine') using project(':libs:engine')
+        substitute module('com.smellouk.konitor:cpu-module') using project(':libs:modules:cpu')
+        substitute module('com.smellouk.konitor:fps-module') using project(':libs:modules:fps')
+        substitute module('com.smellouk.konitor:memory-module') using project(':libs:modules:memory')
+        substitute module('com.smellouk.konitor:network-module') using project(':libs:modules:network')
+        substitute module('com.smellouk.konitor:issues-module') using project(':libs:modules:issues')
+        substitute module('com.smellouk.konitor:jank-module') using project(':libs:modules:jank')
+        substitute module('com.smellouk.konitor:gc-module') using project(':libs:modules:gc')
+        substitute module('com.smellouk.konitor:thermal-module') using project(':libs:modules:thermal')
+        substitute module('com.smellouk.konitor:gpu-module') using project(':libs:modules:gpu')
+        substitute module('com.smellouk.konitor:kmm') using project(':libs:ui:kmm')
+    }
+}

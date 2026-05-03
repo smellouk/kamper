@@ -1362,7 +1362,7 @@ PODS:
     - React-RCTFBReactNativeSpec
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
-  - react-native-kamper (0.1.0):
+  - react-native-konitor (0.1.0):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -1880,7 +1880,7 @@ DEPENDENCIES:
   - React-logger (from `../node_modules/react-native/ReactCommon/logger`)
   - React-Mapbuffer (from `../node_modules/react-native/ReactCommon`)
   - React-microtasksnativemodule (from `../node_modules/react-native/ReactCommon/react/nativemodule/microtasks`)
-  - react-native-kamper (from `../node_modules/react-native-kamper`)
+  - react-native-konitor (from `../node_modules/react-native-konitor`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - React-NativeModulesApple (from `../node_modules/react-native/ReactCommon/react/nativemodule/core/platform/ios`)
   - React-networking (from `../node_modules/react-native/ReactCommon/react/networking`)
@@ -1996,8 +1996,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon"
   React-microtasksnativemodule:
     :path: "../node_modules/react-native/ReactCommon/react/nativemodule/microtasks"
-  react-native-kamper:
-    :path: "../node_modules/react-native-kamper"
+  react-native-konitor:
+    :path: "../node_modules/react-native-konitor"
   react-native-safe-area-context:
     :path: "../node_modules/react-native-safe-area-context"
   React-NativeModulesApple:
@@ -2110,7 +2110,7 @@ SPEC CHECKSUMS:
   React-logger: 2c87840a9f6322a1226d0df337d9662f44ea6094
   React-Mapbuffer: 1fc10d873f00aa895836c316a9737ce7d43875ce
   React-microtasksnativemodule: 85ac7286ff84e8fc8e1956233748b8d4b2a6dcea
-  react-native-kamper: ddef11b29949baaf76133cd834782e89b590ea70
+  react-native-konitor: c334024f869a59c751af16e1375b4b0716b648a8
   react-native-safe-area-context: 6b4966397ada0f7dd481e4486a2ef936834861a1
   React-NativeModulesApple: 993744f42aab769eb02bf5d256b6767c546d0bb5
   React-networking: 251bfddc651caca5e3039d1afa1d2eca890d0c56
@@ -2148,6 +2148,6 @@ SPEC CHECKSUMS:
   ReactNativeDependencies: 6c02f0382d2f9bdba52e6cdefa26137714d0913d
   Yoga: 04bb4bfeb02c0000b940c1e6e89e856cd8de5a71
 
-PODFILE CHECKSUM: ff51d3fb1c856e16444d65fda61c5cd0a257a545
+PODFILE CHECKSUM: 04bacf66e75d132e71f5f08927afc243ca375c22
 
 COCOAPODS: 1.16.2

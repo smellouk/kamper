@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.smellouk.kamper.android"
+    namespace = "com.smellouk.konitor.android"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.smellouk.kamper.android"
+        applicationId = "com.smellouk.konitor.android"
         minSdk = 21
         targetSdk = 35
         versionCode = 1

@@ -3,7 +3,7 @@ plugins {
     id("com.android.library")
     id("org.jetbrains.compose")
     alias(libs.plugins.kotlin.compose)
-    id("kamper.android.config")
+    id("konitor.android.config")
 }
 
 // Compose Multiplatform 1.9.x does not publish tvOS klib variants for foundation, animation,
@@ -59,8 +59,8 @@ abstract class TvosIosDisambiguationRule : AttributeDisambiguationRule<String> {
 }
 
 android {
-    namespace = "com.smellouk.kamper.ui"
-    // compileSdk, minSdk, compileOptions provided by kamper.android.config
+    namespace = "com.smellouk.konitor.ui"
+    // compileSdk, minSdk, compileOptions provided by konitor.android.config
 
     testOptions {
         unitTests {

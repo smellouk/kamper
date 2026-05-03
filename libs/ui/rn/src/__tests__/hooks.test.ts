@@ -1,15 +1,15 @@
 /**
  * Wave 0 skeleton — hook mount/unmount lifecycle (per D-07).
  *
- * RED state until Plan 03 ships kamper/react-native/src/hooks/*.ts and
- * kamper/react-native/src/Kamper.ts.
+ * RED state until Plan 03 ships konitor/react-native/src/hooks/*.ts and
+ * konitor/react-native/src/Konitor.ts.
  * Once Plans 01 + 03 land, all imports resolve and the suite goes GREEN.
  *
- * Strategy: mock the underlying NativeKamperModule (already done globally
+ * Strategy: mock the underlying NativeKonitorModule (already done globally
  * via jest moduleNameMapper) and assert that:
- *   - mounting a hook starts the engine exactly once via Kamper.start()
+ *   - mounting a hook starts the engine exactly once via Konitor.start()
  *   - mounting two hooks does NOT start the engine a second time (ref count)
- *   - unmounting the LAST active hook calls Kamper.stop()
+ *   - unmounting the LAST active hook calls Konitor.stop()
  *
  * react-test-renderer's `renderHook` is provided by @testing-library/react-hooks
  * via the RN jest preset stack. If unavailable, tests fall back to manual
@@ -18,11 +18,11 @@
 
 import { renderHook } from '@testing-library/react-native';
 import {
-  _resetNativeKamperModuleMocks,
+  _resetNativeKonitorModuleMocks,
   start as nativeStart,
   stop as nativeStop,
-} from './NativeKamperModule.mock';
-import { useKamper } from '../hooks/useKamper';
+} from './NativeKonitorModule.mock';
+import { useKonitor } from '../hooks/useKonitor';
 import { useCpu } from '../hooks/useCpu';
 import { useFps } from '../hooks/useFps';
 import { useMemory } from '../hooks/useMemory';
@@ -33,18 +33,18 @@ import { useGc } from '../hooks/useGc';
 import { useThermal } from '../hooks/useThermal';
 
 beforeEach(() => {
-  _resetNativeKamperModuleMocks();
+  _resetNativeKonitorModuleMocks();
 });
 
-describe('useKamper umbrella hook (D-07)', () => {
+describe('useKonitor umbrella hook (D-07)', () => {
   it('mount calls native start() exactly once', () => {
-    const { unmount } = renderHook(() => useKamper({ cpu: true }));
+    const { unmount } = renderHook(() => useKonitor({ cpu: true }));
     expect(nativeStart).toHaveBeenCalledTimes(1);
     unmount();
   });
 
   it('unmount calls native stop() when ref count hits zero', () => {
-    const { unmount } = renderHook(() => useKamper({ cpu: true }));
+    const { unmount } = renderHook(() => useKonitor({ cpu: true }));
     unmount();
     expect(nativeStop).toHaveBeenCalledTimes(1);
   });

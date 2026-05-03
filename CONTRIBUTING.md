@@ -1,6 +1,6 @@
-# Contributing to Kamper
+# Contributing to Konitor
 
-Thank you for your interest in contributing to Kamper! This guide covers everything you need
+Thank you for your interest in contributing to Konitor! This guide covers everything you need
 to set up, build, follow the module patterns, and submit a conformant pull request.
 
 ---
@@ -12,7 +12,7 @@ to set up, build, follow the module patterns, and submit a conformant pull reque
   Device-attached tests are a separate step covered below.
 - Smoke test on a fresh clone:
   ```
-  ./gradlew :kamper:api:test :kamper:engine:test
+  ./gradlew :libs:api:test :libs:engine:test
   ```
   Both tasks must pass before you begin work.
 
@@ -21,14 +21,14 @@ to set up, build, follow the module patterns, and submit a conformant pull reque
 ## Clone and build
 
 ```bash
-git clone https://github.com/smellouk/kamper.git
-cd kamper
+git clone https://github.com/smellouk/konitor.git
+cd konitor
 ```
 
 Run the smoke test to confirm the build is healthy:
 
 ```bash
-./gradlew :kamper:api:test :kamper:engine:test
+./gradlew :libs:api:test :libs:engine:test
 ```
 
 Both tasks compile and test without a connected device.
@@ -41,10 +41,10 @@ Prefer the fast JVM path for iterative development — it runs in seconds and re
 
 | Command | Scope | When to use |
 |---------|-------|-------------|
-| `./gradlew :kamper:modules:<name>:jvmTest` | Single module, JVM only | Fast feedback (primary path) |
-| `./gradlew :kamper:modules:<name>:test` | Single module, all unit tests | Includes androidUnitTest |
-| `./gradlew :kamper:api:test` | API contracts | After modifying the api layer |
-| `./gradlew :kamper:engine:test` | Engine | After modifying the engine layer |
+| `./gradlew :libs:modules:<name>:jvmTest` | Single module, JVM only | Fast feedback (primary path) |
+| `./gradlew :libs:modules:<name>:test` | Single module, all unit tests | Includes androidUnitTest |
+| `./gradlew :libs:api:test` | API contracts | After modifying the api layer |
+| `./gradlew :libs:engine:test` | Engine | After modifying the engine layer |
 | `./gradlew test` | All modules, all unit tests | Full pre-commit sweep |
 | `./gradlew detekt` | Static analysis (zero-tolerance) | Before every commit |
 
@@ -73,8 +73,8 @@ using the commands in the Development workflow table above.
 
 ## Module pattern
 
-Every Kamper performance module follows a strict 4-class structure. Deviating from this
-structure is a convention violation. The canonical reference module is `kamper/modules/cpu/` —
+Every Konitor performance module follows a strict 4-class structure. Deviating from this
+structure is a convention violation. The canonical reference module is `libs/modules/cpu/` —
 when in doubt, mirror what CPU does.
 
 ### 4-class structure
@@ -101,7 +101,7 @@ data class {Name}Info(val value: Double) : Info {
 
 ### Builder / DEFAULT pattern
 
-Every `Config` must expose a `@KamperDslMarker` Builder object and a `DEFAULT` companion val.
+Every `Config` must expose a `@KonitorDslMarker` Builder object and a `DEFAULT` companion val.
 
 ```kotlin
 data class {Name}Config(
@@ -109,7 +109,7 @@ data class {Name}Config(
     override val intervalInMs: Long,
     val logger: Logger
 ) : Config {
-    @KamperDslMarker
+    @KonitorDslMarker
     object Builder {
         var isEnabled: Boolean = false
         var intervalInMs: Long = 1000L
@@ -126,7 +126,7 @@ data class {Name}Config(
 ### Safety rule
 
 All platform-specific calls inside `{Name}InfoSource` must be wrapped in `try/catch`.
-Exceptions are logged and absorbed — Kamper must never propagate an exception to the host
+Exceptions are logged and absorbed — Konitor must never propagate an exception to the host
 application.
 
 ```kotlin
@@ -147,7 +147,7 @@ Additional safety rules:
 
 ## Commit format
 
-Kamper uses [Conventional Commits](https://www.conventionalcommits.org/).
+Konitor uses [Conventional Commits](https://www.conventionalcommits.org/).
 
 ```
 <type>(<scope>): <short description>
@@ -201,7 +201,7 @@ refactor(memory): extract MemoryInfoMapper
 Before opening a pull request, verify all items in this checklist:
 
 - [ ] `./gradlew detekt` passes (zero issues)
-- [ ] `./gradlew :kamper:modules:<name>:jvmTest` passes for every touched module
+- [ ] `./gradlew :libs:modules:<name>:jvmTest` passes for every touched module
 - [ ] No `TODO:` or `FIXME:` comments in changed files
 - [ ] Public API changes are additive only (no removals or signature breaks)
 
@@ -212,7 +212,7 @@ each item.
 
 ## Code review
 
-Kamper is maintained by a single maintainer. Please be patient — reviews typically happen
+Konitor is maintained by a single maintainer. Please be patient — reviews typically happen
 within a few days.
 
 Reviewers check:
@@ -222,4 +222,4 @@ Reviewers check:
 - Commit message format (Conventional Commits, no emojis, imperative mood)
 
 To self-review your module changes before submitting, compare your implementation against
-`kamper/modules/cpu/` — it is the most complete and well-tested module in the repository.
+`libs/modules/cpu/` — it is the most complete and well-tested module in the repository.

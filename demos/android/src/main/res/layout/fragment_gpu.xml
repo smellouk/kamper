@@ -280,7 +280,7 @@
         </LinearLayout>
 
         <!-- Stress canvas: square box (width = height via onMeasure), shown only when stressing -->
-        <com.smellouk.kamper.android.GpuStressView
+        <com.smellouk.konitor.android.GpuStressView
             android:id="@+id/gpuStressView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

@@ -10,59 +10,59 @@ linkerOpts = -framework IOKit
  * SMC key "Tp09" is the CPU proximity sensor on M-series chips.
  * Falls back through a list of known keys if the first is absent.      */
 
-#define KAMPER_SMC_INDEX        2
-#define KAMPER_SMC_GET_KEY_INFO 9
-#define KAMPER_SMC_READ_BYTES   5
+#define KONITOR_SMC_INDEX        2
+#define KONITOR_SMC_GET_KEY_INFO 9
+#define KONITOR_SMC_READ_BYTES   5
 
 typedef struct {
     char    major; char minor; char build; char reserved[1]; UInt16 release;
-} KamperSMCVersion;
+} KonitorSMCVersion;
 
 typedef struct {
     UInt16 version; UInt16 length;
     UInt32 cpuPLimit; UInt32 gpuPLimit; UInt32 memPLimit;
-} KamperSMCPLimit;
+} KonitorSMCPLimit;
 
 typedef struct {
     UInt32 dataSize; UInt32 dataType; char dataAttributes;
-} KamperSMCKeyInfo;
+} KonitorSMCKeyInfo;
 
 typedef struct {
     UInt32          key;
-    KamperSMCVersion vers;
-    KamperSMCPLimit  pLimitData;
-    KamperSMCKeyInfo keyInfo;
+    KonitorSMCVersion vers;
+    KonitorSMCPLimit  pLimitData;
+    KonitorSMCKeyInfo keyInfo;
     char            result;
     char            status;
     char            data8;
     UInt32          data32;
     UInt8           bytes[32];
-} KamperSMCParam;
+} KonitorSMCParam;
 
-static UInt32 kamper_smc_encode_key(const char *k) {
+static UInt32 konitor_smc_encode_key(const char *k) {
     return ((UInt32)(UInt8)k[0] << 24) | ((UInt32)(UInt8)k[1] << 16)
          | ((UInt32)(UInt8)k[2] <<  8) |  (UInt32)(UInt8)k[3];
 }
 
-static double kamper_smc_read_key(io_connect_t conn, const char *key) {
-    KamperSMCParam in = {0}, out = {0};
-    size_t outSize = sizeof(KamperSMCParam);
+static double konitor_smc_read_key(io_connect_t conn, const char *key) {
+    KonitorSMCParam in = {0}, out = {0};
+    size_t outSize = sizeof(KonitorSMCParam);
 
-    in.key   = kamper_smc_encode_key(key);
-    in.data8 = KAMPER_SMC_GET_KEY_INFO;
-    if (IOConnectCallStructMethod(conn, KAMPER_SMC_INDEX,
+    in.key   = konitor_smc_encode_key(key);
+    in.data8 = KONITOR_SMC_GET_KEY_INFO;
+    if (IOConnectCallStructMethod(conn, KONITOR_SMC_INDEX,
             &in, sizeof(in), &out, &outSize) != KERN_SUCCESS) return -1.0;
 
     UInt32 dataSize = out.keyInfo.dataSize;
     UInt32 dataType = out.keyInfo.dataType;
 
     memset(&in, 0, sizeof(in));
-    in.key              = kamper_smc_encode_key(key);
+    in.key              = konitor_smc_encode_key(key);
     in.keyInfo.dataSize = dataSize;
-    in.data8            = KAMPER_SMC_READ_BYTES;
+    in.data8            = KONITOR_SMC_READ_BYTES;
     memset(&out, 0, sizeof(out));
-    outSize = sizeof(KamperSMCParam);
-    if (IOConnectCallStructMethod(conn, KAMPER_SMC_INDEX,
+    outSize = sizeof(KonitorSMCParam);
+    if (IOConnectCallStructMethod(conn, KONITOR_SMC_INDEX,
             &in, sizeof(in), &out, &outSize) != KERN_SUCCESS) return -1.0;
 
     /* "sp78" — signed fixed-point 7.8 (most common for temperature) */
@@ -81,7 +81,7 @@ static double kamper_smc_read_key(io_connect_t conn, const char *key) {
     return -1.0;
 }
 
-static double kamper_get_cpu_temperature(void) {
+static double konitor_get_cpu_temperature(void) {
     /* Only supported on Apple Silicon */
     int is_arm64 = 0;
     size_t sz = sizeof(is_arm64);
@@ -101,7 +101,7 @@ static double kamper_get_cpu_temperature(void) {
     const char *keys[] = { "Tp09", "Tp0P", "TC0P", "TC0D", NULL };
     double temp = -1.0;
     for (int i = 0; keys[i] && temp <= 0.0; i++) {
-        double t = kamper_smc_read_key(conn, keys[i]);
+        double t = konitor_smc_read_key(conn, keys[i]);
         if (t > 0.0 && t < 150.0) temp = t;
     }
 

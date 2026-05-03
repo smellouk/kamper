@@ -5,6 +5,6 @@ headers = Foundation/Foundation.h
 
 /* Returns NSProcessInfo.thermalState as an int.
  * 0=Nominal, 1=Fair, 2=Serious, 3=Critical. */
-static int kamper_thermal_state(void) {
+static int konitor_thermal_state(void) {
     return (int)[[NSProcessInfo processInfo] thermalState];
 }

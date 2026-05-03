@@ -1,9 +1,9 @@
 plugins {
-    id("kamper.kmp.library")
+    id("konitor.kmp.library")
 }
 
 android {
-    namespace = "com.smellouk.kamper.api"
+    namespace = "com.smellouk.konitor.api"
 }
 
 kotlin {

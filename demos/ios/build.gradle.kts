@@ -2,7 +2,7 @@ plugins {
     alias(libs.plugins.kotlin.multiplatform)
 }
 
-val appBundleDir = layout.buildDirectory.dir("KamperIOS.app")
+val appBundleDir = layout.buildDirectory.dir("KonitorIOS.app")
 
 tasks.register("assembleIosSimulatorApp") {
     dependsOn("linkDebugExecutableIosSimulatorArm64")
@@ -12,7 +12,7 @@ tasks.register("assembleIosSimulatorApp") {
     doLast {
         val bundle = appBundleDir.get().asFile
         bundle.mkdirs()
-        val exe = bundle.resolve("KamperIOS")
+        val exe = bundle.resolve("KonitorIOS")
         kexe.get().asFile.copyTo(exe, overwrite = true)
         exe.setExecutable(true)
         bundle.resolve("Info.plist").writeText("""
@@ -21,9 +21,9 @@ tasks.register("assembleIosSimulatorApp") {
             <plist version="1.0">
             <dict>
                 <key>CFBundleExecutable</key>
-                <string>KamperIOS</string>
+                <string>KonitorIOS</string>
                 <key>CFBundleIdentifier</key>
-                <string>com.smellouk.kamper.ios</string>
+                <string>com.smellouk.konitor.ios</string>
                 <key>CFBundleName</key>
                 <string>K|iOS</string>
                 <key>CFBundleDisplayName</key>
@@ -60,14 +60,14 @@ kotlin {
     iosArm64 {
         binaries {
             executable {
-                entryPoint = "com.smellouk.kamper.ios.main"
+                entryPoint = "com.smellouk.konitor.ios.main"
             }
         }
     }
     iosSimulatorArm64 {
         binaries {
             executable {
-                entryPoint = "com.smellouk.kamper.ios.main"
+                entryPoint = "com.smellouk.konitor.ios.main"
             }
         }
     }

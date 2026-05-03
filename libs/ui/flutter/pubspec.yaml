@@ -1,0 +1,21 @@
+name: konitor_flutter
+description: Konitor performance monitoring plugin for Flutter (Android + iOS).
+version: 0.1.0
+homepage: https://github.com/smellouk/konitor
+
+environment:
+  sdk: ^3.2.0
+  flutter: ">=3.16.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+flutter:
+  plugin:
+    platforms:
+      android:
+        package: com.smellouk.konitor.flutter
+        pluginClass: KonitorFlutterPlugin
+      ios:
+        pluginClass: KonitorFlutterPlugin

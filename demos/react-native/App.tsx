@@ -17,7 +17,7 @@ import {SafeAreaProvider, SafeAreaView} from 'react-native-safe-area-context';
 // references so the import surface is exercised at TypeScript compile time
 // (no transient "add and revert" required for verification per revision
 // iteration 1 WARNING fix).
-import {Kamper, showOverlay, hideOverlay} from 'react-native-kamper';
+import {Konitor, showOverlay, hideOverlay} from 'react-native-konitor';
 import type {
   CpuInfo,
   FpsInfo,
@@ -31,7 +31,7 @@ import type {
   JsMemoryInfo,
   JsGcInfo,
   UserEventInfo,
-} from 'react-native-kamper';
+} from 'react-native-konitor';
 
 // ─── D-12 verification: __DEV__-only overlay sample ─────────────────────
 // This block is INTENTIONALLY commented out — it documents the canonical
@@ -41,7 +41,7 @@ import type {
 // the app. To exercise the overlay, uncomment temporarily:
 //
 //   if (__DEV__) {
-//     // Show the native Kamper overlay in development builds only.
+//     // Show the native Konitor overlay in development builds only.
 //     // showOverlay();
 //     // ... and later when leaving the screen:
 //     // hideOverlay();
@@ -71,7 +71,7 @@ const C = {
 };
 
 // ── Types ──────────────────────────────────────────────────────────────────────
-// Aliased to types exported by react-native-kamper (D-09).
+// Aliased to types exported by react-native-konitor (D-09).
 // Field shapes are guaranteed identical (validated by Codegen + types.ts contract).
 type CpuData = CpuInfo;
 type FpsData = FpsInfo;
@@ -278,12 +278,12 @@ function CpuTab({cpu, running}: {cpu: CpuData | null; running: boolean}) {
     if (stressing) {
       activeRef.current = false;
       setStressing(false);
-      Kamper.logEvent('cpu_load_stop');
+      Konitor.logEvent('cpu_load_stop');
     } else {
       activeRef.current = true;
       setStressing(true);
       setTimeout(runLoop, 50);
-      Kamper.logEvent('cpu_load_start');
+      Konitor.logEvent('cpu_load_start');
     }
   }, [stressing, runLoop]);
 
@@ -353,13 +353,13 @@ function MemoryTab({mem, jsMem, running}: {mem: MemoryData | null; jsMem: JsMemo
   const [allocMsg, setAllocMsg] = useState('');
 
   const alloc32Mb = useCallback(() => {
-    Kamper.logEvent('memory_alloc_32mb_js');
+    Konitor.logEvent('memory_alloc_32mb_js');
     allocRef.current = new Uint8Array(32 * 1024 * 1024).fill(0xAA);
     setAllocMsg('Allocated 32 MB in JS heap');
   }, []);
 
   const releaseJsMem = useCallback(() => {
-    Kamper.logEvent('memory_release_js');
+    Konitor.logEvent('memory_release_js');
     allocRef.current = null;
     setAllocMsg('Released — awaiting Hermes GC');
     setTimeout(() => setAllocMsg(''), 3000);
@@ -429,7 +429,7 @@ function NetworkTab({
   const [dlStatus, setDlStatus] = useState('');
 
   const testDownload = useCallback(async () => {
-    Kamper.logEvent('network_download_test');
+    Konitor.logEvent('network_download_test');
     setFetching(true);
     setDlStatus('Fetching 5 MB…');
     try {
@@ -536,20 +536,20 @@ function IssuesTab({issues, onClear}: {issues: IssueData[]; onClear: () => void}
   const [spanStatus, setSpanStatus] = useState('');
 
   const triggerSlowSpan = useCallback(() => {
-    Kamper.logEvent('issue_slow_span_js');
+    Konitor.logEvent('issue_slow_span_js');
     setSpanStatus('Blocking JS thread 800 ms…');
     setTimeout(() => {
-      Kamper.beginSpan('js-slow-span', 500);
+      Konitor.beginSpan('js-slow-span', 500);
       const start = Date.now();
       while (Date.now() - start < 800) {}
-      Kamper.endSpan('js-slow-span');
+      Konitor.endSpan('js-slow-span');
       setSpanStatus('Done — SLOW_SPAN event fired');
       setTimeout(() => setSpanStatus(''), 5000);
     }, 200);
   }, []);
 
   const triggerCrash = useCallback(() => {
-    Kamper.logEvent('issue_crash_trigger');
+    Konitor.logEvent('issue_crash_trigger');
     setTimeout(() => { throw new Error('Demo crash: test crash triggered by user'); }, 0);
   }, []);
 
@@ -576,7 +576,7 @@ function JankTab({jank, running}: {jank: JankData | null; running: boolean}) {
   const [jankMsg, setJankMsg] = useState('');
 
   const simulateJank = useCallback(() => {
-    Kamper.logEvent('jank_simulate');
+    Konitor.logEvent('jank_simulate');
     setJankMsg('Blocking 200 ms (Native)…');
     setTimeout(() => {
       const end = Date.now() + 200;
@@ -626,7 +626,7 @@ function GcTab({gc, jsGc, running}: {gc: GcData | null; jsGc: JsGcData | null; r
   const [gcMsg, setGcMsg] = useState('');
 
   const simulateGc = useCallback(() => {
-    Kamper.logEvent('gc_simulate_js');
+    Konitor.logEvent('gc_simulate_js');
     setGcMsg('Allocating…');
     setTimeout(() => {
       const bufs: Uint8Array[] = [];
@@ -722,12 +722,12 @@ function ThermalTab({thermal, running}: {thermal: ThermalData | null; running: b
     if (stressing) {
       activeRef.current = false;
       setStressing(false);
-      Kamper.logEvent('thermal_stress_stop');
+      Konitor.logEvent('thermal_stress_stop');
     } else {
       activeRef.current = true;
       setStressing(true);
       setTimeout(runLoop, 50);
-      Kamper.logEvent('thermal_stress_start');
+      Konitor.logEvent('thermal_stress_start');
     }
   }, [stressing, runLoop]);
 
@@ -944,7 +944,7 @@ function GpuTab({gpu, running}: {gpu: GpuData | null; running: boolean}) {
       </ScrollView>
       <View style={s.footer}>
         {running
-          ? <Btn label={stressing ? 'STOP STRESS' : 'STRESS GPU'} onPress={() => { Kamper.logEvent(stressing ? 'gpu_stress_stop' : 'gpu_stress_start'); setStressing(v => !v); }} />
+          ? <Btn label={stressing ? 'STOP STRESS' : 'STRESS GPU'} onPress={() => { Konitor.logEvent(stressing ? 'gpu_stress_stop' : 'gpu_stress_start'); setStressing(v => !v); }} />
           : <Text style={s.footerHint}>Engine stopped</Text>
         }
       </View>
@@ -988,16 +988,16 @@ function EventsTab({events, onClear}: {events: Array<UserEventData & {wallClockM
   const logCustom = useCallback(() => {
     const name = customName.trim();
     if (!name) return;
-    Kamper.logEvent(name);
+    Konitor.logEvent(name);
     setCustomName('');
   }, [customName]);
 
   const triggerVideoPlayback = useCallback(() => {
     if (recording) return;
     setRecording(true);
-    const tokenId = Kamper.startEvent('video_playback');
+    const tokenId = Konitor.startEvent('video_playback');
     setTimeout(() => {
-      Kamper.endEvent(tokenId);
+      Konitor.endEvent(tokenId);
       setRecording(false);
     }, 2000);
   }, [recording]);
@@ -1013,7 +1013,7 @@ function EventsTab({events, onClear}: {events: Array<UserEventData & {wallClockM
       <View style={[s.footer, {flexDirection: 'column', gap: 8, alignItems: 'stretch'}]}>
         <View style={{flexDirection: 'row', gap: 8, flexWrap: 'wrap'}}>
           {EVENT_PRESETS.map(name => (
-            <Btn key={name} label={name.toUpperCase()} onPress={() => Kamper.logEvent(name)} />
+            <Btn key={name} label={name.toUpperCase()} onPress={() => Konitor.logEvent(name)} />
           ))}
           <Btn label={recording ? 'Recording…' : 'video_playback'} onPress={triggerVideoPlayback} disabled={recording} />
           <Btn label="CLEAR" onPress={onClear} />
@@ -1058,47 +1058,47 @@ export default function App() {
   const peakTxRef                 = useRef(0);
 
   useEffect(() => {
-    Kamper.start();
+    Konitor.start();
     if (__DEV__) showOverlay();
     setRunning(true);
     const subs = [
-      Kamper.on('cpu',     (d: CpuData)     => setCpu(d)),
-      Kamper.on('fps',     (d: FpsData)     => setFps(d)),
-      Kamper.on('memory',  (d: MemoryData)  => setMem(d)),
-      Kamper.on('network', (d: NetworkData) => {
+      Konitor.on('cpu',     (d: CpuData)     => setCpu(d)),
+      Konitor.on('fps',     (d: FpsData)     => setFps(d)),
+      Konitor.on('memory',  (d: MemoryData)  => setMem(d)),
+      Konitor.on('network', (d: NetworkData) => {
         peakRxRef.current = Math.max(peakRxRef.current, d.rxMb);
         peakTxRef.current = Math.max(peakTxRef.current, d.txMb);
         setNet(d);
       }),
-      Kamper.on('issue',   (d: IssueData)   => {
+      Konitor.on('issue',   (d: IssueData)   => {
         setIssues(prev => [d, ...prev].slice(0, 100));
       }),
-      Kamper.on('jank',    (d: JankData)    => setJank(d)),
-      Kamper.on('gc',       (d: GcData)       => setGc(d)),
-      Kamper.on('gpu',      (d: GpuData)      => setGpu(d)),
-      Kamper.on('thermal',  (d: ThermalData)  => setThermal(d)),
-      Kamper.on('jsMemory', (d: JsMemoryData) => setJsMem(d)),
-      Kamper.on('jsGc',     (d: JsGcData)     => setJsGc(d)),
-      Kamper.on('userEvent', (d: UserEventData) => {
+      Konitor.on('jank',    (d: JankData)    => setJank(d)),
+      Konitor.on('gc',       (d: GcData)       => setGc(d)),
+      Konitor.on('gpu',      (d: GpuData)      => setGpu(d)),
+      Konitor.on('thermal',  (d: ThermalData)  => setThermal(d)),
+      Konitor.on('jsMemory', (d: JsMemoryData) => setJsMem(d)),
+      Konitor.on('jsGc',     (d: JsGcData)     => setJsGc(d)),
+      Konitor.on('userEvent', (d: UserEventData) => {
         setUserEvents(prev => [{...d, wallClockMs: Date.now()}, ...prev].slice(0, 200));
       }),
     ];
     return () => {
       subs.forEach(sub => sub.remove());
-      Kamper.stop();
+      Konitor.stop();
     };
   }, []);
 
   const toggle = useCallback(() => {
     if (running) {
-      Kamper.stop();
+      Konitor.stop();
       setRunning(false);
       setCpu(null); setFps(null); setMem(null); setNet(null); setIssues([]);
       setJank(null); setGc(null); setGpu(null); setThermal(null); setJsMem(null); setJsGc(null);
       setUserEvents([]);
       peakRxRef.current = 0; peakTxRef.current = 0;
     } else {
-      Kamper.start();
+      Konitor.start();
       setRunning(true);
     }
   }, [running]);
@@ -1162,7 +1162,7 @@ export default function App() {
           running={running}
         />
       )}
-      {activeTab === 6 && <IssuesTab  issues={issues} onClear={() => { Kamper.logEvent('issues_clear'); setIssues([]); }} />}
+      {activeTab === 6 && <IssuesTab  issues={issues} onClear={() => { Konitor.logEvent('issues_clear'); setIssues([]); }} />}
       {activeTab === 7 && <JankTab    jank={jank}    running={running} />}
       {activeTab === 8 && <GcTab      gc={gc}        jsGc={jsGc}  running={running} />}
       {activeTab === 9 && <ThermalTab thermal={thermal} running={running} />}

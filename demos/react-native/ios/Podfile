@@ -8,15 +8,15 @@ require Pod::Executable.execute_command('node', ['-p',
 platform :ios, min_ios_version_supported
 prepare_react_native_project!
 
-# react-native-kamper is symlinked into node_modules (package.json file: reference).
-# The podspec uses '../xcframework/...' relative to the symlink target; CocoaPods does
+# react-native-konitor is symlinked into node_modules (package.json file: reference).
+# The podspec uses '../apple-sdk/...' relative to the symlink target; CocoaPods does
 # not follow symlinks when resolving vendored_frameworks, so that path would land in
-# node_modules/xcframework/ (non-existent). Create a sibling symlink here — at Podfile
+# node_modules/apple-sdk/ (non-existent). Create a sibling symlink here — at Podfile
 # load time, before podspec analysis — so the path resolves correctly.
 _nm_dir   = File.expand_path('../node_modules', __dir__)
-_xcfw_link = File.join(_nm_dir, 'xcframework')
+_xcfw_link = File.join(_nm_dir, 'apple-sdk')
 unless File.exist?(_xcfw_link)
-  _xcfw_real = File.expand_path('../../../libs/xcframework', __dir__)
+  _xcfw_real = File.expand_path('../../../libs/apple-sdk', __dir__)
   File.symlink(_xcfw_real, _xcfw_link)
 end
 
@@ -27,12 +27,12 @@ if linkage != nil
 end
 
 pre_install do |installer|
-  puts "Building Kamper XCFramework (this may take a moment on first run)..."
+  puts "Building Konitor XCFramework (this may take a moment on first run)..."
   repo_root = File.expand_path('../../../', __dir__)
-  system("cd '#{repo_root}' && ./gradlew :libs:xcframework:assembleKamperReleaseXCFramework")
+  system("cd '#{repo_root}' && ./gradlew :libs:apple-sdk:assembleKonitorXCFramework")
 end
 
-target 'KamperRn' do
+target 'KonitorRn' do
   config = use_native_modules!
 
   use_react_native!(
@@ -49,10 +49,10 @@ target 'KamperRn' do
       # :ccache_enabled => true
     )
 
-    # Kamper.xcframework is built by a script phase and doesn't exist at pod install
+    # Konitor.xcframework is built by a script phase and doesn't exist at pod install
     # time, so CocoaPods omits vendored_frameworks entries. Patch xcconfig files
-    # directly so the compiler and linker can find Kamper.framework.
-    kamper_fw_dir = File.expand_path('../../../libs/xcframework/build/XCFrameworks/release/Kamper.xcframework/ios-arm64-simulator', installer.config.installation_root)
+    # directly so the compiler and linker can find Konitor.framework.
+    konitor_fw_dir = File.expand_path('../../../libs/apple-sdk/build/XCFrameworks/release/Konitor.xcframework/ios-arm64-simulator', installer.config.installation_root)
 
     installer.pods_project.targets.each do |target|
       target.build_configurations.each do |bc|
@@ -62,15 +62,15 @@ target 'KamperRn' do
         modified = false
 
         # Add xcframework slice to FRAMEWORK_SEARCH_PATHS for compiler header lookup.
-        unless content.include?(kamper_fw_dir)
-          content.sub!(/^(FRAMEWORK_SEARCH_PATHS = .*)$/, "\\1 \"#{kamper_fw_dir}\"")
+        unless content.include?(konitor_fw_dir)
+          content.sub!(/^(FRAMEWORK_SEARCH_PATHS = .*)$/, "\\1 \"#{konitor_fw_dir}\"")
           modified = true
         end
 
-        # Add -framework Kamper to OTHER_LDFLAGS for the app-aggregate xcconfig so
-        # the linker resolves symbols from libreact-native-kamper.a.
-        if target.name == 'Pods-KamperRn' && !content.include?('-framework "Kamper"')
-          content.sub!(/^(OTHER_LDFLAGS = .*)$/, "\\1 -framework \"Kamper\"")
+        # Add -framework Konitor to OTHER_LDFLAGS for the app-aggregate xcconfig so
+        # the linker resolves symbols from libreact-native-konitor.a.
+        if target.name == 'Pods-KonitorRn' && !content.include?('-framework "Konitor"')
+          content.sub!(/^(OTHER_LDFLAGS = .*)$/, "\\1 -framework \"Konitor\"")
           modified = true
         end
 

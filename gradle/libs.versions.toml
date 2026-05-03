@@ -73,6 +73,6 @@ detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 test-logger = { id = "com.adarshr.test-logger", version.ref = "gradle-test-logger" }
 
 # Convention plugins (resolved via includeBuild("build-logic"); no version)
-kamper-kmp-library = { id = "kamper.kmp.library" }
-kamper-android-config = { id = "kamper.android.config" }
-kamper-publish = { id = "kamper.publish" }
+konitor-kmp-library = { id = "konitor.kmp.library" }
+konitor-android-config = { id = "konitor.android.config" }
+konitor-publish = { id = "konitor.publish" }

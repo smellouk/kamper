@@ -1,8 +1,8 @@
 // src/hooks/useNetwork.ts — single-metric hook (D-07).
 
 import { useEffect, useState } from 'react';
-import { Kamper } from '../Kamper';
-import { _acquireEngine, _releaseEngine } from './useKamper';
+import { Konitor } from '../Konitor';
+import { _acquireEngine, _releaseEngine } from './useKonitor';
 import type { NetworkInfo } from '../types';
 
 /**
@@ -14,7 +14,7 @@ export function useNetwork(): NetworkInfo | null {
 
   useEffect(() => {
     _acquireEngine({ network: true });
-    const sub = Kamper.on('network', (d: NetworkInfo) => {
+    const sub = Konitor.on('network', (d: NetworkInfo) => {
       setData(d);
     });
     return () => {

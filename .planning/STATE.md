@@ -2,21 +2,21 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: complete
-stopped_at: Phase 24 UAT complete — milestone v1.0 delivered (2026-05-03)
+status: planning
+stopped_at: phase 26 planned (2026-05-03)
 last_updated: "2026-05-03T00:00:00Z"
 progress:
-  total_phases: 24
-  completed_phases: 23
-  total_plans: 130
-  completed_plans: 130
-  percent: 100
+  total_phases: 26
+  completed_phases: 24
+  total_plans: 138
+  completed_plans: 132
+  percent: 96
 ---
 
 # GSD State
 
 **Date:** 2026-05-03
-**Status:** Milestone v1.0 Complete — Phase 24 UAT passed (10/10)
+**Status:** Phase 26 Ready to Execute — flutter support package and demo (6 plans, 3 waves)
 
 ---
 
@@ -24,15 +24,15 @@ progress:
 
 | Field | Value |
 |-------|-------|
-| Branch | phase/24-log-events-perfetto |
+| Branch | phase/25-kamper-to-konitor-rename |
 | Milestone | v1.0 |
-| Current Phase | None — milestone complete |
-| Last Completed Phase | 24 — log events (Perfetto UI) |
-| Phases Completed | 01–16, 18–24 |
+| Current Phase | — (all phases complete) |
+| Last Completed Phase | 25 — rename Kamper → Konitor |
+| Phases Completed | 01–16, 18–25 |
 | Phases Remaining | 17 (pending/skipped — Medium Articles) |
-| Completion | 23 / 24 phases |
+| Completion | 24 / 25 phases |
 
-Progress: [████████████████████████] 130/130 plans (100%)
+Progress: [████████████████████████] 132/132 plans (100%)
 
 ---
 
@@ -73,7 +73,8 @@ All active phases complete. Phase 17 (Medium Articles) remains at 0/5 — intent
 - Phase 22 added: manual testing all demo platforms ✓ Complete
 - Phase 23 added: implement GPU module for all platforms ✓ Complete
 - Phase 24 added: event logging API with Perfetto UI integration
-- Phase 25: duplicate of Phase 24 — to be removed in Phase 24 plan 10
+- Phase 25 added: rename the library from Kamper to Konitor
+- Phase 26 added: flutter support package and demo
 
 ### Blockers/Concerns
 
@@ -91,8 +92,8 @@ All active phases complete. Phase 17 (Medium Articles) remains at 0/5 — intent
 
 ## Session Continuity
 
-Last session: 2026-05-03T00:00:00Z
-Stopped at: Phase 24 UAT complete (10/10 passed) — milestone v1.0 delivered
+Last session: 2026-05-03T03:49:24.880Z
+Stopped at: context exhaustion at 75% (2026-05-03)
 Resume file: None
 
 ---
@@ -106,4 +107,20 @@ See: .planning/PROJECT.md (updated 2026-04-28)
 
 ---
 
-*Updated: 2026-05-03 after Phase 24 (milestone v1.0 complete)*
+---
+
+## Phase 25 Status (Plans 01–07)
+
+- **Status:** Complete (2026-05-03) — all 7 plans delivered, 17/17 truths verified
+- **Context file:** `.planning/phases/25-rename-the-library-from-kamper-to-konitor/`
+- **Scope:** Full Kamper → Konitor rename across all shipped artifacts
+  - Plans 01–02: Build-logic plugin renames + source directory/package renames (548 .kt files)
+  - Plan 03: Public class renames (Kamper→Konitor, KamperUi→KonitorUi, etc.) + file renames
+  - Plan 04: Android namespace/applicationId, BOM, GPU native lib, cinterop, XML resource renames
+  - Plan 05: Demo renames, RN TypeScript/podspec, CI workflows, release-please config
+  - Plan 06: Skill directory renames (6 konitor-* dirs), CLAUDE.md, README.md, docs
+  - Plan 07: Final audit + gap fixes (AndroidManifest, ObjC, App.tsx, Podfile, firebase podspec, rn package.json, jest.config)
+
+---
+
+*Updated: 2026-05-03 after Phase 25 (Kamper → Konitor rename complete)*

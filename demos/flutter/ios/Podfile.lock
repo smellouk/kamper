@@ -1,0 +1,22 @@
+PODS:
+  - Flutter (1.0.0)
+  - konitor_flutter (0.1.0):
+    - Flutter
+
+DEPENDENCIES:
+  - Flutter (from `Flutter`)
+  - konitor_flutter (from `.symlinks/plugins/konitor_flutter/ios`)
+
+EXTERNAL SOURCES:
+  Flutter:
+    :path: Flutter
+  konitor_flutter:
+    :path: ".symlinks/plugins/konitor_flutter/ios"
+
+SPEC CHECKSUMS:
+  Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
+  konitor_flutter: c435bc5eac685c59343ea7e39026dab66f48a09d
+
+PODFILE CHECKSUM: ec8b70a489dd1f81e53ef185cf7ad30fce8f8d00
+
+COCOAPODS: 1.16.2

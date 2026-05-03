@@ -1,10 +1,10 @@
 plugins {
-    id("kamper.kmp.library")
-    id("kamper.publish")
+    id("konitor.kmp.library")
+    id("konitor.publish")
 }
 
 android {
-    namespace = "com.smellouk.kamper.cpu"
+    namespace = "com.smellouk.konitor.cpu"
     buildFeatures { buildConfig = true }
 }
 
@@ -34,7 +34,7 @@ kotlin {
         target.compilations.getByName("main") {
             cinterops.create("cpuInfo") {
                 defFile(project.file("src/nativeInterop/cinterop/cpuInfo.def"))
-                packageName("com.smellouk.kamper.cpu.cinterop")
+                packageName("com.smellouk.konitor.cpu.cinterop")
             }
         }
     }

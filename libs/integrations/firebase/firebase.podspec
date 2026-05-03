@@ -1,19 +1,19 @@
 Pod::Spec.new do |spec|
     spec.name                     = 'firebase'
     spec.version                  = '1.0.0'
-    spec.homepage                 = 'https://github.com/smellouk/kamper'
+    spec.homepage                 = 'https://github.com/smellouk/konitor'
     spec.source                   = { :http=> ''}
     spec.authors                  = ''
     spec.license                  = ''
-    spec.summary                  = 'Kamper Firebase Crashlytics integration'
-    spec.vendored_frameworks      = 'build/cocoapods/framework/kamper_firebase.framework'
+    spec.summary                  = 'Konitor Firebase Crashlytics integration'
+    spec.vendored_frameworks      = 'build/cocoapods/framework/konitor_firebase.framework'
     spec.libraries                = 'c++'
     spec.ios.deployment_target    = '13.0'
     spec.osx.deployment_target    = '10.15'
     spec.dependency 'FirebaseCrashlytics', '~> 11.0'
-    if !Dir.exist?('build/cocoapods/framework/kamper_firebase.framework') || Dir.empty?('build/cocoapods/framework/kamper_firebase.framework')
+    if !Dir.exist?('build/cocoapods/framework/konitor_firebase.framework') || Dir.empty?('build/cocoapods/framework/konitor_firebase.framework')
         raise "
-        Kotlin framework 'kamper_firebase' doesn't exist yet, so a proper Xcode project can't be generated.
+        Kotlin framework 'konitor_firebase' doesn't exist yet, so a proper Xcode project can't be generated.
         'pod install' should be executed after running ':generateDummyFramework' Gradle task:
             ./gradlew :libs:integrations:firebase:generateDummyFramework
         Alternatively, proper pod installation is performed during Gradle sync in the IDE (if Podfile location is set)"
@@ -23,7 +23,7 @@ Pod::Spec.new do |spec|
     }
     spec.pod_target_xcconfig = {
         'KOTLIN_PROJECT_PATH' => ':libs:integrations:firebase',
-        'PRODUCT_MODULE_NAME' => 'kamper_firebase',
+        'PRODUCT_MODULE_NAME' => 'konitor_firebase',
     }
     spec.script_phases = [
         {

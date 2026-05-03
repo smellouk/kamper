@@ -8,14 +8,14 @@ typedef struct {
     double utilization;     /* "Device Utilization %" or "GPU Activity(%)" */
     double rendererUtil;    /* "Renderer Utilization %" */
     double tilerUtil;       /* "Tiler Utilization %" */
-} KamperGpuStats;
+} KonitorGpuStats;
 
 /* Reads GPU stats from IOAccelerator PerformanceStatistics.
  * utilization: overall GPU %, 0..100. -1.0 on read failure, -2.0 if UNSUPPORTED.
  * rendererUtil / tilerUtil: per-engine %, or -1.0 if the key is absent.
  * Iterates IOAccelerator class — handles AGX (Apple Silicon), Intel, AMD. */
-static KamperGpuStats kamper_gpu_stats(void) {
-    KamperGpuStats result = { -2.0, -1.0, -1.0 };
+static KonitorGpuStats konitor_gpu_stats(void) {
+    KonitorGpuStats result = { -2.0, -1.0, -1.0 };
     io_iterator_t iter = 0;
     if (IOServiceGetMatchingServices(0, IOServiceMatching("IOAccelerator"), &iter) != KERN_SUCCESS) {
         return result;

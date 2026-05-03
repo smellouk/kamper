@@ -1,7 +1,7 @@
 /**
  * Wave 0 skeleton — type export verification (per D-09).
  *
- * RED state until Plan 01 ships kamper/react-native/src/types.ts.
+ * RED state until Plan 01 ships konitor/react-native/src/types.ts.
  * Once Plan 01 lands, all 9 imports resolve and the suite goes GREEN.
  *
  * These tests intentionally check structural shape rather than runtime
@@ -19,10 +19,10 @@ import type {
   JankInfo,
   GcInfo,
   ThermalInfo,
-  KamperConfig,
+  KonitorConfig,
 } from '../types';
 
-describe('react-native-kamper public type exports (D-09)', () => {
+describe('react-native-konitor public type exports (D-09)', () => {
   it('CpuInfo has 5 numeric fields', () => {
     const sample: CpuInfo = {
       totalUseRatio: 0,
@@ -91,9 +91,9 @@ describe('react-native-kamper public type exports (D-09)', () => {
     expect(typeof sample.isThrottling).toBe('boolean');
   });
 
-  it('KamperConfig accepts all 8 module flags as optional booleans (D-08)', () => {
-    const empty: KamperConfig = {};
-    const full: KamperConfig = {
+  it('KonitorConfig accepts all 8 module flags as optional booleans (D-08)', () => {
+    const empty: KonitorConfig = {};
+    const full: KonitorConfig = {
       cpu: true, fps: true, memory: true, network: true,
       issues: true, jank: true, gc: true, thermal: true,
     };

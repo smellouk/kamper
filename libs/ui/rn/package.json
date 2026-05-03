@@ -1,30 +1,30 @@
 {
-  "name": "react-native-kamper",
+  "name": "react-native-konitor",
   "version": "0.1.0",
-  "description": "Kamper performance monitoring for React Native — TurboModule library exposing CPU, FPS, memory, network, and overlay UI",
+  "description": "Konitor performance monitoring for React Native — TurboModule library exposing CPU, FPS, memory, network, and overlay UI",
   "main": "src/index.ts",
   "types": "src/index.ts",
-  "files": ["src/", "android/", "ios/", "kamper-react-native.podspec", "package.json", "README.md"],
+  "files": ["src/", "android/", "ios/", "react-native-konitor.podspec", "package.json", "README.md"],
   "android": "./android",
-  "ios": "./ios/KamperTurboModule.h",
+  "ios": "./ios/KonitorTurboModule.h",
   "scripts": {
     "test": "jest --no-coverage",
     "tsc": "tsc --noEmit"
   },
-  "keywords": ["react-native", "performance", "monitoring", "kamper", "turbomodule"],
+  "keywords": ["react-native", "performance", "monitoring", "konitor", "turbomodule"],
   "author": "smellouk <sidali.mellouk@zattoo.com>",
   "license": "Apache-2.0",
-  "homepage": "https://github.com/smellouk/kamper",
+  "homepage": "https://github.com/smellouk/konitor",
   "codegenConfig": {
-    "name": "NativeKamperModuleSpec",
+    "name": "NativeKonitorModuleSpec",
     "type": "modules",
     "jsSrcsDir": "./src",
     "android": {
-      "javaPackageName": "com.smellouk.kamper.rn"
+      "javaPackageName": "com.smellouk.konitor.rn"
     },
     "ios": {
       "modulesProvider": {
-        "KamperModule": "KamperTurboModule"
+        "KonitorModule": "KonitorTurboModule"
       }
     }
   },

@@ -7,8 +7,8 @@
   "packages": {
     ".": {
       "release-type": "simple",
-      "package-name": "kamper",
-      "component": "kamper",
+      "package-name": "konitor",
+      "component": "konitor",
       "include-component-in-tag": false,
       "changelog-path": "CHANGELOG.md",
       "extra-files": [
@@ -18,16 +18,16 @@
         },
         {
           "type": "generic",
-          "path": "Kamper.podspec"
+          "path": "Konitor.podspec"
         }
       ],
-      "release-notes-body": "\n\n## Installation\n\n### Gradle (Maven Central) — via BOM\n\n```kotlin\nrepositories {\n    mavenCentral()\n}\n\ndependencies {\n    // Import the BOM — all module versions are managed automatically\n    implementation(platform(\"com.smellouk.kamper:bom:{{version}}\"))\n    implementation(\"com.smellouk.kamper:engine\")\n    // Optional metric modules (no version needed when using BOM):\n    implementation(\"com.smellouk.kamper:cpu-module\")\n    implementation(\"com.smellouk.kamper:fps-module\")\n    implementation(\"com.smellouk.kamper:memory-module\")\n    implementation(\"com.smellouk.kamper:network-module\")\n}\n```\n\n### Gradle (Maven Central) — without BOM\n\n```kotlin\ndependencies {\n    implementation(\"com.smellouk.kamper:engine:{{version}}\")\n    implementation(\"com.smellouk.kamper:cpu-module:{{version}}\")\n    implementation(\"com.smellouk.kamper:fps-module:{{version}}\")\n    implementation(\"com.smellouk.kamper:memory-module:{{version}}\")\n    implementation(\"com.smellouk.kamper:network-module:{{version}}\")\n}\n```\n\n### CocoaPods (iOS via XCFramework)\n\n```ruby\npod 'Kamper', '~> {{version}}'\n```\n\nThen run `pod install`.\n\n### Direct XCFramework download\n\n[Kamper.xcframework.zip](https://github.com/smellouk/kamper/releases/download/v{{version}}/Kamper.xcframework.zip)"
+      "release-notes-body": "\n\n## Installation\n\n### Gradle (Maven Central) — via BOM\n\n```kotlin\nrepositories {\n    mavenCentral()\n}\n\ndependencies {\n    // Import the BOM — all module versions are managed automatically\n    implementation(platform(\"com.smellouk.konitor:bom:{{version}}\"))\n    implementation(\"com.smellouk.konitor:engine\")\n    // Optional metric modules (no version needed when using BOM):\n    implementation(\"com.smellouk.konitor:cpu-module\")\n    implementation(\"com.smellouk.konitor:fps-module\")\n    implementation(\"com.smellouk.konitor:memory-module\")\n    implementation(\"com.smellouk.konitor:network-module\")\n}\n```\n\n### Gradle (Maven Central) — without BOM\n\n```kotlin\ndependencies {\n    implementation(\"com.smellouk.konitor:engine:{{version}}\")\n    implementation(\"com.smellouk.konitor:cpu-module:{{version}}\")\n    implementation(\"com.smellouk.konitor:fps-module:{{version}}\")\n    implementation(\"com.smellouk.konitor:memory-module:{{version}}\")\n    implementation(\"com.smellouk.konitor:network-module:{{version}}\")\n}\n```\n\n### CocoaPods (iOS via XCFramework)\n\n```ruby\npod 'Konitor', '~> {{version}}'\n```\n\nThen run `pod install`.\n\n### Direct XCFramework download\n\n[Konitor.xcframework.zip](https://github.com/smellouk/konitor/releases/download/v{{version}}/Konitor.xcframework.zip)"
     },
     "libs/ui/rn": {
       "release-type": "node",
-      "package-name": "react-native-kamper",
+      "package-name": "react-native-konitor",
       "changelog-path": "libs/ui/rn/CHANGELOG.md",
-      "release-notes-body": "\n\n## Installation\n\n### npm\n\n```bash\nnpm install react-native-kamper@{{version}}\n```\n\nor with yarn:\n\n```bash\nyarn add react-native-kamper@{{version}}\n```\n\n### iOS (CocoaPods)\n\nRun `pod install` from your `ios/` directory after installing the package. The native iOS bridge is bundled with the package.\n\n### Android\n\nThe native Android bridge is bundled with the package via the React Native autolinking mechanism — no manual `MainApplication.kt` changes required.\n\n### React Native New Architecture (TurboModule)\n\n`react-native-kamper` requires React Native ≥ 0.73 with the New Architecture enabled. See the package README for the imperative API (`Kamper.start/stop/on`) and the hooks API (`useCpu`, `useFps`, `useMemory`, `useNetwork`)."
+      "release-notes-body": "\n\n## Installation\n\n### npm\n\n```bash\nnpm install react-native-konitor@{{version}}\n```\n\nor with yarn:\n\n```bash\nyarn add react-native-konitor@{{version}}\n```\n\n### iOS (CocoaPods)\n\nRun `pod install` from your `ios/` directory after installing the package. The native iOS bridge is bundled with the package.\n\n### Android\n\nThe native Android bridge is bundled with the package via the React Native autolinking mechanism — no manual `MainApplication.kt` changes required.\n\n### React Native New Architecture (TurboModule)\n\n`react-native-konitor` requires React Native >= 0.73 with the New Architecture enabled. See the package README for the imperative API (`Konitor.start/stop/on`) and the hooks API (`useCpu`, `useFps`, `useMemory`, `useNetwork`)."
     }
   }
 }

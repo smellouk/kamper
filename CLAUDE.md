@@ -1,12 +1,12 @@
 # CLAUDE.md
 
-Kamper is a Kotlin Multiplatform (KMP) performance monitoring library for Android, iOS, JVM, macOS, tvOS, JS, and WASM. This file is the authoritative reference for Claude Code agents and contributors working in this repository — all critical information is inlined here so you can act without exploring other files.
+Konitor is a Kotlin Multiplatform (KMP) performance monitoring library for Android, iOS, JVM, macOS, tvOS, JS, and WASM. This file is the authoritative reference for Claude Code agents and contributors working in this repository — all critical information is inlined here so you can act without exploring other files.
 
 ---
 
 ## Quick Start
 
-- Clone: `git clone https://github.com/smellouk/kamper.git`
+- Clone: `git clone https://github.com/smellouk/konitor.git`
 - Required: JDK 17. No Android device is needed for the default development workflow.
 - Smoke test: `./gradlew :libs:api:test :libs:engine:test`
 - Read the four sections below before opening a PR.
@@ -32,9 +32,9 @@ Prefer the fast JVM path (`jvmTest`) for iterative development — it runs in se
 > It will fail in any environment without one. Never run it autonomously. If a user asks for
 > instrumented tests, confirm a device is attached first.
 
-**Note:** Common Gradle commands (`jvmTest`, `test`, `detekt`) are pre-approved in `.claude/settings.json` — Claude Code will not prompt for these. See `.claude/skills/kamper-check/SKILL.md` for the full approved command list. Device-requiring tasks like `connectedAndroidTest` are deliberately excluded.
+**Note:** Common Gradle commands (`jvmTest`, `test`, `detekt`) are pre-approved in `.claude/settings.json` — Claude Code will not prompt for these. See `.claude/skills/konitor-check/SKILL.md` for the full approved command list. Device-requiring tasks like `connectedAndroidTest` are deliberately excluded.
 
-**Module path prefix:** All library Gradle projects live under `:libs:` (e.g., `:libs:modules:cpu`, `:libs:api`, `:libs:engine`). The top-level directory is `libs/`. Maven artifact coordinates remain `com.smellouk.kamper:*` — unchanged for library consumers.
+**Module path prefix:** All library Gradle projects live under `:libs:` (e.g., `:libs:modules:cpu`, `:libs:api`, `:libs:engine`). The top-level directory is `libs/`. Maven artifact coordinates remain `com.smellouk.konitor:*` — unchanged for library consumers.
 
 **Detekt** runs with `autoCorrect: true` — it auto-fixes formatting violations on check. The config lives in `quality/code/detekt.yml`. Forbidden patterns include `TODO:`, `FIXME:`, `println(` in production code, and re-throwing caught exceptions.
 
@@ -42,7 +42,7 @@ Prefer the fast JVM path (`jvmTest`) for iterative development — it runs in se
 
 ## Module Patterns
 
-Every Kamper performance module follows a strict 4-class structure. Deviation is a convention violation.
+Every Konitor performance module follows a strict 4-class structure. Deviation is a convention violation.
 
 ### The 4-Class Structure
 
@@ -67,7 +67,7 @@ data class {Name}Info(val value: Double) : Info {
 
 ### Builder / DEFAULT Pattern
 
-Every `Config` must have a `@KamperDslMarker` Builder object and a `DEFAULT` companion val.
+Every `Config` must have a `@KonitorDslMarker` Builder object and a `DEFAULT` companion val.
 
 ```kotlin
 data class {Name}Config(
@@ -75,7 +75,7 @@ data class {Name}Config(
     override val intervalInMs: Long,
     val logger: Logger
 ) : Config {
-    @KamperDslMarker
+    @KonitorDslMarker
     object Builder {
         var isEnabled: Boolean = false
         var intervalInMs: Long = 1000L
@@ -94,7 +94,7 @@ data class {Name}Config(
 Each module declares one `expect val` in `commonMain` and seven `actual val` implementations — one per platform:
 
 ```kotlin
-// commonMain/kotlin/com/smellouk/kamper/{name}/Module.kt
+// commonMain/kotlin/com/smellouk/konitor/{name}/Module.kt
 expect val {Name}Module: PerformanceModule<{Name}Config, {Name}Info>
 ```
 
@@ -109,7 +109,7 @@ Actual implementations live in each of the 7 platform main source sets:
 
 ### Safety Rule (Hard — D-06)
 
-All platform-specific calls inside `{Name}InfoSource` must be wrapped in `try/catch`. Exceptions are logged and absorbed. Kamper must never propagate an exception to the host application.
+All platform-specific calls inside `{Name}InfoSource` must be wrapped in `try/catch`. Exceptions are logged and absorbed. Konitor must never propagate an exception to the host application.
 
 ```kotlin
 // Correct — exception is absorbed, INVALID returned
@@ -132,12 +132,12 @@ Additional safety rules:
 
 ```kotlin
 plugins {
-    id("kamper.kmp.library")
-    id("kamper.publish")
+    id("konitor.kmp.library")
+    id("konitor.publish")
 }
 
 android {
-    namespace = "com.smellouk.kamper.{name}"
+    namespace = "com.smellouk.konitor.{name}"
     buildFeatures { buildConfig = true }
 }
 
@@ -170,7 +170,7 @@ New modules must also be registered in `settings.gradle.kts`:
 include(":libs:modules:{name}")
 ```
 
-Use the `/kamper-new-module` project skill to scaffold a complete module skeleton automatically.
+Use the `/konitor-new-module` project skill to scaffold a complete module skeleton automatically.
 
 ---
 
@@ -243,7 +243,7 @@ Before opening a pull request:
 │  Layer 2 — Engine (Orchestration)                                │
 │  libs/engine/src/                                                │
 │  Engine (install/uninstall/start/stop/clear)                     │
-│  Kamper object (platform actuals with lifecycle integration)     │
+│  Konitor object (platform actuals with lifecycle integration)     │
 └────────────────────────┬─────────────────────────────────────────┘
                          │ depends on
 ┌────────────────────────▼─────────────────────────────────────────┐
@@ -256,8 +256,8 @@ Before opening a pull request:
 ┌────────────────────────▼─────────────────────────────────────────┐
 │  Layer 4 — UI (Presentation)                                     │
 │  libs/ui/android/src/                                            │
-│  KamperUi (expect/actual attach/detach)                          │
-│  KamperPanel / KamperChip (Compose overlay)                      │
+│  KonitorUi (expect/actual attach/detach)                          │
+│  KonitorPanel / KonitorChip (Compose overlay)                      │
 └──────────────────────────────────────────────────────────────────┘
 ```
 
@@ -267,20 +267,20 @@ Before opening a pull request:
 
 | File | Purpose |
 |------|---------|
-| `libs/api/src/commonMain/kotlin/com/smellouk/kamper/api/Watcher.kt` | Core coroutine polling loop — the heart of all modules |
-| `libs/engine/src/commonMain/kotlin/com.smellouk.kamper/Engine.kt` | Module registry; install/uninstall/start/stop |
+| `libs/api/src/commonMain/kotlin/com/smellouk/konitor/api/Watcher.kt` | Core coroutine polling loop — the heart of all modules |
+| `libs/engine/src/commonMain/kotlin/com.smellouk.konitor/Engine.kt` | Module registry; install/uninstall/start/stop |
 | `libs/modules/cpu/` | Canonical reference module — most complete implementation |
 | `build-logic/src/main/kotlin/KmpLibraryPlugin.kt` | Convention plugin applied by every KMP module |
 | `settings.gradle.kts` | New modules must be registered here |
 | `.planning/` | GSD planning artifacts (planning docs, phase plans, ADRs) — not shipped in the published library |
 | `.claude/settings.json` | Claude Code allowlist for Gradle and shell commands |
-| `.claude/skills/` | Project-specific Claude skills (`/kamper-new-module`, `/kamper-check`, `/kamper-module-review`, `/kamper-migrate-agp`, `/kamper-migrate-gradle`, `/kamper-migrate-kotlin`) |
+| `.claude/skills/` | Project-specific Claude skills (`/konitor-new-module`, `/konitor-check`, `/konitor-module-review`, `/konitor-migrate-agp`, `/konitor-migrate-gradle`, `/konitor-migrate-kotlin`) |
 
 ### Relevant ADRs
 
 The ADRs live in `.planning/codebase/adr/`:
 
-- **ADR-001 — Plugin architecture (manual install pattern):** Modules are installed explicitly via `Kamper.install(XxxModule)` rather than auto-discovered. This gives consuming apps precise control over which metrics are active.
+- **ADR-001 — Plugin architecture (manual install pattern):** Modules are installed explicitly via `Konitor.install(XxxModule)` rather than auto-discovered. This gives consuming apps precise control over which metrics are active.
 - **ADR-002 — KMP expect/actual pattern:** Platform-specific behavior is isolated behind `expect`/`actual` declarations. Common business logic lives in `commonMain`; platform adapters live in platform source sets.
 - **ADR-003 — Listener pattern:** Metric data is delivered via push (`InfoListener<I>` callbacks) rather than pull. Listeners are registered on the `Engine` and receive data on `Dispatchers.Main`.
 - **ADR-004 — No breaking changes (API freeze):** The public API (`Info`, `Config`, `Watcher`, `Performance`, `Engine`) is frozen for the v1.0 milestone. Additive changes only.

@@ -3,12 +3,12 @@ plugins {
     id("org.jetbrains.kotlin.native.cocoapods")
     id("com.android.library")
     id("dev.mokkery")
-    id("kamper.android.config")
-    id("kamper.publish")
+    id("konitor.android.config")
+    id("konitor.publish")
 }
 
 android {
-    namespace = "com.smellouk.kamper.firebase"
+    namespace = "com.smellouk.konitor.firebase"
 }
 
 kotlin {
@@ -22,7 +22,7 @@ kotlin {
     iosSimulatorArm64()
     // js(IR) and wasmJs are intentionally included: firebase has no KMP SDK for these
     // targets but the no-op actuals allow consumers to compile for any target without
-    // platform guards. Unlike sentry-kotlin-multiplatform, kamper-firebase has no
+    // platform guards. Unlike sentry-kotlin-multiplatform, konitor-firebase has no
     // KMP transitive dep that blocks JS/WasmJS.
     js(IR) {
         browser()
@@ -34,14 +34,14 @@ kotlin {
     cocoapods {
         // Required for Kotlin/Native interop with FirebaseCrashlytics on iOS targets.
         // Consumer apps must already configure Firebase via google-services.json /
-        // GoogleService-Info.plist — Kamper does not initialize Firebase (per
+        // GoogleService-Info.plist — Konitor does not initialize Firebase (per
         // RESEARCH anti-pattern: 'Initializing Firebase SDK inside the IntegrationModule constructor').
-        summary = "Kamper Firebase Crashlytics integration"
-        homepage = "https://github.com/smellouk/kamper"
+        summary = "Konitor Firebase Crashlytics integration"
+        homepage = "https://github.com/smellouk/konitor"
         ios.deploymentTarget = "13.0"
         osx.deploymentTarget = "10.15"
         framework {
-            baseName = "kamper_firebase"
+            baseName = "konitor_firebase"
             isStatic = true
         }
         pod("FirebaseCrashlytics") {
