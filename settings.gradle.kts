@@ -47,7 +47,7 @@ rootProject.name = "Kamper"
 include(":libs:api")
 include(":libs:bom")
 include(":libs:engine")
-include(":libs:xcframework")
+include(":libs:apple-sdk")
 
 include(":libs:modules:cpu")
 include(":libs:modules:fps")
